@@ -40,8 +40,11 @@ function ensureSchema(sql) {
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
-  if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' });
-  const body = typeof req.body === 'string' ? safeJson(req.body) : (req.body || {});
+  // GET só para os dados públicos do convite (útil para conferir se o banco está ligado).
+  const isPublicGet = req.method === 'GET' && req.query && req.query.fn === 'get_public';
+  if (req.method !== 'POST' && !isPublicGet) return res.status(405).json({ error: 'method_not_allowed' });
+  const body = isPublicGet ? { fn: 'get_public' }
+    : typeof req.body === 'string' ? safeJson(req.body) : (req.body || {});
   const call = CALLS[body.fn];
   if (!call) return res.status(400).json({ error: 'unknown_fn' });
   const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
