@@ -1,5 +1,5 @@
 // Única porta de entrada do navegador para o banco (Neon/Postgres).
-// Só as funções listadas em CALLS podem ser chamadas; as do painel exigem o PIN.
+// Só as funções listadas em CALLS podem ser chamadas; as do painel exigem e-mail e senha.
 const { neon } = require('@neondatabase/serverless');
 const SCHEMA = require('../lib/schema');
 
@@ -12,12 +12,15 @@ const CALLS = {
       (Array.isArray(a.companions) ? a.companions : []).slice(0, 20).map(c => str(c, 200)),
       str(a.diet, 500), str(a.notes, 1000)],
   },
-  admin_load: { sql: 'select admin_load($1) as v', args: a => [str(a.pin, 20)] },
+  admin_load: { sql: 'select admin_load($1, $2) as v', args: a => [str(a.email, 200), str(a.password, 200)] },
   admin_save: {
-    sql: 'select admin_save($1, $2::jsonb, $3::int) as v',
-    args: a => [str(a.pin, 20), JSON.stringify(a.data || {}), Number(a.version) || 0],
+    sql: 'select admin_save($1, $2, $3::jsonb, $4::int) as v',
+    args: a => [str(a.email, 200), str(a.password, 200), JSON.stringify(a.data || {}), Number(a.version) || 0],
   },
-  admin_set_pin: { sql: 'select admin_set_pin($1, $2) as v', args: a => [str(a.pin, 20), str(a.new_pin, 20)] },
+  admin_set_login: {
+    sql: 'select admin_set_login($1, $2, $3, $4) as v',
+    args: a => [str(a.email, 200), str(a.password, 200), str(a.new_email, 200), str(a.new_password, 200)],
+  },
 };
 // Erros levantados pelas funções do banco que podem ser mostrados ao navegador.
 const PUBLIC_ERRORS = new Set(['not_configured', 'locked', 'closed', 'invalid_name', 'invalid_phone',

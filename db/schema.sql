@@ -123,3 +123,58 @@ begin
   update app_state set pin_hash = crypt(p_new, gen_salt('bf')) where id = 1;
   return jsonb_build_object('ok', true);
 end $$;
+-- @@
+-- Login com e-mail e senha (substitui o PIN). A senha usa o mesmo hash (pin_hash);
+-- a senha inicial é o ADMIN_PIN. Enquanto admin_email estiver vazio, o primeiro
+-- login com a senha certa grava o e-mail usado.
+alter table app_state add column if not exists admin_email text;
+-- @@
+create or replace function check_login(p_email text, p_pw text) returns boolean language plpgsql as $$
+declare s app_state; e text := lower(trim(coalesce(p_email, '')));
+begin
+  select * into s from app_state where id = 1 for update;
+  if not found then raise exception 'not_configured'; end if;
+  if s.locked_until is not null and s.locked_until > now() then raise exception 'locked'; end if;
+  if e ~ '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+     and (s.admin_email is null or s.admin_email = e)
+     and s.pin_hash = crypt(coalesce(p_pw, ''), s.pin_hash) then
+    update app_state set fails = 0, locked_until = null, admin_email = coalesce(admin_email, e) where id = 1;
+    return true;
+  end if;
+  update app_state
+     set fails = case when s.fails + 1 >= 5 then 0 else s.fails + 1 end,
+         locked_until = case when s.fails + 1 >= 5 then now() + interval '30 seconds' else null end
+   where id = 1;
+  return false;
+end $$;
+-- @@
+create or replace function admin_load(p_email text, p_pw text) returns jsonb language plpgsql as $$
+declare s app_state;
+begin
+  if not check_login(p_email, p_pw) then return jsonb_build_object('ok', false, 'error', 'bad_login'); end if;
+  select * into s from app_state where id = 1;
+  return jsonb_build_object('ok', true, 'data', s.data, 'version', s.version, 'email', s.admin_email,
+    'rsvps', coalesce((select jsonb_agg(to_jsonb(r) order by r.updated_at) from rsvps r), '[]'::jsonb));
+end $$;
+-- @@
+create or replace function admin_save(p_email text, p_pw text, p_data jsonb, p_version int) returns jsonb language plpgsql as $$
+declare v int;
+begin
+  if not check_login(p_email, p_pw) then return jsonb_build_object('ok', false, 'error', 'bad_login'); end if;
+  update app_state set data = p_data, version = version + 1, updated_at = now()
+   where id = 1 and version = p_version returning version into v;
+  if v is null then return jsonb_build_object('ok', false, 'error', 'conflict'); end if;
+  return jsonb_build_object('ok', true, 'version', v);
+end $$;
+-- @@
+create or replace function admin_set_login(p_email text, p_pw text, p_new_email text, p_new_pw text) returns jsonb language plpgsql as $$
+declare ne text := lower(trim(coalesce(p_new_email, '')));
+begin
+  if not check_login(p_email, p_pw) then return jsonb_build_object('ok', false, 'error', 'bad_login'); end if;
+  if ne !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then return jsonb_build_object('ok', false, 'error', 'invalid_email'); end if;
+  if coalesce(p_new_pw, '') <> '' and length(p_new_pw) < 6 then return jsonb_build_object('ok', false, 'error', 'weak_password'); end if;
+  update app_state set admin_email = ne,
+    pin_hash = case when coalesce(p_new_pw, '') <> '' then crypt(p_new_pw, gen_salt('bf')) else pin_hash end
+   where id = 1;
+  return jsonb_build_object('ok', true);
+end $$;

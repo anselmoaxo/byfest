@@ -249,7 +249,7 @@ details.sec .body{padding-bottom:20px}
 .modal-foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:20px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--cream);padding:12px 18px;border-radius:999px;font-weight:600;z-index:60;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center;animation:up .2s ease}
 .login{max-width:420px;margin:0 auto;padding-block:48px}
-.pin{letter-spacing:.5em;text-align:center;font-size:1.5rem !important}
+.pwwrap{position:relative;display:block}.pwwrap .input{padding-right:84px}.pwtoggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--ink-2);font:inherit;font-size:.85rem;padding:8px 10px;cursor:pointer;border-radius:8px}.pwtoggle:hover{color:var(--cherry,#b0182b)}
 .photo-edit{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
 .photo-edit .arch{width:120px;margin:0;border-width:4px}
 #printArea{display:none}
@@ -413,7 +413,7 @@ function save(){if(REMOTE){if(authed)queuePush();return}try{localStorage.setItem
 let authed=false;
 
 /* ---------------- sincronização com o banco (modo online) ---------------- */
-let pinMem='',version=0,saveT=null,saving=false,pendingChange=false,syncState='';
+let cred={email:'',password:''},version=0,saveT=null,saving=false,pendingChange=false,syncState='';
 function normPh(p){let d=digits(p);if(d.length>11&&d.startsWith('55'))d=d.slice(2);return d}
 function syncLabel(){return {saving:'Salvando…',saved:'✓ Salvo',error:'⚠ Não salvo, tentando de novo'}[syncState]||''}
 function setSync(st){syncState=st;const el=document.getElementById('sync');if(el)el.textContent=syncLabel()}
@@ -422,10 +422,10 @@ async function push(){
   saveT=null;if(saving){queuePush(400);return}
   saving=true;pendingChange=false;
   try{
-    const r=await rpc('admin_save',{pin:pinMem,data:S,version});
+    const r=await rpc('admin_save',{email:cred.email,password:cred.password,data:S,version});
     if(r&&r.ok){version=r.version;if(!pendingChange)setSync('saved')}
-    else if(r&&r.error==='conflict'){await adminLogin(pinMem);render();toast('Os dados mudaram em outro aparelho. Recarregamos a versão mais nova; confira sua última alteração.')}
-    else if(r&&r.error==='bad_pin'){logoutRemote()}
+    else if(r&&r.error==='conflict'){await adminLogin(cred.email,cred.password);render();toast('Os dados mudaram em outro aparelho. Recarregamos a versão mais nova; confira sua última alteração.')}
+    else if(r&&r.error==='bad_login'){logoutRemote()}
     else{setSync('error');queuePush(5000)}
   }catch(e){setSync('error');queuePush(5000)}
   finally{saving=false}
@@ -441,21 +441,21 @@ function mergeRsvps(list){
   });
   return n;
 }
-async function adminLogin(pin){
-  const r=await rpc('admin_load',{pin});
+async function adminLogin(email,password){
+  const r=await rpc('admin_load',{email,password});
   if(!r||!r.ok)return r||{ok:false};
-  pinMem=pin;version=r.version;const base=freshRemote();
+  cred={email:r.email||email,password};version=r.version;const base=freshRemote();
   if(r.data){S=Object.assign(base,r.data);S.party=Object.assign(base.party,r.data.party||{});S.rsvpSeen=r.data.rsvpSeen||{};delete S.pinHash;S.pinDefault=false}
   else{const party=S.party;S=base;Object.assign(S.party,party)}
-  authed=true;try{sessionStorage.setItem(KEY+':pin',pin)}catch(_){}
+  authed=true;try{sessionStorage.setItem(KEY+':cred',JSON.stringify(cred))}catch(_){}
   const n=mergeRsvps(r.rsvps||[]);
   if(!r.data||n)queuePush(0);
   r.newRsvps=n;return r;
 }
-function logoutRemote(){try{sessionStorage.removeItem(KEY+':pin')}catch(_){}location.hash='convite';location.reload()}
+function logoutRemote(){try{sessionStorage.removeItem(KEY+':cred')}catch(_){}location.replace('/login')}
 async function refreshRemote(silent){
   if(!REMOTE||!authed||pendingChange||saving)return;
-  try{const r=await adminLogin(pinMem);if(r.ok){render();if(!silent||r.newRsvps)toast(r.newRsvps?r.newRsvps+' resposta(s) nova(s) de convidados':'Nenhuma resposta nova')}}catch(e){if(!silent)toast('Não foi possível atualizar agora. Verifique a conexão.')}
+  try{const r=await adminLogin(cred.email,cred.password);if(r.ok){render();if(!silent||r.newRsvps)toast(r.newRsvps?r.newRsvps+' resposta(s) nova(s) de convidados':'Nenhuma resposta nova')}}catch(e){if(!silent)toast('Não foi possível atualizar agora. Verifique a conexão.')}
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshRemote(true)});
 
@@ -476,7 +476,7 @@ function guestStats(){
 }
 function partyDate(){const p=S.party;if(!p.date)return null;return new Date(p.date+'T'+(p.time||'00:00'))}
 function rsvpClosed(){const p=S.party;if(!p.rsvpOpen)return 'As confirmações estão encerradas.';if(p.rsvpDeadline&&daysUntil(p.rsvpDeadline)<0)return 'O prazo para confirmar presença terminou em '+fmtDate(p.rsvpDeadline)+'.';return ''}
-function inviteLink(){return S.party.inviteUrl||(location.href.split('#')[0]+'#convite')}
+function inviteLink(){return S.party.inviteUrl||(REMOTE?location.origin+'/':location.href.split('#')[0]+'#convite')}
 function mapsLink(){const p=S.party;const q=[p.venue,p.address].filter(Boolean).join(', ');return q?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q):''}
 function gcalLink(){
   const p=S.party;if(!p.date)return '';const d=p.date.replace(/-/g,'');let dates;
@@ -537,7 +537,8 @@ function parseCSV(text){
 
 /* ---------------- roteamento ---------------- */
 const PRIVATE=['painel','convidados','checklist','financas','festa'];
-function route(){return (location.hash||'').replace('#','')||'convite'}
+const LOGIN_PATH=/^\/login\/?$/.test(location.pathname);
+function route(){return (location.hash||'').replace('#','')||(LOGIN_PATH?'entrar':'convite')}
 function go(r){if(location.hash==='#'+r)render();else location.hash=r}
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
 
@@ -546,12 +547,12 @@ function render(){
   const r=route();clearInterval(cdTimer);
   const app=document.getElementById('app');
   if(PRIVATE.includes(r)){
-    if(!authed){app.innerHTML=viewLogin(r);return}
+    if(!authed){app.innerHTML=viewLogin(r);focusLogin();return}
     app.innerHTML=shell(r,({painel:viewDash,convidados:viewGuests,checklist:viewTasks,financas:viewFinance,festa:viewParty})[r]());
     return;
   }
   if(r==='confirmar'){app.innerHTML=viewRsvp();focusFirst();return}
-  if(r==='entrar'){app.innerHTML=viewLogin('painel');return}
+  if(r==='entrar'){if(authed){go('painel');return}app.innerHTML=viewLogin('painel');focusLogin();return}
   app.innerHTML=viewInvite();startCountdown();
 }
 function focusFirst(){setTimeout(()=>{const f=document.querySelector('#app .card input,#app .card button');if(f&&rsvp.step>1)f.focus()},30)}
@@ -589,7 +590,6 @@ function viewInvite(){
       '<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
      '</div><div class="row" style="justify-content:center;margin-top:4px"><a class="btn leaf" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar no WhatsApp</a>'+(p.date?'<a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+'</div>'+
    '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
-   '<a class="host-link" href="#painel">Área da aniversariante</a>'+
   '</main>';
 }
 function startCountdown(){
@@ -677,14 +677,18 @@ function rsvpSubmit(){
 }
 
 /* ================= LOGIN ================= */
-let pinFails=0,pinLockUntil=0,loginErr='';
+let pinFails=0,pinLockUntil=0,loginErr='',loginEmail='';
 function viewLogin(target){
-  return '<main class="login gutter"><div class="card stack" style="text-align:center"><div style="width:56px;margin:0 auto">'+cherry()+'</div><h1 style="font-size:1.7rem">Área da aniversariante</h1><p class="muted">Painel privado de '+esc(S.party.name)+'. Digite o PIN para continuar.</p>'+
-   '<form data-form="login" data-target="'+esc(target)+'" class="stack" novalidate><label class="field"><span class="sr">PIN</span><input class="input pin" id="pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" aria-invalid="'+(!!loginErr)+'" placeholder="••••"></label>'+(loginErr?'<span class="err">'+esc(loginErr)+'</span>':'')+
+  return '<main class="login gutter"><div class="card stack"><div style="text-align:center"><div style="width:56px;margin:0 auto 6px">'+cherry()+'</div><h1 style="font-size:1.7rem">Entrar</h1><p class="muted">Área privada da festa de '+esc(S.party.name)+'.</p></div>'+
+   '<form data-form="login" data-target="'+esc(target)+'" class="stack" novalidate>'+
+   '<label class="field"><span>E-mail</span><input class="input" id="lemail" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" value="'+esc(loginEmail)+'" placeholder="seu@email.com" aria-invalid="'+(!!loginErr)+'"></label>'+
+   '<label class="field"><span>Senha</span><span class="pwwrap"><input class="input" id="lpw" name="password" type="password" autocomplete="current-password" aria-invalid="'+(!!loginErr)+'"><button type="button" class="pwtoggle" data-act="toggle-pw" aria-label="Mostrar senha" aria-pressed="false">Mostrar</button></span></label>'+
+   (loginErr?'<span class="err" role="alert">'+esc(loginErr)+'</span>':'')+
    '<button class="btn primary big block" type="submit">'+ic('lock')+'Entrar</button></form>'+
-   (S.pinDefault?'<div class="notice info small" style="text-align:left">'+ic('info')+'<span>PIN inicial desta versão: <b>4040</b>. Troque em Festa › Segurança no primeiro acesso.</span></div>':'')+
-   '<a class="btn ghost" href="#convite">Voltar ao convite</a></div></main>';
+   (S.pinDefault?'<div class="notice info small">'+ic('info')+'<span>Nesta versão de demonstração use qualquer e-mail e a senha <b>4040</b>. Troque em Festa › Acesso.</span></div>':'')+
+   '<a class="btn ghost" href="'+(REMOTE?'/':'#convite')+'">Ver o convite</a></div></main>';
 }
+function focusLogin(){setTimeout(()=>{const e=document.getElementById('lemail'),p=document.getElementById('lpw');const f=e&&e.value?p:e;if(f)f.focus()},30)}
 
 /* ================= SHELL PRIVADO ================= */
 const NAV=[['painel','home','Início'],['convidados','users','Convidados'],['checklist','list','Tarefas'],['financas','wallet','Finanças'],['festa','gear','Festa']];
@@ -937,7 +941,7 @@ function viewParty(){
   '</div></details>'+
   '<details class="sec" open><summary>Orçamento</summary><div class="body stack">'+f('budget','Orçamento total da festa (R$)',moneyInput(p.budget),'inputmode="decimal" placeholder="0,00" class="input num"')+'</div></details>'+
   '<div class="err" id="pf-err" style="margin-top:10px"></div><div class="row" style="margin:16px 0 24px"><button class="btn primary big" type="submit">'+ic('check')+'Salvar dados da festa</button></div></form>'+
-  '<details class="sec"><summary>Segurança</summary><div class="body"><form data-form="pin" class="stack" novalidate><p class="small muted">O PIN protege o painel, a lista de convidados e as finanças. Compartilhe só com quem você autorizar.</p><div class="grid2"><label class="field"><span>Novo PIN (4 a 8 números)</span><input class="input pin" id="np1" name="p1" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"></label><label class="field"><span>Repita o PIN</span><input class="input pin" id="np2" name="p2" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"></label></div><div class="err" id="pin-err"></div><button class="btn" type="submit">'+ic('lock')+'Trocar PIN</button></form></div></details>'+
+  '<details class="sec"><summary>Acesso</summary><div class="body"><form data-form="access" class="stack" novalidate><p class="small muted">O e-mail e a senha protegem o painel, a lista de convidados e as finanças. Entre pelo endereço '+esc(REMOTE?location.origin+'/login':'#entrar')+'.</p><label class="field"><span>E-mail de acesso</span><input class="input" id="ac-email" name="email" type="email" autocomplete="username" value="'+esc(REMOTE?cred.email:(S.adminEmail||''))+'"></label><div class="grid2"><label class="field"><span>Nova senha (mínimo 6 caracteres)</span><input class="input" id="np1" name="p1" type="password" autocomplete="new-password"></label><label class="field"><span>Repita a nova senha</span><input class="input" id="np2" name="p2" type="password" autocomplete="new-password"></label></div><p class="small muted">Deixe a senha em branco para manter a atual.</p><div class="err" id="pin-err"></div><button class="btn" type="submit">'+ic('lock')+'Salvar acesso</button></form></div></details>'+
   '<details class="sec"><summary>Dados do app</summary><div class="body stack">'+(hasDemo()?'<div class="row"><button class="btn" data-act="clear-demo">Remover dados de exemplo</button><span class="small muted">Apaga só os itens marcados como Exemplo.</span></div>':'<p class="small muted">Não há dados de exemplo.</p>')+'<div class="row"><button class="btn danger" data-act="reset-all">'+ic('trash')+'Apagar tudo e recomeçar</button></div></div></details>';
 }
 function resizeImage(file,cb){
@@ -995,6 +999,7 @@ document.addEventListener('click',e=>{
    case 'reset-all':confirmDialog('Apagar tudo','Isso apaga dados da festa, convidados, tarefas e despesas'+(REMOTE?'':' e volta o PIN para 4040')+'. Não dá para desfazer.','Apagar tudo',()=>{if(REMOTE){const seen=S.rsvpSeen;S=freshRemote();S.rsvpSeen=seen;save();render();toast('Tudo apagado');return}S=defaults();S.guests=[];S.expenses=[];S.tasks.forEach(t=>t.expenseId='');save();authed=false;go('convite');toast('Tudo apagado')});break;
    case 'refresh':refreshRemote(false);break;
    case 'reload':location.reload();break;
+   case 'toggle-pw':{const i=document.getElementById('lpw');if(i){const show=i.type==='password';i.type=show?'text':'password';el.textContent=show?'Ocultar':'Mostrar';el.setAttribute('aria-pressed',String(show));el.setAttribute('aria-label',show?'Ocultar senha':'Mostrar senha')}break}
    case 'photo-del':S.party.photo='';save();render();toast('Foto removida');break;
   }
 });
@@ -1047,16 +1052,21 @@ document.addEventListener('submit',e=>{
   }
   if(kind==='rsvp3'){saveCompanionInputs();const er={};for(let i=0;i<rsvp.count;i++){if((rsvp.companions[i]||'').trim().length<2)er['c'+i]='Informe o nome do acompanhante '+(i+1)+'.'}rsvp.errors=er;if(Object.keys(er).length){render();return}rsvpNav(1);return}
   if(kind==='rsvp4'){rsvp.diet=v('diet');rsvp.notes=v('notes');rsvpNav(1);return}
-  if(kind==='login'&&REMOTE){
-    const b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Entrando…'}
-    adminLogin(v('pin')).then(r=>{if(r.ok){loginErr='';go(form.dataset.target||'painel');render()}else{loginErr='PIN incorreto. Tente novamente.';render();const p=document.getElementById('pin');if(p)p.focus()}})
-      .catch(e=>{loginErr=e.code==='locked'?'Muitas tentativas. Aguarde 30 segundos e tente de novo.':e.code==='not_configured'||e.code==='db_not_configured'?'O banco de dados ainda não foi conectado.':'Não foi possível entrar agora. Verifique a conexão.';render()});
-    return;
-  }
   if(kind==='login'){
-    if(Date.now()<pinLockUntil){loginErr='Muitas tentativas. Aguarde alguns segundos e tente de novo.';render();return}
-    if(pinHash(v('pin'))===S.pinHash){authed=true;pinFails=0;loginErr='';try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}go(form.dataset.target||'painel');render()}
-    else{pinFails++;if(pinFails>=5){pinLockUntil=Date.now()+30000;pinFails=0;loginErr='PIN incorreto. Aguarde 30 segundos para tentar de novo.'}else loginErr='PIN incorreto. Tente novamente.';render();const p=document.getElementById('pin');if(p)p.focus()}
+    const email=v('email').toLowerCase(),pw=fd.get('password')||'';loginEmail=email;
+    const done=()=>{loginErr='';if(LOGIN_PATH)history.replaceState(null,'','/#'+(form.dataset.target||'painel'));go(form.dataset.target||'painel');render()};
+    const fail=m=>{loginErr=m;render();const f=document.getElementById(email?'lpw':'lemail');if(f)f.focus()};
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){fail('Informe um e-mail válido.');return}
+    if(!pw){fail('Informe a senha.');return}
+    if(REMOTE){
+      const b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Entrando…'}
+      adminLogin(email,pw).then(r=>{if(r.ok)done();else fail('E-mail ou senha incorretos.')})
+        .catch(e=>fail(e.code==='locked'?'Muitas tentativas. Aguarde 30 segundos e tente de novo.':e.code==='not_configured'||e.code==='db_not_configured'?'O banco de dados ainda não foi conectado.':'Não foi possível entrar agora. Verifique a conexão.'));
+      return;
+    }
+    if(Date.now()<pinLockUntil){fail('Muitas tentativas. Aguarde alguns segundos e tente de novo.');return}
+    if(pinHash(pw)===S.pinHash&&(!S.adminEmail||S.adminEmail===email)){if(!S.adminEmail){S.adminEmail=email;save()}authed=true;pinFails=0;try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}done()}
+    else{pinFails++;if(pinFails>=5){pinLockUntil=Date.now()+30000;pinFails=0;fail('E-mail ou senha incorretos. Aguarde 30 segundos para tentar de novo.')}else fail('E-mail ou senha incorretos.')}
     return;
   }
   if(kind==='guest'){
@@ -1100,12 +1110,13 @@ document.addEventListener('submit',e=>{
     Object.assign(p,{name:v('name'),age:parseInt(v('age'))||40,tagline:v('tagline')||p.tagline,date:v('date'),time:v('time'),endTime:v('endTime'),venue:v('venue'),address:v('address'),dress:v('dress'),parking:v('parking'),notes:v('notes'),contactName:v('contactName'),contactPhone:cp,rsvpOpen:!!fd.get('rsvpOpen'),rsvpDeadline:v('rsvpDeadline'),maxCompanions:Math.max(0,parseInt(v('maxCompanions'))||0),budget:budget||0,inviteUrl:url});
     save();render();toast('Dados da festa salvos');return;
   }
-  if(kind==='pin'){
-    const err=document.getElementById('pin-err');const a=v('p1'),b=v('p2');
-    if(!/^\d{4,8}$/.test(a)){err.textContent='O PIN precisa ter de 4 a 8 números.';return}
-    if(a!==b){err.textContent='Os dois PINs não são iguais.';return}
-    if(REMOTE){rpc('admin_set_pin',{pin:pinMem,new_pin:a}).then(r=>{if(r&&r.ok){pinMem=a;try{sessionStorage.setItem(KEY+':pin',a)}catch(_){}form.reset();err.textContent='';toast('PIN alterado')}else err.textContent='Não foi possível trocar o PIN.'}).catch(()=>{err.textContent='Não foi possível trocar o PIN agora. Verifique a conexão.'});return}
-    S.pinHash=pinHash(a);S.pinDefault=false;save();try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}render();toast('PIN alterado');return;
+  if(kind==='access'){
+    const err=document.getElementById('pin-err');const email=v('email').toLowerCase(),a=fd.get('p1')||'',b=fd.get('p2')||'';
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){err.textContent='Informe um e-mail válido.';return}
+    if(a&&a.length<6){err.textContent='A senha precisa ter pelo menos 6 caracteres.';return}
+    if(a!==b){err.textContent='As duas senhas não são iguais.';return}
+    if(REMOTE){rpc('admin_set_login',{email:cred.email,password:cred.password,new_email:email,new_password:a}).then(r=>{if(r&&r.ok){cred={email,password:a||cred.password};try{sessionStorage.setItem(KEY+':cred',JSON.stringify(cred))}catch(_){}form.reset();err.textContent='';render();toast('Acesso atualizado')}else err.textContent=r&&r.error==='weak_password'?'A senha precisa ter pelo menos 6 caracteres.':r&&r.error==='invalid_email'?'Informe um e-mail válido.':'Não foi possível salvar o acesso.'}).catch(()=>{err.textContent='Não foi possível salvar agora. Verifique a conexão.'});return}
+    S.adminEmail=email;if(a){S.pinHash=pinHash(a);S.pinDefault=false}save();try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}render();toast('Acesso atualizado');return;
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('#modalRoot .overlay'))closeModal()});
@@ -1118,8 +1129,8 @@ async function boot(){
     app.innerHTML='<main class="login gutter"><div class="card" style="text-align:center"><div style="width:56px;margin:0 auto 10px">'+cherry()+'</div><p class="muted">Carregando o convite…</p></div></main>';
     try{
       const pub=await rpc('get_public');REMOTE=true;S=freshRemote();Object.assign(S.party,pub||{});
-      let pin='';try{pin=sessionStorage.getItem(KEY+':pin')||''}catch(_){}
-      if(pin){try{const r=await adminLogin(pin);if(!r.ok)sessionStorage.removeItem(KEY+':pin')}catch(_){}}
+      let c=null;try{c=JSON.parse(sessionStorage.getItem(KEY+':cred')||'null');sessionStorage.removeItem(KEY+':pin')}catch(_){}
+      if(c&&c.email&&c.password){try{const r=await adminLogin(c.email,c.password);if(!r.ok)sessionStorage.removeItem(KEY+':cred')}catch(_){}}
     }catch(e){
       if(e.code!=='no_api'){app.innerHTML='<main class="login gutter"><div class="card stack" style="text-align:center"><div style="width:56px;margin:0 auto">'+cherry()+'</div><h1 style="font-size:1.5rem">Não foi possível carregar o convite</h1><p class="muted">Verifique sua conexão e tente de novo.</p><button class="btn primary" data-act="reload">Tentar de novo</button></div></main>';return}
     }
