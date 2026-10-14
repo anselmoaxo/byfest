@@ -40,6 +40,7 @@ create table if not exists party_photos (
 );
 -- @@
 create index if not exists party_photos_status_created_idx on party_photos (status, created_at desc);
+-- @@
 create index if not exists party_photos_created_idx on party_photos (created_at desc);
 -- @@
 create or replace function norm_phone(p text) returns text language sql immutable as $$
