@@ -1,0 +1,13 @@
+{
+  "name": "byfest",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Convite, confirmação de presença e painel da festa Priscila 40 (tema Cherry)",
+  "scripts": {
+    "build:schema": "node scripts/build-schema.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  },
+  "engines": { "node": ">=20" }
+}
