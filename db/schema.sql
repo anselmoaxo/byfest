@@ -23,6 +23,25 @@ create table if not exists rsvps (
   updated_at timestamptz not null default now()
 );
 -- @@
+-- Album privado da festa e fotos aprovadas/revisadas pelo anfitrião.
+create table if not exists party_album (
+  id int primary key default 1 check (id = 1),
+  access_token text not null unique,
+  publish_immediately boolean not null default false
+);
+-- @@
+create table if not exists party_photos (
+  id uuid primary key default gen_random_uuid(),
+  sender_name text not null check (length(sender_name) between 2 and 80),
+  mime_type text not null check (mime_type in ('image/jpeg','image/png','image/webp')),
+  image_data bytea not null check (octet_length(image_data) <= 3145728),
+  status text not null default 'pending' check (status in ('pending','approved','hidden')),
+  created_at timestamptz not null default now()
+);
+-- @@
+create index if not exists party_photos_status_created_idx on party_photos (status, created_at desc);
+create index if not exists party_photos_created_idx on party_photos (created_at desc);
+-- @@
 create or replace function norm_phone(p text) returns text language sql immutable as $$
   select case when length(d) > 11 and left(d, 2) = '55' then substr(d, 3) else d end
   from (select regexp_replace(coalesce(p, ''), '\D', '', 'g') as d) s

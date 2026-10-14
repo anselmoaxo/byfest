@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
 <title>Priscila 40 · Cherry</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Priscila 40 anos: uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
@@ -170,7 +171,7 @@ textarea.input{min-height:90px;resize:vertical}
 .page-head p{color:var(--ink-2)}
 @media (max-width:820px){
   .topbar .tabs{display:none}
-  .bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  .bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
   .bottomnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;min-height:54px;border-radius:12px;text-decoration:none;color:var(--ink-2);font-size:.72rem;font-weight:600}
   .bottomnav a svg{width:22px;height:22px}
   .bottomnav a[aria-current="page"]{color:var(--cherry);background:var(--blush-2)}
@@ -359,6 +360,7 @@ details.more .in{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 <div id="toastRoot" role="status" aria-live="polite"></div>
 <div id="printArea"></div>
 
+<script src="/vendor/qrcode-generator.js"></script>
 <script>
 (function(){
 'use strict';
@@ -664,7 +666,7 @@ function parseCSV(text){
 }
 
 /* ---------------- roteamento ---------------- */
-const PRIVATE=['painel','convidados','checklist','financas','festa'];
+const PRIVATE=['painel','convidados','checklist','financas','festa','fotos'];
 const LOGIN_PATH=/^\/login\/?$/.test(location.pathname);
 function route(){return (location.hash||'').replace('#','')||(LOGIN_PATH?'entrar':'convite')}
 function go(r){if(location.hash==='#'+r)render();else location.hash=r}
@@ -677,17 +679,32 @@ function render(){
   const app=document.getElementById('app');
   if(PRIVATE.includes(r)){
     if(!authed){app.innerHTML=viewLogin(r);focusLogin();return}
-    app.innerHTML=shell(r,({painel:viewDash,convidados:viewGuests,checklist:viewTasks,financas:viewFinance,festa:viewParty})[r]());
+    app.innerHTML=shell(r,({painel:viewDash,convidados:viewGuests,checklist:viewTasks,financas:viewFinance,festa:viewParty,fotos:viewPhotosAdmin})[r]());if(r==='fotos'&&REMOTE)loadAdminAlbum();
     return;
   }
   if(r==='confirmar'){rsvpPersist();app.innerHTML=viewRsvp();focusFirst();return}
   if(r==='entrar'){if(authed){go('painel');return}app.innerHTML=viewLogin('painel');focusLogin();return}
-  app.innerHTML=viewInvite();startCountdown();
+  app.innerHTML=viewInvite();startCountdown();loadGuestGallery();
 }
 function focusFirst(){setTimeout(()=>{const f=document.querySelector('#app .card input,#app .card button');if(f&&rsvp.step>1)f.focus()},30)}
 
 /* ================= CONVITE PÚBLICO ================= */
 function factRow(icon,label,value,extra){return '<div class="fact"><div class="ic">'+ic(icon)+'</div><div><div class="label">'+label+'</div><div class="v">'+value+'</div>'+(extra||'')+'</div></div>'}
+/* ---------------- album privado de fotos ---------------- */
+const PHOTO_API='/api/photos';let albumPhotos=[],albumToken='',albumBusy=false,photoFiles=[],albumQrSvg='',adminPhotoRows=[],adminShown=0;
+async function photoCall(data){const r=await fetch(PHOTO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({},data,{email:cred.email,password:cred.password}))});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'request_failed');return j}
+function albumLink(token){const base=S.party.inviteUrl||(REMOTE?PUBLIC_URL:location.origin+location.pathname);try{const u=new URL(base,location.origin);u.searchParams.delete('album');u.hash='album='+encodeURIComponent(token);return u.toString()}catch(_){return base.split('#')[0]+'#album='+encodeURIComponent(token)}}
+function guestAlbum(){try{return new URLSearchParams(location.hash.slice(1)).get('album')||new URLSearchParams(location.search).get('album')||''}catch(_){return ''}}
+function photoGrid(rows,token,admin){return rows.length?'<div class="grid2" style="grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px">'+rows.map(p=>'<article class="panel" style="padding:8px"><img loading="lazy" src="'+(admin?'#':'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')+'" '+(admin?'data-photo-id="'+esc(p.id)+'"':'data-gallery-photo="'+esc(p.id)+'"')+' alt="Foto enviada por '+esc(p.sender_name)+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px"><p class="small" style="margin:6px 0">'+esc(p.sender_name)+' · '+esc(p.status||'aprovada')+'</p>'+(admin?'<div class="row"><button class="btn sm" data-act="photo-approve" data-id="'+esc(p.id)+'">Aprovar</button><button class="btn sm" data-act="photo-hide" data-id="'+esc(p.id)+'">Ocultar</button><button class="btn sm" data-act="photo-download" data-id="'+esc(p.id)+'">Baixar</button><button class="btn sm danger" data-act="photo-delete" data-id="'+esc(p.id)+'">Excluir</button></div>':'')+'</article>').join('')+'</div>':'<div class="notice info"><span>A galeria ainda está vazia. As fotos aprovadas aparecerão aqui.</span></div>'}
+function guestPhotoSection(){const token=guestAlbum();if(!token)return '';return '<section class="sect" id="album"><h2 class="sh">'+cherry()+'Fotos da festa</h2><p class="muted">Compartilhe seus momentos com os participantes autorizados desta festa.</p><form id="photo-upload" class="stack"><label class="field"><span>Seu nome</span><input class="input" name="sender" maxlength="80" required minlength="2"></label><label class="btn primary big block" for="photo-input">'+ic('upload')+'Enviar minhas fotos</label><input id="photo-input" class="sr" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" multiple><div id="photo-preview" class="grid2" style="grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px"></div><p class="small muted">JPEG, PNG ou WebP · até 3 MB por foto. Ao enviar, você concorda que as imagens poderão ser vistas pelos participantes autorizados da festa.</p><div id="photo-progress" class="small" role="status" aria-live="polite"></div><button class="btn" id="photo-submit" type="submit" disabled>Enviar fotos selecionadas</button></form><div id="guest-gallery" style="margin-top:18px"></div></section>'}
+function hydrateGuestImages(root,token){const imgs=root.querySelectorAll('img[data-gallery-photo]');const load=async img=>{try{const r=await fetch(PHOTO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'image',id:img.dataset.galleryPhoto,token})});if(!r.ok)throw new Error();const url=URL.createObjectURL(await r.blob());img.src=url;img.dataset.objectUrl=url}catch(_){img.alt+=' (indisponível)'}};if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>entries.forEach(x=>{if(x.isIntersecting){observer.unobserve(x.target);load(x.target)}}),{rootMargin:'160px'});imgs.forEach(i=>observer.observe(i))}else imgs.forEach(load)}
+function loadGuestGallery(){const t=guestAlbum();if(!t)return;fetch(PHOTO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'gallery',token:t})}).then(r=>r.json()).then(j=>{const el=document.getElementById('guest-gallery');if(!el)return;el.querySelectorAll('img[data-object-url]').forEach(i=>URL.revokeObjectURL(i.dataset.objectUrl));el.innerHTML=j.ok?photoGrid(j.photos,t,false):'<div class="notice info">Este link do álbum não está válido. Peça um link atualizado à anfitriã.</div>';if(j.ok)hydrateGuestImages(el,t)}).catch(()=>{const el=document.getElementById('guest-gallery');if(el)el.innerHTML='<div class="notice info">Não foi possível carregar as fotos. Verifique a conexão e tente novamente.</div>'});}
+function photoPreview(){const root=document.getElementById('photo-preview');if(!root)return;root.innerHTML=photoFiles.map((f,i)=>'<div style="position:relative"><img src="'+f.url+'" alt="Prévia de '+esc(f.file.name)+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px"><button type="button" class="btn sm" data-act="photo-remove" data-index="'+i+'" aria-label="Remover '+esc(f.file.name)+'" style="position:absolute;right:4px;top:4px">×</button></div>').join('');const b=document.getElementById('photo-submit');if(b)b.disabled=!photoFiles.length||albumBusy}
+function viewPhotosAdmin(){return '<div class="page-head"><div><h2>Fotos da festa</h2><p>Álbum privado · revise as fotos antes de exibi-las aos convidados.</p></div><button class="btn" data-act="album-refresh">Atualizar</button></div><section class="panel stack"><label class="switch"><input type="checkbox" id="album-immediate" data-act="album-setting">Exibir fotos imediatamente após o envio</label><p class="small muted">Desativado: as imagens ficam privadas até você aprovar. Os links incluem uma chave exclusiva da festa.</p><div class="row"><input class="input" id="album-url" readonly aria-label="Link privado do álbum"><button class="btn" data-act="album-copy">Copiar link</button><button class="btn" data-act="album-share">Compartilhar link</button><button class="btn" data-act="album-qr">Gerar QR Code</button><button class="btn" data-act="album-rotate">Gerar novo link</button><button class="btn" data-act="album-download-all">Baixar todas as aprovadas</button></div><div id="album-qr-preview" aria-live="polite"></div><div id="album-admin" class="stack" aria-live="polite">Carregando álbum…</div></section>'}
+function appendAdminPhotoBatch(){const root=document.getElementById('album-admin');if(!root)return;const batch=adminPhotoRows.slice(adminShown,adminShown+12);if(!batch.length&&adminShown===0){root.innerHTML='<div class="notice info">Nenhuma foto enviada ainda.</div>';return}root.querySelector('#album-more')?.remove();if(batch.length){root.insertAdjacentHTML('beforeend',photoGrid(batch,albumToken,true));adminShown+=batch.length;root.querySelectorAll('img[data-photo-id]:not([data-loaded])').forEach(async img=>{img.dataset.loaded='1';try{const x=await photoCall({action:'admin_image',id:img.dataset.photoId});img.src='data:'+x.mime+';base64,'+x.data}catch(_){img.alt='Prévia indisponível'}})}if(adminShown<adminPhotoRows.length)root.insertAdjacentHTML('beforeend','<button class="btn" id="album-more" data-act="album-more">Carregar mais fotos</button>')}
+async function loadAdminAlbum(){try{const r=await photoCall({action:'admin_load'});albumToken=r.token;adminPhotoRows=r.photos||[];adminShown=0;const u=document.getElementById('album-url'),c=document.getElementById('album-immediate'),root=document.getElementById('album-admin');if(u)u.value=albumLink(albumToken);if(c)c.checked=r.publishImmediately;if(root){root.innerHTML='';appendAdminPhotoBatch()}}catch(_){const root=document.getElementById('album-admin');if(root)root.innerHTML='<div class="notice">Não foi possível carregar o álbum. Verifique sua conexão e tente novamente.</div>'}}
+async function downloadApprovedPhoto(id){try{const r=await photoCall({action:'download',id:id||null});for(let i=0;i<r.photos.length;i++){const p=r.photos[i],x=await photoCall({action:'admin_image',id:p.id}),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([Uint8Array.from(atob(x.data),c=>c.charCodeAt(0))],{type:x.mime}));a.download=(slug(S.party.name)||'festa')+'-'+p.id+'.'+({'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[x.mime]||'jpg');a.click();setTimeout(()=>URL.revokeObjectURL(a.href),30000);if(r.photos.length>1)await new Promise(ok=>setTimeout(ok,350))}if(!r.photos.length)toast('Não há fotos aprovadas para baixar.')}catch(_){toast('Não foi possível baixar as fotos aprovadas.')}}
+function compressGuestPhoto(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject();reader.onload=()=>{const img=new Image();img.onerror=()=>reject();img.onload=()=>{const max=1800,k=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);resolve(c.toDataURL('image/jpeg',.82).split(',')[1])};img.src=reader.result};reader.readAsDataURL(file)})}
 function viewInvite(){
   const p=S.party;const tbd='<span class="tbd">A confirmar</span>';
   const falls=[3,12,86,95].map((l,i)=>'<svg viewBox="0 0 60 72" style="left:'+l+'%;animation-duration:'+(14+i*2.3)+'s;animation-delay:-'+(i*3.1)+'s"><use href="#cherry"/></svg>').join('');
@@ -724,6 +741,7 @@ function viewInvite(){
    '</div>'+(p.date?'<div class="actions"><a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a></div>':'')+
    '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
    (extras.length?'<section class="sect" aria-labelledby="h-info"><h2 class="sh" id="h-info">'+cherry()+'Bom saber</h2><div class="facts">'+extras.join('')+'</div></section>':'')+
+   guestPhotoSection()+
    '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
    '</div>'+
   '</main>';
@@ -825,7 +843,7 @@ function viewLogin(target){
 function focusLogin(){setTimeout(()=>{const e=document.getElementById('lemail'),p=document.getElementById('lpw');const f=e&&e.value?p:e;if(f)f.focus()},30)}
 
 /* ================= SHELL PRIVADO ================= */
-const NAV=[['painel','home','Início'],['convidados','users','Convidados'],['checklist','list','Tarefas'],['financas','wallet','Finanças'],['festa','gear','Festa']];
+const NAV=[['painel','home','Início'],['convidados','users','Convidados'],['checklist','list','Tarefas'],['financas','wallet','Finanças'],['fotos','eye','Fotos'],['festa','gear','Festa']];
 function shell(r,content){
   const links=NAV.map(n=>'<a href="#'+n[0]+'" '+(r===n[0]?'aria-current="page"':'')+'>'+ic(n[1])+'<span>'+n[2]+'</span></a>').join('');
   return '<header class="topbar"><div class="in gutter"><a class="brand" href="#painel">'+cherry()+'<b>'+esc(S.party.name)+'</b><span>'+partyAge()+'</span></a><nav class="tabs" aria-label="Seções">'+links+'</nav><span class="spacer"></span>'+(REMOTE?'<span id="sync" class="small muted" aria-live="polite">'+syncLabel()+'</span>':'')+
@@ -1290,7 +1308,7 @@ function viewParty(){
   const p=S.party;
   const f=(id,label,val,attrs,hint)=>'<label class="field"><span>'+label+'</span><input class="input" id="pf-'+id+'" name="'+id+'" value="'+esc(val)+'" '+(attrs||'')+'>'+(hint?'<small>'+hint+'</small>':'')+'</label>';
   return '<div class="page-head"><div><h2>Dados da festa</h2><p>Tudo o que aparece no convite público. Campos vazios aparecem como “A confirmar”.</p></div><a class="btn" href="#convite">'+ic('eye')+'Ver convite</a></div>'+
-  '<form data-form="party" novalidate>'+
+  '<a class="btn" style="margin:0 0 14px" href="#fotos">'+ic('eye')+'Gerenciar fotos da festa</a><form data-form="party" novalidate>'+
   '<details class="sec" open><summary>Convite</summary><div class="body stack">'+
    '<div class="photo-edit"><div class="arch">'+(p.photo?'<img src="'+p.photo+'" alt="Foto atual">':'<div class="ph">'+cherry()+'</div>')+'</div><div class="stack" style="gap:8px"><b>Foto de capa</b><label class="btn sm" for="pf-photo" style="cursor:pointer">'+ic('upload')+(p.photo?'Trocar foto':'Adicionar foto')+'</label><input id="pf-photo" type="file" accept="image/*" class="sr" data-act="photo">'+(p.photo?'<button type="button" class="btn sm danger" data-act="photo-del">Remover foto</button>':'')+'<small class="muted">A foto é reduzida automaticamente para carregar rápido.</small></div></div>'+
    '<div class="grid2">'+f('name','Nome da aniversariante',p.name,'maxlength="40" required')+f('age','Idade',p.age,'type="number" min="1" max="120"')+'</div>'+
@@ -1325,6 +1343,18 @@ document.addEventListener('click',e=>{
   if(el.tagName==='INPUT'&&(el.type==='checkbox'||el.type==='file'))return;
   if(el.tagName==='A'&&el.getAttribute('href')==='#')e.preventDefault();
   switch(a){
+   case 'album-refresh':loadAdminAlbum();break;
+   case 'album-more':appendAdminPhotoBatch();break;
+   case 'album-copy':copyText(document.getElementById('album-url')?.value||'','Link do álbum copiado');break;
+   case 'album-share':{const url=document.getElementById('album-url')?.value||'';if(navigator.share)navigator.share({title:'Fotos da festa de '+S.party.name,text:'Envie suas fotos para o álbum da festa.',url}).catch(()=>{});else copyText(url,'Link do álbum copiado');break}
+   case 'album-qr':{try{const url=document.getElementById('album-url')?.value||'',qr=qrcode(0,'M');qr.addData(url,'Byte');qr.make();albumQrSvg=qr.createSvgTag(6,4);const root=document.getElementById('album-qr-preview');if(root)root.innerHTML='<div class="panel stack" style="width:max-content;max-width:100%;text-align:center"><b>QR Code do álbum</b><div role="img" aria-label="QR Code para abrir o álbum de fotos" style="width:min(260px,70vw);margin:auto">'+albumQrSvg+'</div><a class="btn" download="QR-fotos-'+(slug(S.party.name)||'festa')+'.svg" href="data:image/svg+xml;charset=utf-8,'+encodeURIComponent(albumQrSvg)+'">Baixar para imprimir</a><small class="muted">Use este código no convite ou nas mesas da festa.</small></div>'}catch(_){toast('Não foi possível gerar o QR Code para este link.')}break}
+   case 'album-rotate':photoCall({action:'rotate'}).then(r=>{albumToken=r.token;const u=document.getElementById('album-url'),q=document.getElementById('album-qr-preview');if(u)u.value=albumLink(albumToken);if(q)q.innerHTML='';toast('Novo link criado. O anterior foi desativado.')}).catch(()=>toast('Não foi possível gerar um novo link.'));break;
+   case 'photo-approve':photoCall({action:'moderate',id,status:'approved'}).then(()=>loadAdminAlbum()).catch(()=>toast('Não foi possível aprovar a foto.'));break;
+   case 'photo-hide':photoCall({action:'moderate',id,status:'hidden'}).then(()=>loadAdminAlbum()).catch(()=>toast('Não foi possível ocultar a foto.'));break;
+   case 'photo-delete':confirmDialog('Excluir foto','Esta foto será removida permanentemente.','Excluir',()=>photoCall({action:'delete',id}).then(()=>loadAdminAlbum()).catch(()=>toast('Não foi possível excluir a foto.')));break;
+   case 'photo-download':downloadApprovedPhoto(id);break;
+   case 'album-download-all':downloadApprovedPhoto('');break;
+   case 'photo-remove':{const removed=photoFiles.splice(Number(el.dataset.index),1)[0];if(removed)URL.revokeObjectURL(removed.url);photoPreview();break}
    case 'close':closeModal();break;
    case 'confirm-yes':{const f=pendingConfirm;pendingConfirm=null;closeModal();f&&f();break}
    case 'logout':if(REMOTE){logoutRemote();break}authed=false;try{sessionStorage.removeItem(KEY+':auth')}catch(_){}go('convite');break;
@@ -1383,6 +1413,8 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const el=e.target;
+  if(el.id==='photo-input'){const files=Array.from(el.files||[]);if(files.length>10){toast('Selecione até 10 fotos por envio.');el.value='';return}if(files.some(f=>!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>10*1024*1024)){toast('Use fotos JPEG, PNG ou WebP com até 10 MB cada.');el.value='';return}photoFiles.forEach(x=>URL.revokeObjectURL(x.url));photoFiles=files.map(file=>({file,url:URL.createObjectURL(file)}));photoPreview();return}
+  if(el.dataset.act==='album-setting'){photoCall({action:'settings',publishImmediately:el.checked}).then(()=>toast(el.checked?'Novas fotos serão exibidas imediatamente':'Novas fotos aguardarão sua aprovação')).catch(()=>{el.checked=!el.checked;toast('Não foi possível salvar essa opção.')});return}
   if(el.dataset.act==='toggle-rsvp'){S.party.rsvpOpen=el.checked;save();render();toast(el.checked?'Confirmações abertas':'Confirmações fechadas');return}
   if(el.dataset.act==='photo'&&el.files[0]){resizeImage(el.files[0],url=>{const old=S.party.photo;S.party.photo=url;save();if(!storageOk){S.party.photo=old}render();if(storageOk)toast('Foto atualizada')});return}
   if(el.dataset.act==='imp-file'&&el.files[0]){const r=new FileReader();r.onload=()=>{document.getElementById('imp-text').value=r.result};r.readAsText(el.files[0]);return}
@@ -1443,7 +1475,7 @@ document.addEventListener('input',onFormEdit);document.addEventListener('change'
 function saveCompanionInputs(){for(let i=0;i<rsvp.count;i++){const n=document.getElementById('r-c'+i);if(n)rsvp.companions[i]=n.value}}
 
 document.addEventListener('submit',e=>{
-  const form=e.target;const kind=form.dataset.form;if(!kind)return;e.preventDefault();
+  const form=e.target;if(form.id==='photo-upload'){e.preventDefault();const name=String(new FormData(form).get('sender')||'').trim(),progress=document.getElementById('photo-progress'),button=document.getElementById('photo-submit'),token=guestAlbum();if(name.length<2||!photoFiles.length||albumBusy)return;if(!token){if(progress)progress.textContent='Link do álbum inválido.';return}albumBusy=true;photoPreview();if(button)button.setAttribute('aria-busy','true');(async()=>{try{for(let i=0;i<photoFiles.length;i++){if(progress)progress.textContent='Enviando foto '+(i+1)+' de '+photoFiles.length+'…';const data=await compressGuestPhoto(photoFiles[i].file);await fetch(PHOTO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'upload',token,name,mime:'image/jpeg',data})}).then(async r=>{if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.error||'upload_failed')}})}photoFiles.forEach(x=>URL.revokeObjectURL(x.url));photoFiles=[];form.reset();if(progress)progress.textContent='Envio concluído! Obrigado por compartilhar suas fotos.';photoPreview();loadGuestGallery()}catch(err){const messages={album_full:'O álbum atingiu o limite de fotos. Fale com a anfitriã.',rate_limited:'Muitos envios foram feitos recentemente. Tente novamente mais tarde.',invalid_link:'Este link do álbum expirou. Peça um link atualizado à anfitriã.'};if(progress)progress.textContent=err.message==='too_large'?'Uma das fotos ficou grande demais. Tente escolher uma imagem menor.':messages[err.message]||'Não foi possível concluir o envio. Verifique a conexão e tente novamente.'}finally{albumBusy=false;if(button)button.removeAttribute('aria-busy');photoPreview()}})();return}const kind=form.dataset.form;if(!kind)return;e.preventDefault();
   const fd=new FormData(form);const v=k=>String(fd.get(k)||'').trim();
   if(kind==='rsvp1'){
     rsvp.name=v('name');rsvp.phone=v('phone');rsvp.consent=!!fd.get('consent');const er={};
