@@ -321,6 +321,15 @@ const T_ST_CLS={pendente:'',andamento:'warn',concluida:'ok'};
 const CHART_COLORS=['var(--cherry)','var(--leaf)','var(--warn)','var(--ink-2)'];
 const DEFAULT_PIN='4040';
 const inFrame=(function(){try{return window.self!==window.top}catch(e){return true}})();
+/* Modo online: quando o app roda publicado (Vercel) e /api/rpc responde, os dados ficam no banco.
+   Sem a API (arquivo aberto direto, prévia), tudo fica salvo só neste navegador. */
+let REMOTE=false;const API='/api/rpc';
+async function rpc(fn,args){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fn,args:args||{}})});
+  let j=null;try{j=await r.json()}catch(e){}
+  if(!r.ok){const code=(j&&j.error)||(r.status===404?'no_api':'http_'+r.status);const e=new Error(code);e.code=code;throw e}
+  return j;
+}
 
 /* ---------------- ícones ---------------- */
 const I={
@@ -416,9 +425,57 @@ function defaults(){
     guests:d.guests,expenses:d.expenses,tasks:d.tasks,pinHash:pinHash(DEFAULT_PIN),pinDefault:true};
 }
 let S;let storageOk=true;
+function freshRemote(){const d=defaults();d.guests=[];d.expenses=[];d.tasks.forEach(t=>t.expenseId='');d.pinDefault=false;delete d.pinHash;d.rsvpSeen={};return d}
 function load(){try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);const def=defaults();S=Object.assign({},def,o);S.party=Object.assign({},def.party,o.party||{});return}}catch(e){storageOk=false}S=defaults()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false;toast('Não foi possível salvar neste navegador. Libere espaço ou remova a foto.')}}
-let authed=false;try{authed=sessionStorage.getItem(KEY+':auth')===S?.pinHash}catch(e){}
+function save(){if(REMOTE){if(authed)queuePush();return}try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false;toast('Não foi possível salvar neste navegador. Libere espaço ou remova a foto.')}}
+let authed=false;
+
+/* ---------------- sincronização com o banco (modo online) ---------------- */
+let pinMem='',version=0,saveT=null,saving=false,pendingChange=false,syncState='';
+function normPh(p){let d=digits(p);if(d.length>11&&d.startsWith('55'))d=d.slice(2);return d}
+function syncLabel(){return {saving:'Salvando…',saved:'✓ Salvo',error:'⚠ Não salvo, tentando de novo'}[syncState]||''}
+function setSync(st){syncState=st;const el=document.getElementById('sync');if(el)el.textContent=syncLabel()}
+function queuePush(ms){pendingChange=true;clearTimeout(saveT);setSync('saving');saveT=setTimeout(push,ms==null?600:ms)}
+async function push(){
+  saveT=null;if(saving){queuePush(400);return}
+  saving=true;pendingChange=false;
+  try{
+    const r=await rpc('admin_save',{pin:pinMem,data:S,version});
+    if(r&&r.ok){version=r.version;if(!pendingChange)setSync('saved')}
+    else if(r&&r.error==='conflict'){await adminLogin(pinMem);render();toast('Os dados mudaram em outro aparelho. Recarregamos a versão mais nova; confira sua última alteração.')}
+    else if(r&&r.error==='bad_pin'){logoutRemote()}
+    else{setSync('error');queuePush(5000)}
+  }catch(e){setSync('error');queuePush(5000)}
+  finally{saving=false}
+}
+function mergeRsvps(list){
+  S.rsvpSeen=S.rsvpSeen||{};let n=0;
+  list.forEach(r=>{
+    const seen=S.rsvpSeen[r.phone];if(seen&&seen>=r.updated_at)return;
+    const g=S.guests.find(x=>normPh(x.phone)===r.phone);
+    const data={phone:r.phone,status:r.status,companions:r.companions||[],diet:r.diet||'',notes:r.notes||'',respondedAt:String(r.updated_at).slice(0,10)};
+    if(g)Object.assign(g,data);else S.guests.push(Object.assign({id:uid(),name:r.name,group:'Pelo convite',allowed:Number(S.party.maxCompanions)||0,demo:false},data));
+    S.rsvpSeen[r.phone]=r.updated_at;n++;
+  });
+  return n;
+}
+async function adminLogin(pin){
+  const r=await rpc('admin_load',{pin});
+  if(!r||!r.ok)return r||{ok:false};
+  pinMem=pin;version=r.version;const base=freshRemote();
+  if(r.data){S=Object.assign(base,r.data);S.party=Object.assign(base.party,r.data.party||{});S.rsvpSeen=r.data.rsvpSeen||{};delete S.pinHash;S.pinDefault=false}
+  else{const party=S.party;S=base;Object.assign(S.party,party)}
+  authed=true;try{sessionStorage.setItem(KEY+':pin',pin)}catch(_){}
+  const n=mergeRsvps(r.rsvps||[]);
+  if(!r.data||n)queuePush(0);
+  r.newRsvps=n;return r;
+}
+function logoutRemote(){try{sessionStorage.removeItem(KEY+':pin')}catch(_){}location.hash='convite';location.reload()}
+async function refreshRemote(silent){
+  if(!REMOTE||!authed||pendingChange||saving)return;
+  try{const r=await adminLogin(pinMem);if(r.ok){render();if(!silent||r.newRsvps)toast(r.newRsvps?r.newRsvps+' resposta(s) nova(s) de convidados':'Nenhuma resposta nova')}}catch(e){if(!silent)toast('Não foi possível atualizar agora. Verifique a conexão.')}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refreshRemote(true)});
 
 /* ---------------- cálculos ---------------- */
 function cost(x){return Number(x.final)>0?Number(x.final):Number(x.planned)||0}
@@ -605,6 +662,7 @@ function viewRsvp(){
     if(rsvp.notes)rows.push([rsvp.answer==='no'?'Recado':'Observações',esc(rsvp.notes)]);
     body='<div class="stack"><h2>Confira antes de enviar</h2><dl class="review">'+rows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>').join('')+'</dl>'+
       '<div class="row"><button class="btn" data-act="rsvp-back">Voltar</button><span class="spacer"></span><button class="btn primary big" data-act="rsvp-submit">'+ic('check')+'Confirmar resposta</button></div>'+
+      (e.submit?'<div class="notice" style="background:var(--bad-bg);color:var(--bad)">'+ic('alert')+'<span>'+esc(e.submit)+'</span></div>':'')+
       '<button class="btn ghost sm" data-act="rsvp-goto" data-s="1">Corrigir meus dados</button></div>';
   }
   return '<main class="rsvp gutter">'+head+bar+'<div class="card">'+body+'</div><p class="privacy">Seus dados são usados apenas para a organização da comemoração e não aparecem para outros convidados.</p></main>';
@@ -621,9 +679,17 @@ function viewRsvpDone(){
    '<button class="btn block" data-act="rsvp-edit">'+ic('edit')+'Alterar minha resposta</button>'+
    '<a class="btn ghost block" href="#convite">Voltar ao convite</a></div>';
 }
+const RSVP_ERR={closed:'As confirmações estão encerradas. Fale com a aniversariante se precisar.',too_many_companions:'O número de acompanhantes passou do permitido. Volte e ajuste.',invalid_phone:'O WhatsApp parece incompleto. Corrija seus dados.',invalid_name:'Confira seu nome em “Corrigir meus dados”.',invalid_companion:'Confira os nomes dos acompanhantes.',not_configured:'O convite ainda está sendo preparado. Tente de novo mais tarde.',full:'Não foi possível registrar mais respostas. Fale com a aniversariante.'};
 function rsvpSubmit(){
   const p=S.party;const now=new Date().toISOString().slice(0,10);
   const data={name:rsvp.name.trim(),phone:digits(rsvp.phone),status:rsvp.answer,companions:rsvp.answer==='no'?[]:rsvp.companions.slice(0,rsvp.count).map(s=>s.trim()),diet:rsvp.answer==='no'?'':rsvp.diet.trim(),notes:rsvp.notes.trim(),respondedAt:now};
+  if(REMOTE){
+    const b=document.querySelector('[data-act=rsvp-submit]');if(b){b.disabled=true;b.textContent='Enviando…'}
+    rpc('submit_rsvp',{name:data.name,phone:normPh(data.phone),status:data.status,companions:data.companions,diet:data.diet,notes:data.notes})
+      .then(()=>{rsvp.step=6;rsvp.errors={};render();window.scrollTo(0,0)})
+      .catch(e=>{rsvp.errors={submit:RSVP_ERR[e.code]||'Não foi possível enviar agora. Verifique a conexão e tente de novo.'};render()});
+    return;
+  }
   let g=rsvp.existingId&&S.guests.find(x=>x.id===rsvp.existingId);
   if(g){Object.assign(g,data)}else{S.guests.push(Object.assign({id:uid(),group:'Pelo convite',allowed:Number(p.maxCompanions)||0,demo:false},data))}
   save();rsvp.step=6;render();window.scrollTo(0,0);
@@ -643,7 +709,7 @@ function viewLogin(target){
 const NAV=[['painel','home','Início'],['convidados','users','Convidados'],['checklist','list','Tarefas'],['financas','wallet','Finanças'],['festa','gear','Festa']];
 function shell(r,content){
   const links=NAV.map(n=>'<a href="#'+n[0]+'" '+(r===n[0]?'aria-current="page"':'')+'>'+ic(n[1])+'<span>'+n[2]+'</span></a>').join('');
-  return '<header class="topbar"><div class="in gutter"><a class="brand" href="#painel">'+cherry()+'<b>'+esc(S.party.name)+'</b><span>'+esc(S.party.age)+'</span></a><nav class="tabs" aria-label="Seções">'+links+'</nav><span class="spacer"></span>'+
+  return '<header class="topbar"><div class="in gutter"><a class="brand" href="#painel">'+cherry()+'<b>'+esc(S.party.name)+'</b><span>'+esc(S.party.age)+'</span></a><nav class="tabs" aria-label="Seções">'+links+'</nav><span class="spacer"></span>'+(REMOTE?'<span id="sync" class="small muted" aria-live="polite">'+syncLabel()+'</span>':'')+
    '<a class="iconbtn" href="#convite" title="Ver convite" aria-label="Ver convite público">'+ic('eye')+'</a><button class="iconbtn" data-act="logout" title="Sair" aria-label="Sair do painel">'+ic('out')+'</button></div></header>'+
    '<main class="main gutter">'+(storageOk?'':'<div class="notice" style="margin-bottom:14px">'+ic('alert')+'<span>Este navegador não está salvando os dados. As alterações serão perdidas ao fechar a página.</span></div>')+content+'</main>'+
    '<nav class="bottomnav" aria-label="Seções">'+links+'</nav>';
@@ -708,7 +774,7 @@ function viewGuests(){
   const groups=[...new Set(S.guests.map(g=>g.group).filter(Boolean))].sort();
   const q=gFilter.q.toLowerCase();
   const list=S.guests.filter(g=>(!gFilter.status||g.status===gFilter.status)&&(!gFilter.group||g.group===gFilter.group)&&(!q||(g.name+' '+g.phone+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
-  return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button><button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
+  return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
    '<div class="kpis"><div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div></div><div class="kpi"><div class="label">Ainda não sabem</div><div class="v" style="color:var(--warn)">'+gs.maybe+'</div></div><div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div></div><div class="kpi"><div class="label">Sem resposta</div><div class="v">'+gs.pending+'</div></div></div>'+
    '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div></div>'+
    '<div class="toolbar"><input class="input" id="g-q" type="search" placeholder="Buscar por nome ou WhatsApp" value="'+esc(gFilter.q)+'" data-filter="g-q" aria-label="Buscar convidados">'+
@@ -907,7 +973,7 @@ document.addEventListener('click',e=>{
   switch(a){
    case 'close':closeModal();break;
    case 'confirm-yes':{const f=pendingConfirm;pendingConfirm=null;closeModal();f&&f();break}
-   case 'logout':authed=false;try{sessionStorage.removeItem(KEY+':auth')}catch(_){}go('convite');break;
+   case 'logout':if(REMOTE){logoutRemote();break}authed=false;try{sessionStorage.removeItem(KEY+':auth')}catch(_){}go('convite');break;
    /* rsvp */
    case 'rsvp-answer':rsvp.answer=el.dataset.v;rsvp.errors={};if(rsvp.answer==='no'){rsvp.count=0}render();break;
    case 'rsvp-next2':if(!rsvp.answer){rsvp.errors={answer:'Escolha uma das opções para continuar.'};render();break}rsvpNav(1);break;
@@ -945,7 +1011,9 @@ document.addEventListener('click',e=>{
    /* outros */
    case 'copy-invite':copyText(inviteLink(),'Link do convite copiado');break;
    case 'clear-demo':confirmDialog('Remover exemplos','Apagar todos os convidados e despesas marcados como Exemplo? Seus dados reais continuam.','Remover exemplos',()=>{const ids=S.expenses.filter(x=>x.demo).map(x=>x.id);S.guests=S.guests.filter(x=>!x.demo);S.expenses=S.expenses.filter(x=>!x.demo);S.tasks.forEach(t=>{if(ids.includes(t.expenseId))t.expenseId=''});save();render();toast('Exemplos removidos')});break;
-   case 'reset-all':confirmDialog('Apagar tudo','Isso apaga dados da festa, convidados, tarefas, despesas e volta o PIN para 4040. Não dá para desfazer.','Apagar tudo',()=>{S=defaults();S.guests=[];S.expenses=[];S.tasks.forEach(t=>t.expenseId='');save();authed=false;go('convite');toast('Tudo apagado')});break;
+   case 'reset-all':confirmDialog('Apagar tudo','Isso apaga dados da festa, convidados, tarefas e despesas'+(REMOTE?'':' e volta o PIN para 4040')+'. Não dá para desfazer.','Apagar tudo',()=>{if(REMOTE){const seen=S.rsvpSeen;S=freshRemote();S.rsvpSeen=seen;save();render();toast('Tudo apagado');return}S=defaults();S.guests=[];S.expenses=[];S.tasks.forEach(t=>t.expenseId='');save();authed=false;go('convite');toast('Tudo apagado')});break;
+   case 'refresh':refreshRemote(false);break;
+   case 'reload':location.reload();break;
    case 'photo-del':S.party.photo='';save();render();toast('Foto removida');break;
   }
 });
@@ -984,6 +1052,12 @@ document.addEventListener('submit',e=>{
     if(!rsvp.consent)er.consent='Marque a caixa para concordar com o uso dos dados.';
     rsvp.errors=er;if(Object.keys(er).length){render();const f=document.querySelector('[aria-invalid="true"]');if(f)f.focus();return}
     const nd=d.length>11&&d.startsWith('55')?d.slice(2):d;
+    if(REMOTE){
+      const b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Um momento…'}
+      rpc('rsvp_limit',{phone:nd}).then(lim=>{rsvp.limit=Number(lim)||0;rsvp.existingId='';rsvp.count=Math.min(rsvp.count,rsvp.limit);rsvpNav(1)})
+        .catch(()=>{rsvp.errors={phone:'Não foi possível continuar agora. Verifique a conexão e tente de novo.'};render()});
+      return;
+    }
     const g=S.guests.find(x=>{let p=digits(x.phone);if(p.length>11&&p.startsWith('55'))p=p.slice(2);return p&&p===nd});
     rsvp.existingId=g?g.id:'';rsvp.limit=g?(Number(g.allowed)||0):(Number(S.party.maxCompanions)||0);
     if(g&&g.status!=='pending'&&!rsvp.answer){rsvp.answer=g.status;rsvp.companions=(g.companions||[]).slice();rsvp.count=Math.min(rsvp.companions.length,rsvp.limit);rsvp.diet=g.diet||'';rsvp.notes=g.notes||''}
@@ -992,6 +1066,12 @@ document.addEventListener('submit',e=>{
   }
   if(kind==='rsvp3'){saveCompanionInputs();const er={};for(let i=0;i<rsvp.count;i++){if((rsvp.companions[i]||'').trim().length<2)er['c'+i]='Informe o nome do acompanhante '+(i+1)+'.'}rsvp.errors=er;if(Object.keys(er).length){render();return}rsvpNav(1);return}
   if(kind==='rsvp4'){rsvp.diet=v('diet');rsvp.notes=v('notes');rsvpNav(1);return}
+  if(kind==='login'&&REMOTE){
+    const b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Entrando…'}
+    adminLogin(v('pin')).then(r=>{if(r.ok){loginErr='';go(form.dataset.target||'painel');render()}else{loginErr='PIN incorreto. Tente novamente.';render();const p=document.getElementById('pin');if(p)p.focus()}})
+      .catch(e=>{loginErr=e.code==='locked'?'Muitas tentativas. Aguarde 30 segundos e tente de novo.':e.code==='not_configured'||e.code==='db_not_configured'?'O banco de dados ainda não foi conectado.':'Não foi possível entrar agora. Verifique a conexão.';render()});
+    return;
+  }
   if(kind==='login'){
     if(Date.now()<pinLockUntil){loginErr='Muitas tentativas. Aguarde alguns segundos e tente de novo.';render();return}
     if(pinHash(v('pin'))===S.pinHash){authed=true;pinFails=0;loginErr='';try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}go(form.dataset.target||'painel');render()}
@@ -1043,16 +1123,30 @@ document.addEventListener('submit',e=>{
     const err=document.getElementById('pin-err');const a=v('p1'),b=v('p2');
     if(!/^\d{4,8}$/.test(a)){err.textContent='O PIN precisa ter de 4 a 8 números.';return}
     if(a!==b){err.textContent='Os dois PINs não são iguais.';return}
+    if(REMOTE){rpc('admin_set_pin',{pin:pinMem,new_pin:a}).then(r=>{if(r&&r.ok){pinMem=a;try{sessionStorage.setItem(KEY+':pin',a)}catch(_){}form.reset();err.textContent='';toast('PIN alterado')}else err.textContent='Não foi possível trocar o PIN.'}).catch(()=>{err.textContent='Não foi possível trocar o PIN agora. Verifique a conexão.'});return}
     S.pinHash=pinHash(a);S.pinDefault=false;save();try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}render();toast('PIN alterado');return;
   }
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('#modalRoot .overlay'))closeModal()});
 
 /* ---------------- início ---------------- */
-load();
-try{authed=sessionStorage.getItem(KEY+':auth')===S.pinHash}catch(e){authed=false}
-rsvp=newRsvp();
-render();
+async function boot(){
+  load();rsvp=newRsvp();
+  if(/^https?:$/.test(location.protocol)&&!inFrame){
+    const app=document.getElementById('app');
+    app.innerHTML='<main class="login gutter"><div class="card" style="text-align:center"><div style="width:56px;margin:0 auto 10px">'+cherry()+'</div><p class="muted">Carregando o convite…</p></div></main>';
+    try{
+      const pub=await rpc('get_public');REMOTE=true;S=freshRemote();Object.assign(S.party,pub||{});
+      let pin='';try{pin=sessionStorage.getItem(KEY+':pin')||''}catch(_){}
+      if(pin){try{const r=await adminLogin(pin);if(!r.ok)sessionStorage.removeItem(KEY+':pin')}catch(_){}}
+    }catch(e){
+      if(e.code!=='no_api'){app.innerHTML='<main class="login gutter"><div class="card stack" style="text-align:center"><div style="width:56px;margin:0 auto">'+cherry()+'</div><h1 style="font-size:1.5rem">Não foi possível carregar o convite</h1><p class="muted">Verifique sua conexão e tente de novo.</p><button class="btn primary" data-act="reload">Tentar de novo</button></div></main>';return}
+    }
+  }
+  if(!REMOTE){try{authed=sessionStorage.getItem(KEY+':auth')===S.pinHash}catch(e){authed=false}}
+  rsvp=newRsvp();render();
+}
+boot();
 })();
 </script>
 </body>
