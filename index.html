@@ -484,7 +484,7 @@ function gcalLink(){
   if(p.time){const st=new Date(p.date+'T'+p.time);let et;if(p.endTime){et=new Date(p.date+'T'+p.endTime);if(et<=st)et.setDate(et.getDate()+1)}else{et=new Date(st);et.setHours(et.getHours()+5)}dates=compact(st)+'/'+compact(et)}
   else{const n=new Date(p.date+'T12:00');n.setDate(n.getDate()+1);dates=d+'/'+ymd(n).replace(/-/g,'')}
   const loc=[p.venue,p.address].filter(Boolean).join(', ');
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Aniversário de 40 anos da '+p.name+' 🍒')+'&dates='+dates+'&details='+encodeURIComponent('Tema Cherry. Convite: '+inviteLink())+(loc?'&location='+encodeURIComponent(loc):'')+'&ctz=America/Sao_Paulo';
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Aniversário de 40 anos da '+p.name+' 🍒')+'&dates='+dates+'&details='+encodeURIComponent('Convite: '+inviteLink())+(loc?'&location='+encodeURIComponent(loc):'')+'&ctz=America/Sao_Paulo';
 }
 function shareText(){
   const p=S.party;let t='🍒 Você é minha convidada especial! '+p.name+' '+p.age+' anos, '+p.tagline;
@@ -575,7 +575,6 @@ function viewInvite(){
     '<div class="arch">'+photo+'</div>'+
     '<h1 id="ttl"><span class="script">'+esc(p.name)+'</span><span class="forty" style="display:block"><b>'+esc(p.age)+'</b> anos</span></h1>'+
     '<p class="tag">'+esc(p.tagline)+'</p>'+
-    '<span class="theme-badge">'+cherry()+'Tema Cherry</span>'+
     (p.date?'<div class="countdown" id="cd" aria-label="Contagem regressiva"><div><b id="cd-d">0</b><span>dias</span></div><div><b id="cd-h">0</b><span>horas</span></div><div><b id="cd-m">0</b><span>min</span></div><div><b id="cd-s">0</b><span>seg</span></div></div>':'')+
    '</section>'+
    '<section class="sect"><div class="facts">'+
