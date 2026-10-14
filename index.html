@@ -185,6 +185,7 @@ textarea.input{min-height:90px;resize:vertical}
 .rep-kpis .v{font-family:var(--f-num);font-size:1.9rem;font-weight:700;color:var(--cherry);line-height:1.1}
 .rep-kpis .s{font-size:.8rem;color:var(--ink-2)}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
+.pill svg{width:14px;height:14px;flex:none}
 .kpi .v{font-family:var(--f-num);font-size:clamp(1.15rem,4.4vw,1.55rem);white-space:nowrap;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:4px;overflow-wrap:anywhere}
 .kpi .s{font-size:.82rem;color:var(--ink-2)}
 .kpi.hl{background:var(--blush-2);border-color:var(--blush)}
@@ -493,6 +494,8 @@ let authed=false;
 /* ---------------- sincronização com o banco (modo online) ---------------- */
 let cred={email:'',password:''},version=0,saveT=null,saving=false,pendingChange=false,syncState='';
 function normPh(p){let d=digits(p);if(d.length>11&&d.startsWith('55'))d=d.slice(2);return d}
+// DDD válido (11 a 99) + 8 dígitos (fixo) ou 9 começando com 9 (celular)
+function validPhone(d){return /^[1-9][1-9](\d{8}|9\d{8})$/.test(d)}
 function syncLabel(){return {saving:'Salvando…',saved:'✓ Salvo',error:'⚠ Não salvo, tentando de novo'}[syncState]||''}
 function setSync(st){syncState=st;const el=document.getElementById('sync');if(el)el.textContent=syncLabel()}
 function queuePush(ms){pendingChange=true;clearTimeout(saveT);setSync('saving');saveT=setTimeout(push,ms==null?600:ms)}
@@ -584,6 +587,39 @@ function shareText(g){
   t+='\nConfirme sua presença pelo convite: '+inviteLink(g);return t;
 }
 const waShare=(txt,num)=>'https://wa.me/'+(num?waNumber(num):'')+'?text='+encodeURIComponent(txt);
+// convite individual: só usa data, horário e local se estiverem cadastrados
+function guestInviteText(g){
+  const p=S.party,first=String(g.name||'').trim().split(/\s+/)[0]||'';
+  let t='Oi'+(first?', '+first:'')+'! 🍒 Quero convidar você para comemorar meus '+partyAge()+' anos!';
+  if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
+  const loc=[p.venue,p.address].filter(Boolean).join(', ');if(loc)t+='\n📍 '+loc;
+  return t+'\nConfira os detalhes da festa e confirme sua presença por aqui: '+inviteLink(g)+'\nVai ser muito especial ter você comigo! 💕';
+}
+// abrir o WhatsApp não prova que a mensagem foi enviada: fica "preparado" até a anfitriã marcar
+const INV_ST={prepared:'Preparado no WhatsApp',sent:'Convite enviado'};
+function inviteState(g){return g.invite&&INV_ST[g.invite.state]?g.invite.state:''}
+function invitePill(g){const st=inviteState(g);return '<span class="pill '+(st==='sent'?'ok':st==='prepared'?'warn':'')+'">'+ic(st==='sent'?'check':'wa')+(st==='sent'?'Convite enviado'+(g.invite.at?' em '+fmtDate(g.invite.at):''):st==='prepared'?'Preparado no WhatsApp':'Convite não enviado')+'</span>'}
+function openWhatsApp(url){
+  try{const w=window.open('','_blank');if(!w)return false;w.opener=null;w.location.href=url;return true}catch(e){return false}
+}
+function sendInvite(g){
+  const url=waShare(guestInviteText(g),g.phone);
+  const opened=openWhatsApp(url);
+  if(inviteState(g)!=='sent'){g.invite={state:'prepared',at:today()};save()}
+  render();inviteModal(g,opened);
+}
+function inviteModal(g,opened){
+  const url=waShare(guestInviteText(g),g.phone),sent=inviteState(g)==='sent';
+  openModal(opened?'Convite preparado no WhatsApp':'Não foi possível abrir o WhatsApp',
+   '<div class="stack">'+(opened
+     ?'<p>Abrimos o WhatsApp com a mensagem para <b>'+esc(g.name)+'</b> ('+esc(fmtPhone(g.phone))+'). Depois de enviar por lá, marque o convite como enviado.</p>'
+     :'<div class="notice" role="alert">'+ic('alert')+'<span>O cadastro de <b>'+esc(g.name)+'</b> está salvo. O navegador não abriu o WhatsApp; copie a mensagem ou tente abrir pelo link abaixo.</span></div>')+
+   '<label class="field"><span>Mensagem</span><textarea class="input" id="inv-msg" rows="7" readonly>'+esc(guestInviteText(g))+'</textarea></label>'+
+   '<p class="small muted">'+(sent?'Este convite já está marcado como enviado.':'Status atual: <b>Preparado no WhatsApp</b>. A presença só muda quando '+esc(g.name.split(' ')[0])+' responder pelo convite.')+'</p></div>',
+   '<button class="btn" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar mensagem</button>'+
+   '<a class="btn leaf" href="'+esc(url)+'" target="_blank" rel="noopener" data-act="inv-reopen" data-id="'+g.id+'">'+ic('wa')+(opened?'Abrir de novo':'Abrir WhatsApp')+'</a>'+
+   (sent?'<button class="btn primary" data-act="close">Fechar</button>':'<button class="btn primary" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>'));
+}
 
 /* ---------------- toast, modal ---------------- */
 let toastT;
@@ -855,10 +891,11 @@ function budgetBlock(f){
 let gFilter={q:'',status:'',group:''};
 function viewGuests(){
   const gs=guestStats();const p=S.party;
+  const invSent=S.guests.filter(g=>inviteState(g)==='sent').length;
   const groups=[...new Set(S.guests.map(g=>g.group).filter(Boolean))].sort();
   const q=gFilter.q.toLowerCase();
   const list=S.guests.filter(g=>(!gFilter.status||g.status===gFilter.status)&&(!gFilter.group||g.group===gFilter.group)&&(!q||(g.name+' '+g.phone+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
-  return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
+  return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas'+(invSent?' · '+invSent+' convite'+(invSent>1?'s':'')+' enviado'+(invSent>1?'s':''):'')+'</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
    '<div class="kpis"><div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div></div><div class="kpi"><div class="label">Ainda não sabem</div><div class="v" style="color:var(--warn)">'+gs.maybe+'</div></div><div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div></div><div class="kpi"><div class="label">Sem resposta</div><div class="v">'+gs.pending+'</div></div></div>'+
    '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div></div>'+
    reportSection()+
@@ -872,21 +909,25 @@ function guestRow(g){
   return '<div class="rec"><div style="min-width:0"><div class="t">'+esc(g.name)+demoBadge(g)+'</div><div class="meta">'+(g.group?'<span>'+esc(g.group)+'</span>':'')+(g.phone?'<span class="num">'+esc(fmtPhone(g.phone))+'</span>':'')+'<span>até '+(Number(g.allowed)||0)+' acomp.</span>'+(g.respondedAt?'<span>respondeu em '+fmtDate(g.respondedAt)+'</span>':'')+'</div>'+
     ((g.companions||[]).length?'<div class="meta"><span>Com: '+esc(g.companions.join(', '))+'</span></div>':'')+
     (g.diet?'<div class="meta"><span>🍽 '+esc(g.diet)+'</span></div>':'')+(g.notes?'<div class="meta"><span>'+esc(g.notes)+'</span></div>':'')+'</div>'+
-   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
-   '<div class="acts">'+(g.phone?'<a class="btn sm leaf" href="'+waShare('Oi, '+g.name.split(' ')[0]+'! '+shareText(g),g.phone)+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
+   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(g.phone&&!g.demo?invitePill(g):'')+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
+   '<div class="acts">'+(g.phone?'<button class="btn sm leaf" data-act="guest-wa" data-id="'+g.id+'">'+ic('wa')+(inviteState(g)?'Abrir WhatsApp de novo':'Enviar convite')+'</button><button class="btn sm" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar convite</button>'+(inviteState(g)==='prepared'?'<button class="btn sm" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>':''):'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
 }
 function guestForm(g){
-  g=g||{name:'',phone:'',group:'',allowed:S.party.maxCompanions,status:'pending',companions:[],diet:'',notes:''};
+  const maxC=Number(S.party.maxCompanions)||0;
+  g=g||{name:'',phone:'',group:'',allowed:maxC,status:'pending',companions:[],diet:'',notes:''};
+  const lim=Math.max(maxC,Number(g.allowed)||0);
+  // a confirmação só muda pelo convite público; aqui ela aparece só para consulta
+  const conf=g.id?'<div class="notice info">'+ic('info')+'<span>Confirmação: <b>'+G_ST[g.status]+'</b>'+((g.companions||[]).length?' · com '+esc(g.companions.join(', ')):'')+'. Ela só muda quando o convidado responde pelo convite.</span></div>':'';
   openModal(g.id?'Editar convidado':'Novo convidado','<form data-form="guest" data-id="'+(g.id||'')+'" class="stack" novalidate>'+
-   '<label class="field"><span>Nome *</span><input class="input" id="gf-name" name="name" required maxlength="80" value="'+esc(g.name)+'"></label>'+
-   '<div class="grid2"><label class="field"><span>WhatsApp</span><input class="input" id="gf-phone" name="phone" inputmode="tel" maxlength="20" placeholder="(11) 91234-5678" value="'+esc(fmtPhone(g.phone))+'"></label>'+
+   '<label class="field"><span>Nome do convidado *</span><input class="input" id="gf-name" name="name" required maxlength="80" autocomplete="off" value="'+esc(g.name)+'"></label>'+
+   '<div class="grid2"><label class="field"><span>WhatsApp com DDD *</span><input class="input" id="gf-phone" name="phone" type="tel" inputmode="tel" required maxlength="20" placeholder="(11) 91234-5678" autocomplete="off" value="'+esc(fmtPhone(g.phone))+'"></label>'+
    '<label class="field"><span>Grupo ou família</span><input class="input" id="gf-group" name="group" maxlength="60" list="groupsList" value="'+esc(g.group)+'"><datalist id="groupsList">'+[...new Set(S.guests.map(x=>x.group).filter(Boolean))].map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label>'+
-   '<label class="field"><span>Acompanhantes permitidos</span><input class="input" id="gf-allowed" name="allowed" type="number" min="0" max="20" value="'+(Number(g.allowed)||0)+'"></label>'+
-   '<label class="field"><span>Status</span><select class="input" id="gf-status" name="status">'+Object.entries(G_ST).map(([k,v])=>'<option value="'+k+'" '+(g.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label></div>'+
-   '<label class="field"><span>Acompanhantes confirmados</span><input class="input" id="gf-comp" name="companions" maxlength="300" placeholder="Nomes separados por vírgula" value="'+esc((g.companions||[]).join(', '))+'"><small>A quantidade de pessoas é calculada a partir destes nomes.</small></label>'+
+   '<label class="field"><span>Limite de acompanhantes</span><input class="input" id="gf-allowed" name="allowed" type="number" min="0" max="'+lim+'" value="'+Math.min(lim,Number(g.allowed)||0)+'"><small>A festa permite até '+maxC+' por convite (ajuste em Festa).</small></label></div>'+
+   conf+
    '<label class="field"><span>Restrições alimentares</span><input class="input" id="gf-diet" name="diet" maxlength="160" value="'+esc(g.diet)+'"></label>'+
    '<label class="field"><span>Observações</span><textarea class="input" id="gf-notes" name="notes" maxlength="400">'+esc(g.notes)+'</textarea></label>'+
-   '<div class="err" id="gf-err"></div><div class="modal-foot"><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div></form>');
+   (g.id?'':'<p class="small muted">O convidado entra como <b>Sem resposta</b>. A presença só é confirmada quando ele responder pelo convite.</p>')+
+   '<div class="err" id="gf-err" role="alert"></div><div class="modal-foot"><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn" type="submit" name="go" value="save">Salvar convidado</button><button class="btn leaf" type="submit" name="go" value="wa">'+ic('wa')+'Salvar e abrir WhatsApp</button></div></form>');
 }
 function importModal(){
   openModal('Importar convidados','<div class="stack"><p class="small muted">Use um arquivo CSV com cabeçalho. A coluna <b>nome</b> é obrigatória; <b>whatsapp</b>, <b>grupo</b> e <b>acompanhantes_permitidos</b> são opcionais. Exporte a lista atual para ver o modelo completo.</p>'+
@@ -1198,6 +1239,10 @@ document.addEventListener('click',e=>{
    /* convidados */
    case 'guest-new':guestForm();break;
    case 'guest-edit':guestForm(byId(S.guests,id));break;
+   case 'guest-wa':{const g=byId(S.guests,id);if(g)sendInvite(g);break}
+   case 'inv-copy':{const g=byId(S.guests,id);if(g)copyText(guestInviteText(g),'Convite copiado');break}
+   case 'inv-reopen':{const g=byId(S.guests,id);if(g&&inviteState(g)!=='sent'){g.invite={state:'prepared',at:today()};save();render()}break}
+   case 'inv-sent':{const g=byId(S.guests,id);if(g){g.invite={state:'sent',at:today()};save();closeModal();render();toast('Convite de '+g.name.split(' ')[0]+' marcado como enviado')}break}
    case 'guest-del':{const g=byId(S.guests,id);confirmDialog('Remover convidado','Remover <b>'+esc(g.name)+'</b> da lista? A resposta dessa pessoa também será apagada.','Remover',()=>{S.guests=S.guests.filter(x=>x.id!==id);save();render();toast('Convidado removido')});break}
    case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],respondedAt:''});save();render();toast('Resposta cancelada')});break}
    case 'guest-import':importModal();break;
@@ -1337,17 +1382,25 @@ document.addEventListener('submit',e=>{
     return;
   }
   if(kind==='guest'){
-    const err=document.getElementById('gf-err');const name=v('name');const ph=digits(v('phone'));
-    if(name.length<2){err.textContent='Informe o nome do convidado.';document.getElementById('gf-name').focus();return}
-    if(ph&&(ph.length<10||ph.length>13)){err.textContent='WhatsApp inválido. Use DDD + número.';document.getElementById('gf-phone').focus();return}
-    const allowed=Math.max(0,parseInt(v('allowed'))||0);const comps=v('companions').split(',').map(s=>s.trim()).filter(Boolean);
-    if(comps.length>allowed){err.textContent='Há '+comps.length+' acompanhantes, mas o limite é '+allowed+'. Aumente o limite ou remova nomes.';return}
-    const dupe=ph&&S.guests.find(g=>digits(g.phone)===ph&&g.id!==form.dataset.id);if(dupe){err.textContent='Esse WhatsApp já está cadastrado para '+dupe.name+'.';return}
-    const status=v('status');const id=form.dataset.id;const old=id&&byId(S.guests,id);
-    const data={name,phone:ph,group:v('group'),allowed,status,companions:status==='no'||status==='pending'?[]:comps,diet:v('diet'),notes:v('notes')};
-    data.respondedAt=status==='pending'?'':(old&&old.status===status&&old.respondedAt?old.respondedAt:today());
-    if(old)Object.assign(old,data,{demo:false});else S.guests.push(Object.assign({id:uid(),demo:false},data));
-    save();closeModal();render();toast(old?'Convidado atualizado':'Convidado adicionado');return;
+    const err=document.getElementById('gf-err');const name=v('name');const raw=v('phone');const ph=normPh(raw);
+    const fail=(m,f)=>{err.textContent=m;const n=document.getElementById(f);if(n)n.focus()};
+    if(name.length<2)return fail('Informe o nome do convidado.','gf-name');
+    if(!raw)return fail('Informe o WhatsApp com DDD.','gf-phone');
+    if(!validPhone(ph))return fail('WhatsApp inválido. Use DDD + número, por exemplo (11) 91234-5678.','gf-phone');
+    const maxC=Number(S.party.maxCompanions)||0;const id=form.dataset.id;const old=id&&byId(S.guests,id);
+    const lim=Math.max(maxC,old?Number(old.allowed)||0:0);
+    const allowed=Math.max(0,parseInt(v('allowed'))||0);
+    if(allowed>lim)return fail('O limite da festa é de '+lim+' acompanhante(s) por convite.','gf-allowed');
+    if(old&&(old.companions||[]).length>allowed)return fail(old.name+' já confirmou '+old.companions.length+' acompanhante(s). O limite não pode ser menor que isso.','gf-allowed');
+    const dupe=S.guests.find(g=>normPh(g.phone)===ph&&g.id!==id);
+    if(dupe)return fail('Esse WhatsApp já está cadastrado para '+dupe.name+'. Edite o cadastro existente.','gf-phone');
+    // cadastrar ou editar nunca muda a confirmação
+    const data={name,phone:ph,group:v('group'),allowed,diet:v('diet'),notes:v('notes')};
+    let g;if(old){Object.assign(old,data,{demo:false});g=old}else{g=Object.assign({id:uid(),demo:false,status:'pending',companions:[],respondedAt:''},data);S.guests.push(g)}
+    const sub=e.submitter;const wa=sub&&sub.value==='wa';
+    save();closeModal();
+    if(wa){sendInvite(g);return}
+    render();toast(old?'Convidado atualizado':'Convidado adicionado');return;
   }
   if(kind==='task'){
     const err=document.getElementById('tf-err');const name=v('name');if(name.length<2){err.textContent='Dê um nome para a tarefa.';document.getElementById('tf-name').focus();return}
