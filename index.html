@@ -971,14 +971,14 @@ async function downloadReport(){
     repMsg={bad:true,text:'Não foi possível gerar o PDF agora. Verifique a conexão e tente de novo.'};
   }finally{repBusy=false;render()}
 }
-function buildReportPdf(J,list){
+// Base comum dos PDFs do painel (convidados e finanças): mesmo cabeçalho, rodapé, cartões e tabelas no tema Cherry.
+function pdfKit(J,sub){
   const p=S.party,age=partyAge();
   const C={cherry:[163,18,58],deep:[110,12,39],blush:[248,225,230],blush2:[251,238,241],cream:[255,249,244],ink:[59,26,35],muted:[107,74,83],line:[234,205,212],leaf:[61,122,76]};
   const doc=new J({unit:'mm',format:'a4',orientation:'portrait'});
   const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight(),M=16;
-  const title=(p.name||'Aniversário')+' '+age+' anos — Festa Cherry',sub='Lista de convidados confirmados';
-  const people=reportPeople(list),now=new Date();
-  const two=n=>String(n).padStart(2,'0');
+  const title=(p.name||'Aniversário')+' '+age+' anos — Festa Cherry';
+  const now=new Date(),two=n=>String(n).padStart(2,'0');
   const gen='Relatório gerado em '+two(now.getDate())+'/'+two(now.getMonth()+1)+'/'+now.getFullYear()+' às '+two(now.getHours())+'h'+two(now.getMinutes());
   const when=p.date?fmtDateLong(p.date).replace(/^./,c=>c.toUpperCase())+(p.time?' às '+p.time.replace(':','h'):''):'';
   doc.setProperties({title:title+' · '+sub,subject:sub,creator:'Festa Cherry'});
@@ -988,22 +988,74 @@ function buildReportPdf(J,list){
     doc.setFillColor(...C.leaf);doc.ellipse(x+4.7*s,y+.5*s,1.4*s,.6*s,'F');
     doc.setFillColor(...C.cherry);doc.circle(x+1.6*s,y+5.9*s,1.5*s,'F');doc.circle(x+5.2*s,y+6.2*s,1.5*s,'F');
   };
-  // ---- bloco de abertura (só na 1ª página)
-  let y=36;
-  if(when){doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(...C.ink);doc.text('Data da festa: ',M,y);const w=doc.getTextWidth('Data da festa: ');doc.setFont('helvetica','normal');doc.text(when,M+w,y);y+=5.5}
-  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.muted);doc.text(gen,M,y);y+=6;
+  const K={doc,C,W,H,M,
+    // data da festa, data de geração e linhas extras; devolve o próximo y
+    intro(extra){
+      let y=36;
+      if(when){doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(...C.ink);doc.text('Data da festa: ',M,y);const w=doc.getTextWidth('Data da festa: ');doc.setFont('helvetica','normal');doc.text(when,M+w,y);y+=5.5}
+      doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.muted);doc.text(gen,M,y);y+=6;
+      (extra||[]).forEach(t=>{doc.text(t,M,y);y+=6});
+      return y;
+    },
+    // cartões de resumo: items=[[valor, rótulo]]; valor grande em cereja
+    cards(y,items,cols,big){
+      cols=cols||2;const gap=6,bw=(W-2*M-gap*(cols-1))/cols,bh=19,fs=big||22;
+      items.forEach((k,i)=>{
+        const x=M+(i%cols)*(bw+gap),yy=y+Math.floor(i/cols)*(bh+gap*.8);
+        doc.setFillColor(...C.blush2);doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.roundedRect(x,yy,bw,bh,2.5,2.5,'FD');
+        if(cols>2){ // valor em cima, rótulo embaixo
+          doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...C.muted);doc.text(doc.splitTextToSize(k[1],bw-10)[0],x+5,yy+6.4);
+          doc.setFont('times','bold');doc.setFontSize(fs);doc.setTextColor(...(k[2]||C.cherry));doc.text(String(k[0]),x+5,yy+14.6);
+        }else{
+          doc.setFont('times','bold');doc.setFontSize(fs);doc.setTextColor(...C.cherry);doc.text(String(k[0]),x+6,yy+12.6);
+          const nw=doc.getTextWidth(String(k[0]));
+          doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.ink);const ln=doc.splitTextToSize(k[1],bw-nw-16);doc.text(ln,x+nw+10,yy+(ln.length>1?9.4:11.6));
+        }
+      });
+      return y+Math.ceil(items.length/cols)*(bh+gap*.8)-gap*.8+7;
+    },
+    // título de seção dentro do documento; pula de página se não couber
+    section(y,text,need){
+      if(y+(need||30)>H-24){doc.addPage();y=36}
+      doc.setFont('times','bold');doc.setFontSize(13);doc.setTextColor(...C.deep);doc.text(text,M,y);
+      return y+3.5;
+    },
+    table(opts){
+      const t=Object.assign({theme:'grid',showHead:'everyPage',showFoot:'lastPage',rowPageBreak:'avoid',
+        margin:{top:32,bottom:20,left:M,right:M},
+        styles:{font:'helvetica',fontSize:9.5,textColor:C.ink,cellPadding:{top:2.4,bottom:2.4,left:2.6,right:2.6},lineColor:C.line,lineWidth:.2,overflow:'linebreak',valign:'top'},
+        headStyles:{fillColor:C.cherry,textColor:[255,255,255],fontStyle:'bold',valign:'middle'},
+        footStyles:{fillColor:C.blush,textColor:C.deep,fontStyle:'bold'},
+        alternateRowStyles:{fillColor:C.blush2}},opts);
+      if(typeof window.autoTable==='function')window.autoTable(doc,t);else doc.autoTable(t);
+      return doc.lastAutoTable.finalY+9;
+    },
+    // cabeçalho e rodapé em todas as páginas, com numeração quando há mais de uma
+    frame(){
+      const pages=doc.getNumberOfPages();
+      for(let i=1;i<=pages;i++){
+        doc.setPage(i);
+        cherryAt(M,10,1.15);
+        doc.setFont('times','bold');doc.setFontSize(17);doc.setTextColor(...C.cherry);doc.text(title,M+10,16);
+        doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(...C.muted);doc.text(sub+(i>1?' (continuação)':''),M+10,22);
+        if(when){doc.setFontSize(9);doc.text(when,W-M,22,{align:'right'})}
+        doc.setDrawColor(...C.cherry);doc.setLineWidth(.6);doc.line(M,26,W-M,26);
+        doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.line(M,H-14,W-M,H-14);
+        cherryAt(M,H-11.2,.62);
+        doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...C.muted);
+        doc.text(title+' · '+sub,M+6,H-8.6);
+        if(pages>1)doc.text('Página '+i+' de '+pages,W-M,H-8.6,{align:'right'});
+      }
+      return doc;
+    }
+  };
+  return K;
+}
+function buildReportPdf(J,list){
+  const K=pdfKit(J,'Lista de convidados confirmados'),C=K.C,people=reportPeople(list);
   const filters=[rFilter.group?'grupo “'+rFilter.group+'”':'',rFilter.q.trim()?'nome contendo “'+rFilter.q.trim()+'”':''].filter(Boolean);
-  if(filters.length){doc.text('Filtro aplicado: '+filters.join(' e '),M,y);y+=6}
-  const bw=(W-2*M-6)/2,bh=19;
-  [[list.length,list.length===1?'convite confirmado':'convites confirmados'],[people,people===1?'pessoa esperada, com acompanhantes':'pessoas esperadas, com acompanhantes']].forEach((k,i)=>{
-    const x=M+i*(bw+6);
-    doc.setFillColor(...C.blush2);doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.roundedRect(x,y,bw,bh,2.5,2.5,'FD');
-    doc.setFont('times','bold');doc.setFontSize(22);doc.setTextColor(...C.cherry);doc.text(String(k[0]),x+6,y+12.6);
-    const nw=doc.getTextWidth(String(k[0]));
-    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.ink);const ln=doc.splitTextToSize(k[1],bw-nw-16);doc.text(ln,x+nw+10,y+(ln.length>1?9.4:11.6));
-  });
-  y+=bh+7;
-  // ---- tabela
+  let y=K.intro(filters.length?['Filtro aplicado: '+filters.join(' e ')]:[]);
+  y=K.cards(y,[[list.length,list.length===1?'convite confirmado':'convites confirmados'],[people,people===1?'pessoa esperada, com acompanhantes':'pessoas esperadas, com acompanhantes']]);
   const notes=rFilter.notes;
   const head=['#','Convidado','Acompanhantes','Pessoas'].concat(notes?['Observações']:[]);
   const body=list.map((g,i)=>{
@@ -1011,34 +1063,82 @@ function buildReportPdf(J,list){
     const obs=[g.diet?'Restrição: '+g.diet:'',g.notes||''].filter(Boolean).join('\n');
     return [String(i+1),g.name,comp.length?comp.join(', '):'—',String(1+comp.length)].concat(notes?[obs||'—']:[]);
   });
-  const foot=[['','Total','',String(people)].concat(notes?['']:[])];
-  const table={
-    head:[head],body,foot,startY:y,theme:'grid',showHead:'everyPage',showFoot:'lastPage',rowPageBreak:'avoid',
-    margin:{top:32,bottom:20,left:M,right:M},
-    styles:{font:'helvetica',fontSize:9.5,textColor:C.ink,cellPadding:{top:2.4,bottom:2.4,left:2.6,right:2.6},lineColor:C.line,lineWidth:.2,overflow:'linebreak',valign:'top'},
-    headStyles:{fillColor:C.cherry,textColor:[255,255,255],fontStyle:'bold',valign:'middle'},
-    footStyles:{fillColor:C.blush,textColor:C.deep,fontStyle:'bold'},
-    alternateRowStyles:{fillColor:C.blush2},
+  K.table({head:[head],body,foot:[['','Total','',String(people)].concat(notes?['']:[])],startY:y,
     columnStyles:notes?{0:{cellWidth:9,halign:'right',textColor:C.muted},1:{cellWidth:44,fontStyle:'bold'},2:{cellWidth:50},3:{cellWidth:21,halign:'center'},4:{cellWidth:'auto'}}
-                      :{0:{cellWidth:9,halign:'right',textColor:C.muted},1:{cellWidth:62,fontStyle:'bold'},2:{cellWidth:'auto'},3:{cellWidth:21,halign:'center'}}
-  };
-  if(typeof window.autoTable==='function')window.autoTable(doc,table);else doc.autoTable(table);
-  // ---- cabeçalho e rodapé em todas as páginas
-  const pages=doc.getNumberOfPages();
-  for(let i=1;i<=pages;i++){
-    doc.setPage(i);
-    cherryAt(M,10,1.15);
-    doc.setFont('times','bold');doc.setFontSize(17);doc.setTextColor(...C.cherry);doc.text(title,M+10,16);
-    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(...C.muted);doc.text(sub+(i>1?' (continuação)':''),M+10,22);
-    if(when){doc.setFontSize(9);doc.text(when,W-M,22,{align:'right'})}
-    doc.setDrawColor(...C.cherry);doc.setLineWidth(.6);doc.line(M,26,W-M,26);
-    doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.line(M,H-14,W-M,H-14);
-    cherryAt(M,H-11.2,.62);
-    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...C.muted);
-    doc.text(title+' · '+sub,M+6,H-8.6);
-    if(pages>1)doc.text('Página '+i+' de '+pages,W-M,H-8.6,{align:'right'});
+                      :{0:{cellWidth:9,halign:'right',textColor:C.muted},1:{cellWidth:62,fontStyle:'bold'},2:{cellWidth:'auto'},3:{cellWidth:21,halign:'center'}}});
+  return K.frame();
+}
+// ---- resumo financeiro (só no painel; nada é pago pelo app)
+function pdfMoney(v){return money(v).replace(/−/g,'-')}
+function buildFinancePdf(J){
+  const K=pdfKit(J,'Resumo financeiro'),C=K.C,f=fin(),ex=S.expenses.slice();
+  const demo=ex.some(x=>x.demo);
+  let y=K.intro(['Registro e acompanhamento dos gastos. Nenhum pagamento é feito pelo app.'].concat(demo?['Itens marcados com (exemplo) são fictícios e entram nos totais, como no painel.']:[]));
+  const diffLabel=f.budget?(f.diff>=0?'Sobra do orçamento':'Orçamento estourado em'):'Sobra do orçamento';
+  y=K.cards(y,[
+    [f.budget?pdfMoney(f.budget):'Não definido','Orçamento total'],
+    [pdfMoney(f.planned),'Total previsto'],
+    [pdfMoney(f.spent),'Total gasto (valores finais)'],
+    [pdfMoney(f.paid),'Já pago'+(f.committed?' · '+Math.round(f.paid/f.committed*100)+'% do custo':'')],
+    [pdfMoney(f.pending),'Falta pagar'],
+    [f.budget?pdfMoney(Math.abs(f.diff)):'—',diffLabel,f.budget&&f.diff<0?C.deep:C.cherry]
+  ],3,15);
+  K.doc.setFont('helvetica','normal');K.doc.setFontSize(9.5);K.doc.setTextColor(...C.ink);
+  K.doc.text('Custo total considerado (valor final ou, se não houver, o previsto): '+pdfMoney(f.committed),K.M,y-1.5);y+=6;
+  const R={halign:'right'};
+  // gastos por categoria
+  const byCat={};ex.forEach(x=>{const c=x.category;byCat[c]=byCat[c]||{cost:0,paid:0,bal:0,n:0};byCat[c].cost+=cost(x);byCat[c].paid+=Number(x.paid)||0;byCat[c].bal+=balance(x);byCat[c].n++});
+  const cats=Object.entries(byCat).sort((a,b)=>b[1].cost-a[1].cost);
+  if(cats.length){
+    y=K.section(y,'Gastos por categoria');
+    y=K.table({startY:y,head:[['Categoria','Itens','Custo','Pago','Falta pagar','% do custo']],
+      body:cats.map(([k,v])=>[CATS[k]||k,String(v.n),pdfMoney(v.cost),pdfMoney(v.paid),pdfMoney(v.bal),(f.committed?Math.round(v.cost/f.committed*100):0)+'%']),
+      foot:[['Total',String(ex.length),pdfMoney(f.committed),pdfMoney(f.paid),pdfMoney(f.pending),f.committed?'100%':'0%']],
+      columnStyles:{0:{fontStyle:'bold'},1:{cellWidth:16,halign:'center'},2:Object.assign({cellWidth:30},R),3:Object.assign({cellWidth:30},R),4:Object.assign({cellWidth:30},R),5:Object.assign({cellWidth:22},R)},
+      didParseCell:d=>{if(d.section!=='body'&&d.column.index>=2)d.cell.styles.halign=d.column.index===1?'center':'right';if(d.section!=='body'&&d.column.index===1)d.cell.styles.halign='center'}});
   }
-  return doc;
+  // despesas, por vencimento
+  y=K.section(y,'Despesas');
+  const rows=ex.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||a.desc.localeCompare(b.desc,'pt-BR'));
+  if(!rows.length){doc0(K,y,'Nenhuma despesa lançada ainda.');return K.frame()}
+  // a coluna Despesa tem largura fixa e o texto já vai quebrado em linhas (evita o jsPDF juntar linhas ao quebrar)
+  const DW=40,dw=DW-4.4-.8;
+  const descCell=x=>{
+    K.doc.setFontSize(8.8);K.doc.setFont('helvetica','bold');const a=K.doc.splitTextToSize(x.desc+(x.demo?' (exemplo)':''),dw);
+    K.doc.setFont('helvetica','normal');const b=x.supplier?K.doc.splitTextToSize(x.supplier,dw):[];
+    return {content:a.concat(b).join('\n'),n:a.length};
+  };
+  K.table({startY:y,head:[['Despesa','Categoria','Situação','Vencimento','Custo','Pago','Saldo']],
+    body:rows.map(x=>{const ds=dueState(x);return [descCell(x),CATS[x.category]||x.category,EXP_ST[x.status]||x.status,x.due?fmtDate(x.due)+(ds==='overdue'?'\nvencida':ds==='soon'?'\nvence em breve':''):'—',pdfMoney(cost(x)),pdfMoney(x.paid),balance(x)>0?pdfMoney(balance(x)):'Quitado']}),
+    foot:[['Total','','','',pdfMoney(f.committed),pdfMoney(f.paid),pdfMoney(f.pending)]],
+    styles:{font:'helvetica',fontSize:8.8,textColor:C.ink,cellPadding:{top:2.2,bottom:2.2,left:2.2,right:2.2},lineColor:C.line,lineWidth:.2,overflow:'linebreak',valign:'top'},
+    columnStyles:{0:{cellWidth:DW,fontStyle:'normal',overflow:'visible'},1:{cellWidth:24},2:{cellWidth:23},3:{cellWidth:22},4:Object.assign({cellWidth:23},R),5:Object.assign({cellWidth:23},R),6:Object.assign({cellWidth:23},R)},
+    didParseCell:d=>{
+      if(d.column.index>=4)d.cell.styles.halign='right';
+      if(d.section==='body'&&d.column.index===3&&/vencida/.test(d.cell.raw||''))d.cell.styles.textColor=C.deep,d.cell.styles.fontStyle='bold';
+    },
+    // descrição em negrito e fornecedor em cinza na mesma célula: o texto é desenhado à mão
+    willDrawCell:d=>{if(d.section==='body'&&d.column.index===0){d.cell.__lines=d.cell.text;d.cell.text=[]}},
+    didDrawCell:d=>{
+      if(d.section!=='body'||d.column.index!==0||!d.cell.__lines)return;
+      const n=d.cell.raw.n,fs=d.cell.styles.fontSize,l=fs/K.doc.internal.scaleFactor,lh=l*1.15;
+      let yy=d.cell.y+d.cell.padding('top')+l*.85;
+      d.cell.__lines.forEach((t,i)=>{K.doc.setFont('helvetica',i<n?'bold':'normal');K.doc.setTextColor(...(i<n?C.ink:C.muted));K.doc.text(t,d.cell.x+d.cell.padding('left'),yy);yy+=lh});
+    }});
+  return K.frame();
+}
+function doc0(K,y,t){K.doc.setFont('helvetica','normal');K.doc.setFontSize(10);K.doc.setTextColor(...K.C.muted);K.doc.text(t,K.M,y+4)}
+function finFileName(){return 'resumo-financeiro-'+(slug(S.party.name)||'festa')+'-'+partyAge()+'-anos.pdf'}
+let finBusy=false;
+async function downloadFinancePdf(){
+  if(finBusy)return;
+  finBusy=true;render();
+  try{
+    const J=await loadPdfLib();
+    const doc=buildFinancePdf(J);const name=finFileName();
+    doc.save(name);toast('PDF gerado: '+name);
+  }catch(e){console.error(e);toast('Não foi possível gerar o PDF agora. Verifique a conexão e tente de novo.')}
+  finally{finBusy=false;render()}
 }
 
 /* ---------------- checklist ---------------- */
@@ -1081,7 +1181,7 @@ function viewFinance(){
   const byCat={};S.expenses.forEach(x=>{const c=x.category;byCat[c]=byCat[c]||{cost:0,paid:0};byCat[c].cost+=cost(x);byCat[c].paid+=Number(x.paid)||0});
   const cats=Object.entries(byCat).filter(c=>c[1].cost>0).sort((a,b)=>b[1].cost-a[1].cost);const max=Math.max(1,...cats.map(c=>c[1].cost));
   const filtTotal=list.reduce((a,x)=>a+cost(x),0);
-  return demoNotice()+'<div class="page-head"><div><h2>Finanças da festa</h2><p>Registro e acompanhamento dos gastos. Nenhum pagamento é feito pelo app.</p></div><div class="row"><button class="btn primary" data-act="exp-new">'+ic('plus')+'Nova despesa</button><button class="btn" data-act="fin-export">'+ic('download')+'Exportar</button><button class="btn" data-act="fin-copy">'+ic('copy')+'Copiar resumo</button>'+(inFrame?'':'<button class="btn" data-act="fin-print">'+ic('printer')+'Imprimir</button>')+'</div></div>'+
+  return demoNotice()+'<div class="page-head"><div><h2>Finanças da festa</h2><p>Registro e acompanhamento dos gastos. Nenhum pagamento é feito pelo app.</p></div><div class="row"><button class="btn primary" data-act="exp-new">'+ic('plus')+'Nova despesa</button><button class="btn" data-act="fin-export">'+ic('download')+'Exportar</button><button class="btn" data-act="fin-pdf"'+(finBusy?' aria-busy="true"':'')+'>'+(finBusy?'Gerando PDF…':ic('download')+'Resumo em PDF')+'</button><button class="btn" data-act="fin-copy">'+ic('copy')+'Copiar resumo</button>'+(inFrame?'':'<button class="btn" data-act="fin-print">'+ic('printer')+'Imprimir</button>')+'</div></div>'+
    '<div class="kpis">'+
     '<div class="kpi"><div class="label">Orçamento total</div><div class="v">'+(f.budget?money(f.budget):'—')+'</div><div class="s">'+(f.budget?'<a href="#" data-act="budget-edit">Alterar</a>':'<a href="#" data-act="budget-edit">Definir orçamento</a>')+'</div></div>'+
     '<div class="kpi"><div class="label">Total previsto</div><div class="v">'+money(f.planned)+'</div><div class="s">soma dos valores previstos</div></div>'+
@@ -1222,6 +1322,7 @@ document.addEventListener('click',e=>{
    case 'fin-export':exportModal('Exportar despesas','financeiro-priscila-40.csv',finCSV());break;
    case 'fin-copy':copyText(finSummaryText(),'Resumo financeiro copiado');break;
    case 'fin-print':finPrint();break;
+   case 'fin-pdf':downloadFinancePdf();break;
    case 'f-clear':fFilter={q:'',cat:'',st:'',from:'',to:''};render();break;
    case 'budget-edit':go('festa');setTimeout(()=>{const b=document.getElementById('pf-budget');if(b){b.scrollIntoView({block:'center'});b.focus()}},80);break;
    /* outros */
