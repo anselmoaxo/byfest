@@ -6,7 +6,8 @@ Um único arquivo (`index.html`, HTML + JS puro, sem build) com:
 
 - **Convite público** (endereço principal, `/`): é o link enviado pelo WhatsApp, como um link de agendamento. Tem foto, contagem regressiva, mapa, agenda e compartilhamento pelo WhatsApp.
 - **Confirmação de presença** (`#confirmar`): passo a passo com resposta, acompanhantes, restrições e revisão.
-- **Painel privado** (entrada em `/login`, com e-mail e senha): resumo, convidados (CSV), checklist e finanças.
+- **Painel privado** (entrada em `/login`, com e-mail e senha): resumo, convidados (CSV e relatório em PDF dos confirmados), checklist e finanças.
+  O PDF é gerado no navegador com [jsPDF](https://github.com/parallax/jsPDF) e jsPDF-AutoTable (MIT), copiados em `vendor/` e carregados só quando a aniversariante clica em “Baixar relatório em PDF”. Ele usa os dados já carregados no painel e não traz telefones nem valores.
 
 ## Como funciona online
 
