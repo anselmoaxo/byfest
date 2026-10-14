@@ -603,8 +603,10 @@ function shareText(g){
   if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
   t+='\nConfirme sua presença pelo convite: '+inviteLink(g);return t;
 }
-// api.whatsapp.com/send em vez de wa.me: o redirecionamento do wa.me estraga emojis (chegam como "�"), principalmente no WhatsApp do computador
-const waShare=(txt,num)=>'https://api.whatsapp.com/send?'+(num?'phone='+waNumber(num)+'&':'')+'text='+encodeURIComponent(txt);
+// Emojis chegam como "�" quando o link passa pela página de redirecionamento (wa.me / api.whatsapp.com) e abre o app do computador.
+// No computador vamos direto ao WhatsApp Web; no celular o api.whatsapp.com abre o app sem estragar a mensagem.
+const WA_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
+const waShare=(txt,num)=>(WA_MOBILE?'https://api.whatsapp.com/send?':'https://web.whatsapp.com/send?')+(num?'phone='+waNumber(num)+'&':'')+'text='+encodeURIComponent(txt);
 // convite individual: só usa data, horário e local se estiverem cadastrados
 function guestInviteText(g){
   const p=S.party,first=String(g.name||'').trim().split(/\s+/)[0]||'';
