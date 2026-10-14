@@ -180,6 +180,11 @@ textarea.input{min-height:90px;resize:vertical}
 .panel h3{margin-bottom:12px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .kpi{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px 16px;min-width:0}
+.report{margin-top:14px;border-color:color-mix(in srgb,var(--cherry) 22%,var(--line))}
+.rep-kpis{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:12px}
+.rep-kpis .v{font-family:var(--f-num);font-size:1.9rem;font-weight:700;color:var(--cherry);line-height:1.1}
+.rep-kpis .s{font-size:.8rem;color:var(--ink-2)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
 .kpi .v{font-family:var(--f-num);font-size:clamp(1.15rem,4.4vw,1.55rem);white-space:nowrap;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:4px;overflow-wrap:anywhere}
 .kpi .s{font-size:.82rem;color:var(--ink-2)}
 .kpi.hl{background:var(--blush-2);border-color:var(--blush)}
@@ -826,6 +831,7 @@ function viewDash(){
     '<button class="shortcut" data-act="task-new">'+ic('list')+'Nova tarefa</button>'+
     '<button class="shortcut" data-act="copy-invite">'+ic('link')+'Copiar link do convite</button>'+
     '<a class="shortcut" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>'+
+    '<button class="shortcut" data-act="report-open">'+ic('download')+'Relatório de confirmados</button>'+
     '<a class="shortcut" href="#convite">'+ic('eye')+'Ver convite</a></div></section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Dinheiro da festa</h3><span class="spacer"></span><a class="small" href="#financas">Ver finanças</a></div>'+budgetBlock(f)+'</section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Próximas tarefas</h3><span class="spacer"></span><span class="small muted">'+doneT+' de '+S.tasks.length+' concluídas</span></div>'+
@@ -855,6 +861,7 @@ function viewGuests(){
   return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
    '<div class="kpis"><div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div></div><div class="kpi"><div class="label">Ainda não sabem</div><div class="v" style="color:var(--warn)">'+gs.maybe+'</div></div><div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div></div><div class="kpi"><div class="label">Sem resposta</div><div class="v">'+gs.pending+'</div></div></div>'+
    '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div></div>'+
+   reportSection()+
    '<div class="toolbar"><input class="input" id="g-q" type="search" placeholder="Buscar por nome ou WhatsApp" value="'+esc(gFilter.q)+'" data-filter="g-q" aria-label="Buscar convidados">'+
     '<select class="input" id="g-st" data-filter="g-st" aria-label="Filtrar por status"><option value="">Todos os status</option>'+Object.entries(G_ST).map(([k,v])=>'<option value="'+k+'" '+(gFilter.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
     '<select class="input" id="g-gr" data-filter="g-gr" aria-label="Filtrar por grupo"><option value="">Todos os grupos</option>'+groups.map(g=>'<option '+(gFilter.group===g?'selected':'')+'>'+esc(g)+'</option>').join('')+'</select></div>'+
@@ -906,6 +913,132 @@ function runImport(){
 }
 function guestsCSV(){
   return toCSV([['nome','whatsapp','grupo','acompanhantes_permitidos','status','pessoas_confirmadas','acompanhantes','restricoes','observacoes','data_resposta']].concat(S.guests.map(g=>[g.name,fmtPhone(g.phone),g.group,g.allowed,G_ST[g.status],g.status==='yes'?1+(g.companions||[]).length:0,(g.companions||[]).join(', '),g.diet,g.notes,fmtDate(g.respondedAt)])));
+}
+
+/* ---------------- relatório em PDF dos confirmados ---------------- */
+// Só existe no painel (depois do login). O PDF é montado no navegador com os dados já carregados; nada fica em URL pública.
+let rFilter={q:'',group:'',notes:true},repMsg=null,repBusy=false;
+function reportList(){
+  const q=rFilter.q.trim().toLowerCase();
+  return S.guests.filter(g=>g.status==='yes'&&!g.demo&&(!rFilter.group||g.group===rFilter.group)&&(!q||(g.name+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q)))
+    .sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
+}
+function reportPeople(list){return list.reduce((n,g)=>n+1+(g.companions||[]).length,0)}
+function reportSection(){
+  const list=reportList(),people=reportPeople(list);
+  const groups=[...new Set(S.guests.filter(g=>g.status==='yes'&&!g.demo).map(g=>g.group).filter(Boolean))].sort();
+  const demo=S.guests.some(g=>g.demo&&g.status==='yes');
+  const filtered=rFilter.q.trim()||rFilter.group;
+  return '<section class="panel report" id="relatorio" aria-labelledby="rep-h"><div class="row"><h3 id="rep-h" style="margin:0">Convidados confirmados</h3><span class="spacer"></span><span class="pill ok"><i class="dot"></i>Só quem respondeu “Vou”</span></div>'+
+   '<div class="rep-kpis"><div><div class="label">Convites confirmados</div><div class="v">'+list.length+'</div></div><div><div class="label">Pessoas esperadas</div><div class="v">'+people+'</div><div class="s">com acompanhantes</div></div></div>'+
+   '<div class="toolbar" style="margin:12px 0 0"><input class="input" id="r-q" type="search" placeholder="Filtrar por nome" value="'+esc(rFilter.q)+'" data-filter="r-q" aria-label="Filtrar o relatório por nome">'+
+    (groups.length?'<select class="input" id="r-gr" data-filter="r-gr" aria-label="Filtrar o relatório por grupo"><option value="">Todos os grupos</option>'+groups.map(g=>'<option '+(rFilter.group===g?'selected':'')+'>'+esc(g)+'</option>').join('')+'</select>':'')+
+    '<label class="switch"><input type="checkbox" id="r-notes" data-filter="r-notes" '+(rFilter.notes?'checked':'')+'>Incluir observações</label></div>'+
+   (repMsg?'<div class="notice '+(repMsg.bad?'':'info')+'" role="alert" style="margin-top:12px">'+ic(repMsg.bad?'alert':'info')+'<span>'+esc(repMsg.text)+'</span></div>':'')+
+   '<div class="row" style="margin-top:12px">'+
+    '<button class="btn primary" data-act="report-pdf"'+(list.length?'':' disabled')+(repBusy?' aria-busy="true"':'')+'>'+(repBusy?'Gerando PDF…':ic('download')+'Baixar relatório em PDF')+'</button>'+
+    (REMOTE?'<button class="btn" data-act="refresh">Atualizar respostas</button>':'')+
+    (filtered?'<button class="btn" data-act="report-clear">Limpar filtros</button>':'')+'</div>'+
+   '<p class="small muted" style="margin-top:10px">'+(list.length?'':(filtered?'Nenhum confirmado com esses filtros. ':'Ainda não há convidados confirmados. ')+'')+
+    'O PDF traz nome, acompanhantes e total de pessoas'+(rFilter.notes?', com restrições alimentares e observações':'')+'. Telefones e valores da festa não entram.'+(demo?' Convidados de exemplo também ficam de fora.':'')+'</p></section>';
+}
+const PDF_LIBS=['vendor/jspdf.umd.min.js','vendor/jspdf.plugin.autotable.min.js'];
+let pdfLibP=null;
+function loadScript(src){return new Promise((ok,fail)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>fail(new Error('load '+src));document.head.appendChild(s)})}
+function loadPdfLib(){
+  if(!pdfLibP)pdfLibP=PDF_LIBS.reduce((p,src)=>p.then(()=>loadScript(src)),Promise.resolve()).then(()=>{
+    const J=window.jspdf&&window.jspdf.jsPDF;if(!J)throw new Error('jspdf');
+    if(typeof window.applyPlugin==='function')window.applyPlugin(J);return J;
+  }).catch(e=>{pdfLibP=null;throw e});
+  return pdfLibP;
+}
+function slug(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function reportFileName(){return 'convidados-confirmados-'+(slug(S.party.name)||'festa')+'-'+partyAge()+'-anos.pdf'}
+async function downloadReport(){
+  if(repBusy)return;
+  repBusy=true;repMsg=null;render();
+  try{
+    if(REMOTE&&authed)await refreshRemote(true);
+    const list=reportList();
+    if(!list.length){repMsg={text:'Ainda não há convidados confirmados'+(rFilter.q.trim()||rFilter.group?' com esses filtros':'')+'. Nada foi gerado.'};return}
+    const J=await loadPdfLib();
+    const doc=buildReportPdf(J,list);
+    const name=reportFileName();
+    doc.save(name);
+    toast('PDF gerado: '+name);
+  }catch(e){
+    console.error(e);
+    repMsg={bad:true,text:'Não foi possível gerar o PDF agora. Verifique a conexão e tente de novo.'};
+  }finally{repBusy=false;render()}
+}
+function buildReportPdf(J,list){
+  const p=S.party,age=partyAge();
+  const C={cherry:[163,18,58],deep:[110,12,39],blush:[248,225,230],blush2:[251,238,241],cream:[255,249,244],ink:[59,26,35],muted:[107,74,83],line:[234,205,212],leaf:[61,122,76]};
+  const doc=new J({unit:'mm',format:'a4',orientation:'portrait'});
+  const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight(),M=16;
+  const title=(p.name||'Aniversário')+' '+age+' anos — Festa Cherry',sub='Lista de convidados confirmados';
+  const people=reportPeople(list),now=new Date();
+  const two=n=>String(n).padStart(2,'0');
+  const gen='Relatório gerado em '+two(now.getDate())+'/'+two(now.getMonth()+1)+'/'+now.getFullYear()+' às '+two(now.getHours())+'h'+two(now.getMinutes());
+  const when=p.date?fmtDateLong(p.date).replace(/^./,c=>c.toUpperCase())+(p.time?' às '+p.time.replace(':','h'):''):'';
+  doc.setProperties({title:title+' · '+sub,subject:sub,creator:'Festa Cherry'});
+  const cherryAt=(x,y,s)=>{ // par de cerejas pequeno; (x,y) = canto superior esquerdo
+    doc.setDrawColor(...C.leaf);doc.setLineWidth(.35*s);
+    doc.line(x+3.4*s,y,x+1.6*s,y+4.6*s);doc.line(x+3.4*s,y,x+5.2*s,y+4.9*s);
+    doc.setFillColor(...C.leaf);doc.ellipse(x+4.7*s,y+.5*s,1.4*s,.6*s,'F');
+    doc.setFillColor(...C.cherry);doc.circle(x+1.6*s,y+5.9*s,1.5*s,'F');doc.circle(x+5.2*s,y+6.2*s,1.5*s,'F');
+  };
+  // ---- bloco de abertura (só na 1ª página)
+  let y=36;
+  if(when){doc.setFont('helvetica','bold');doc.setFontSize(10.5);doc.setTextColor(...C.ink);doc.text('Data da festa: ',M,y);const w=doc.getTextWidth('Data da festa: ');doc.setFont('helvetica','normal');doc.text(when,M+w,y);y+=5.5}
+  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.muted);doc.text(gen,M,y);y+=6;
+  const filters=[rFilter.group?'grupo “'+rFilter.group+'”':'',rFilter.q.trim()?'nome contendo “'+rFilter.q.trim()+'”':''].filter(Boolean);
+  if(filters.length){doc.text('Filtro aplicado: '+filters.join(' e '),M,y);y+=6}
+  const bw=(W-2*M-6)/2,bh=19;
+  [[list.length,list.length===1?'convite confirmado':'convites confirmados'],[people,people===1?'pessoa esperada, com acompanhantes':'pessoas esperadas, com acompanhantes']].forEach((k,i)=>{
+    const x=M+i*(bw+6);
+    doc.setFillColor(...C.blush2);doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.roundedRect(x,y,bw,bh,2.5,2.5,'FD');
+    doc.setFont('times','bold');doc.setFontSize(22);doc.setTextColor(...C.cherry);doc.text(String(k[0]),x+6,y+12.6);
+    const nw=doc.getTextWidth(String(k[0]));
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...C.ink);const ln=doc.splitTextToSize(k[1],bw-nw-16);doc.text(ln,x+nw+10,y+(ln.length>1?9.4:11.6));
+  });
+  y+=bh+7;
+  // ---- tabela
+  const notes=rFilter.notes;
+  const head=['#','Convidado','Acompanhantes','Pessoas'].concat(notes?['Observações']:[]);
+  const body=list.map((g,i)=>{
+    const comp=(g.companions||[]).filter(Boolean);
+    const obs=[g.diet?'Restrição: '+g.diet:'',g.notes||''].filter(Boolean).join('\n');
+    return [String(i+1),g.name,comp.length?comp.join(', '):'—',String(1+comp.length)].concat(notes?[obs||'—']:[]);
+  });
+  const foot=[['','Total','',String(people)].concat(notes?['']:[])];
+  const table={
+    head:[head],body,foot,startY:y,theme:'grid',showHead:'everyPage',showFoot:'lastPage',rowPageBreak:'avoid',
+    margin:{top:32,bottom:20,left:M,right:M},
+    styles:{font:'helvetica',fontSize:9.5,textColor:C.ink,cellPadding:{top:2.4,bottom:2.4,left:2.6,right:2.6},lineColor:C.line,lineWidth:.2,overflow:'linebreak',valign:'top'},
+    headStyles:{fillColor:C.cherry,textColor:[255,255,255],fontStyle:'bold',valign:'middle'},
+    footStyles:{fillColor:C.blush,textColor:C.deep,fontStyle:'bold'},
+    alternateRowStyles:{fillColor:C.blush2},
+    columnStyles:notes?{0:{cellWidth:9,halign:'right',textColor:C.muted},1:{cellWidth:44,fontStyle:'bold'},2:{cellWidth:50},3:{cellWidth:21,halign:'center'},4:{cellWidth:'auto'}}
+                      :{0:{cellWidth:9,halign:'right',textColor:C.muted},1:{cellWidth:62,fontStyle:'bold'},2:{cellWidth:'auto'},3:{cellWidth:21,halign:'center'}}
+  };
+  if(typeof window.autoTable==='function')window.autoTable(doc,table);else doc.autoTable(table);
+  // ---- cabeçalho e rodapé em todas as páginas
+  const pages=doc.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    cherryAt(M,10,1.15);
+    doc.setFont('times','bold');doc.setFontSize(17);doc.setTextColor(...C.cherry);doc.text(title,M+10,16);
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(...C.muted);doc.text(sub+(i>1?' (continuação)':''),M+10,22);
+    if(when){doc.setFontSize(9);doc.text(when,W-M,22,{align:'right'})}
+    doc.setDrawColor(...C.cherry);doc.setLineWidth(.6);doc.line(M,26,W-M,26);
+    doc.setDrawColor(...C.line);doc.setLineWidth(.3);doc.line(M,H-14,W-M,H-14);
+    cherryAt(M,H-11.2,.62);
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(...C.muted);
+    doc.text(title+' · '+sub,M+6,H-8.6);
+    if(pages>1)doc.text('Página '+i+' de '+pages,W-M,H-8.6,{align:'right'});
+  }
+  return doc;
 }
 
 /* ---------------- checklist ---------------- */
@@ -1069,6 +1202,9 @@ document.addEventListener('click',e=>{
    case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],respondedAt:''});save();render();toast('Resposta cancelada')});break}
    case 'guest-import':importModal();break;
    case 'imp-run':runImport();break;
+   case 'report-pdf':downloadReport();break;
+   case 'report-clear':rFilter.q='';rFilter.group='';repMsg=null;render();break;
+   case 'report-open':go('convidados');setTimeout(()=>{const n=document.getElementById('relatorio');if(n)n.scrollIntoView({block:'start'})},60);break;
    case 'guest-export':exportModal('Exportar convidados','convidados-priscila-40.csv',guestsCSV());break;
    case 'export-copy':copyText(window.__export.content,'CSV copiado. Cole numa planilha.');break;
    case 'export-dl':downloadFile(window.__export.name,window.__export.content);break;
@@ -1114,7 +1250,8 @@ document.addEventListener('input',e=>{
   if(el.hasAttribute('data-calc'))updSaldo();
 });
 function applyFilter(el,keepFocus){
-  const m={'g-q':v=>gFilter.q=v,'g-st':v=>gFilter.status=v,'g-gr':v=>gFilter.group=v,'f-q':v=>fFilter.q=v,'f-cat':v=>fFilter.cat=v,'f-st':v=>fFilter.st=v,'f-from':v=>fFilter.from=v,'f-to':v=>fFilter.to=v};
+  const m={'g-q':v=>gFilter.q=v,'g-st':v=>gFilter.status=v,'g-gr':v=>gFilter.group=v,'f-q':v=>fFilter.q=v,'f-cat':v=>fFilter.cat=v,'f-st':v=>fFilter.st=v,'f-from':v=>fFilter.from=v,'f-to':v=>fFilter.to=v,'r-q':v=>rFilter.q=v,'r-gr':v=>rFilter.group=v,'r-notes':()=>rFilter.notes=el.checked};
+  if(el.dataset.filter.startsWith('r-'))repMsg=null;
   m[el.dataset.filter](el.value);const pos=el.selectionStart;render();
   if(keepFocus){const n=document.getElementById(el.id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
 }
