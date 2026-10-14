@@ -7,8 +7,23 @@
 <title>Priscila 40 · Cherry</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Priscila 40 anos: uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
-<meta property="og:title" content="Priscila 40 anos · Cherry">
-<meta property="og:description" content="Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
+<!-- card de prévia (WhatsApp, redes): genérico de propósito, sem dados de convidados -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Festa Cherry">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://myfest.blogdapriscila.com.br/">
+<meta property="og:title" content="Priscila 40 anos · Festa Cherry">
+<meta property="og:description" content="Você está convidado(a)! Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
+<meta property="og:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
+<meta property="og:image:secure_url" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Convite: Priscila 40 anos, Festa Cherry. Confirme sua presença.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Priscila 40 anos · Festa Cherry">
+<meta name="twitter:description" content="Você está convidado(a)! Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
+<meta name="twitter:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
 <meta name="theme-color" content="#a3123a">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
@@ -588,14 +603,20 @@ function shareText(g){
   if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
   t+='\nConfirme sua presença pelo convite: '+inviteLink(g);return t;
 }
-const waShare=(txt,num)=>'https://wa.me/'+(num?waNumber(num):'')+'?text='+encodeURIComponent(txt);
+// api.whatsapp.com/send em vez de wa.me: o redirecionamento do wa.me estraga emojis (chegam como "�"), principalmente no WhatsApp do computador
+const waShare=(txt,num)=>'https://api.whatsapp.com/send?'+(num?'phone='+waNumber(num)+'&':'')+'text='+encodeURIComponent(txt);
 // convite individual: só usa data, horário e local se estiverem cadastrados
 function guestInviteText(g){
   const p=S.party,first=String(g.name||'').trim().split(/\s+/)[0]||'';
-  let t='Oi'+(first?', '+first:'')+'! 🍒 Quero convidar você para comemorar meus '+partyAge()+' anos!';
-  if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
-  const loc=[p.venue,p.address].filter(Boolean).join(', ');if(loc)t+='\n📍 '+loc;
-  return t+'\nConfira os detalhes da festa e confirme sua presença por aqui: '+inviteLink(g)+'\nVai ser muito especial ter você comigo! 💕';
+  const clean=x=>String(x||'').replace(/\s+/g,' ').trim();
+  const L=['Oi'+(first?', '+first:'')+'! 🍒','Quero convidar você para comemorar meus '+partyAge()+' anos!'];
+  const info=[];
+  if(p.date)info.push('📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):''));
+  const loc=[clean(p.venue),clean(p.address)].filter(Boolean).join(' · ');if(loc)info.push('📍 '+loc);
+  if(info.length)L.push('',...info);
+  // o link fica sozinho na linha: o WhatsApp monta o card de prévia a partir dele
+  L.push('','Confira os detalhes da festa e confirme sua presença:',inviteLink(g),'','Vai ser muito especial ter você comigo! 💕');
+  return L.join('\n');
 }
 // abrir o WhatsApp não prova que a mensagem foi enviada: fica "preparado" até a anfitriã marcar
 const INV_ST={prepared:'Preparado no WhatsApp',sent:'Convite enviado'};
