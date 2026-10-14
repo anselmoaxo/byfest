@@ -261,6 +261,60 @@ details.sec .body{padding-bottom:20px}
   #printArea td,#printArea th{border-bottom:1px solid #ccc;padding:4px;text-align:left}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}.hero .fall{display:none}}
+/* ===== refinamento visual Cherry ===== */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(55vmax 45vmax at 105% -8%, color-mix(in srgb,var(--blush) 80%,transparent), transparent 62%),
+  radial-gradient(45vmax 38vmax at -8% 108%, color-mix(in srgb,var(--leaf-soft) 75%,transparent), transparent 60%)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn[aria-busy="true"]{pointer-events:none;opacity:.9}
+.btn[aria-busy="true"]::before{content:"";width:18px;height:18px;flex:none;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn.is-done{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.leaf-deco{position:absolute;width:130px;height:130px;color:var(--leaf);opacity:.16;pointer-events:none}
+.leaf-deco.tl{top:-26px;left:-30px;transform:rotate(-24deg)}
+.leaf-deco.br{bottom:-30px;right:-26px;transform:rotate(156deg)}
+.hero>*:not(.fall):not(.leaf-deco){position:relative;z-index:1}
+.kicker{font-family:var(--f-display);font-style:italic;color:var(--leaf);font-size:1.05rem;margin-bottom:2px;position:relative}
+.date-chip{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 16px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-weight:600;font-size:.92rem;color:var(--cherry-deep);position:relative}
+.date-chip svg{width:18px;height:18px;color:var(--cherry)}
+.sh{font-size:1.3rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sh svg{width:18px;height:22px;flex:none}
+.note-card{position:relative;overflow:hidden;background:linear-gradient(165deg,var(--paper) 30%,var(--blush-2))}
+.note-card .msg{font-family:var(--f-display);font-size:1.14rem;line-height:1.55;font-style:italic;color:var(--ink);position:relative;white-space:pre-line}
+.note-card .from{font-family:var(--f-script);font-size:2.2rem;color:var(--cherry);line-height:1;margin-top:8px;text-align:right;position:relative}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+.inv-col{min-width:0}
+@media (min-width:960px){
+  .invite{max-width:1080px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start;padding-block:40px 64px}
+  .invite .hero{position:sticky;top:24px;padding:40px 28px}
+  .inv-col>.sect:first-child{margin-top:0}
+  .cta-bar{position:static;background:none;padding:0}
+}
+.ticket{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;background:var(--paper);border:1.5px dashed color-mix(in srgb,var(--cherry) 35%,var(--paper));border-radius:18px;padding:12px 14px;margin-bottom:14px}
+.ticket svg{width:34px;height:42px}
+.ticket b{font-family:var(--f-display);font-weight:500;font-size:1.06rem;display:block;line-height:1.25}
+.ticket .meta{font-size:.84rem;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:2px}
+.progress{list-style:none;padding:0;margin:4px 0 6px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.progress li{display:flex;flex-direction:column;gap:6px;font-size:.74rem;font-weight:600;color:var(--ink-2);line-height:1.25}
+.progress li::before{content:"";height:6px;border-radius:99px;background:var(--line)}
+.progress li.on::before{background:var(--cherry)}
+.progress li[aria-current="step"]{color:var(--cherry)}
+@media (max-width:479px){.progress li span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+.cat{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;border-radius:999px;font-size:.8rem;font-weight:600;white-space:nowrap;background:color-mix(in srgb,var(--c) 12%,var(--paper));color:color-mix(in srgb,var(--c) 85%,var(--ink))}
+.cat i{width:9px;height:9px;border-radius:3px;background:var(--c);flex:none}
+.pill .g{font-size:.85em;line-height:1}
+details.more{flex:1 1 100%}
+details.more summary{cursor:pointer;font-weight:600;font-size:.9rem;color:var(--cherry);padding:6px 0;width:max-content}
+details.more .in{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.kpi{position:relative;overflow:hidden}
+.welcome{position:relative;overflow:hidden}
+.panel h3,.page-head h2{letter-spacing:.005em}
+@media (min-width:821px){.rec{transition:border-color .15s ease, box-shadow .15s ease}.rec:hover{border-color:color-mix(in srgb,var(--cherry) 30%,var(--line));box-shadow:var(--shadow)}}
+@media (max-width:520px){
+  .rec .acts{gap:6px}.rec .acts .btn{padding:0 11px;font-size:.86rem}
+  .page-head .row .btn:not(.primary){min-height:44px;padding:0 14px;font-size:.9rem}
+  .toolbar select.input{flex:1 1 calc(50% - 5px);min-width:0}
+}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .tablewrap{overflow-x:auto}
 </style>
@@ -277,6 +331,10 @@ details.sec .body{padding-bottom:20px}
       <circle cx="45" cy="57" r="13" fill="var(--cherry)"/>
       <ellipse cx="10" cy="50" rx="3.4" ry="2.2" fill="#fff" opacity=".55" transform="rotate(-30 10 50)"/>
       <ellipse cx="40" cy="52" rx="3.4" ry="2.2" fill="#fff" opacity=".55" transform="rotate(-30 40 52)"/>
+    </symbol>
+    <symbol id="leaf" viewBox="0 0 100 100">
+      <path d="M8 92 C 20 50, 52 18, 94 8 C 88 52, 58 84, 8 92 Z" fill="currentColor"/>
+      <path d="M8 92 C 34 66, 60 40, 86 16" fill="none" stroke="var(--cream)" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>
     </symbol>
   </defs>
 </svg>
@@ -295,6 +353,11 @@ const CATS={local:'Local',buffet:'Buffet',churrasco:'Churrasco',decoracao:'Decor
 const TCATS=Object.assign({geral:'Geral',convidados:'Convidados'},CATS);
 const EXP_ST={planejado:'Planejado',pendente:'Pendente',parcial:'Parcialmente pago',pago:'Pago'};
 const EXP_ST_CLS={planejado:'',pendente:'warn',parcial:'cherry',pago:'ok'};
+const EXP_ST_G={planejado:'○',pendente:'!',parcial:'◐',pago:'✓'};
+const CAT_C={local:'#a3123a',buffet:'#b8621b',churrasco:'#8f3b1d',decoracao:'#c8375b',bolo:'#c25a86',bebidas:'#2c6f8c',musica:'#6a4a9e',fotografia:'#45598a',lembrancinhas:'#a2507f',convites:'#86683a',transporte:'#4f6d76',roupa:'#8e4767',beleza:'#b8476f',outros:'#76656b',geral:'#3d7a4c',convidados:'#3d7a4c'};
+function catChip(k){return '<span class="cat" style="--c:'+(CAT_C[k]||'#76656b')+'"><i aria-hidden="true"></i>'+esc(TCATS[k]||k)+'</span>'}
+function stPill(k){return '<span class="pill '+EXP_ST_CLS[k]+'"><span class="g" aria-hidden="true">'+EXP_ST_G[k]+'</span>'+EXP_ST[k]+'</span>'}
+const DEFAULT_WELCOME='Quarenta anos merecem ser celebrados com quem faz parte da minha história. Vai ser uma alegria ter você comigo nessa comemoração.';
 const PAY=['Pix','Dinheiro','Cartão de crédito','Cartão de débito','Boleto','Transferência','Outro'];
 const G_ST={pending:'Sem resposta',yes:'Vai',no:'Não vai',maybe:'Ainda não sabe'};
 const G_ST_CLS={pending:'',yes:'ok',no:'bad',maybe:'warn'};
@@ -403,7 +466,7 @@ function demoData(){
 }
 function defaults(){
   const d=demoData();
-  return {v:1,party:{name:'Priscila',age:40,tagline:'uma celebração doce, cheia de amor e boas histórias.',date:'',time:'',endTime:'',venue:'',address:'',dress:'',parking:'',notes:'',contactName:'',contactPhone:'',photo:'',rsvpDeadline:'',maxCompanions:2,rsvpOpen:true,budget:0,inviteUrl:''},
+  return {v:1,party:{name:'Priscila',age:40,tagline:'uma celebração doce, cheia de amor e boas histórias.',welcome:'',date:'',time:'',endTime:'',venue:'',address:'',dress:'',parking:'',notes:'',contactName:'',contactPhone:'',photo:'',rsvpDeadline:'',maxCompanions:2,rsvpOpen:true,budget:0,inviteUrl:''},
     guests:d.guests,expenses:d.expenses,tasks:d.tasks,pinHash:pinHash(DEFAULT_PIN),pinDefault:true};
 }
 let S;let storageOk=true;
@@ -500,7 +563,7 @@ function gcalLink(){
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Aniversário de 40 anos da '+p.name+' 🍒')+'&dates='+dates+'&details='+encodeURIComponent('Convite: '+inviteLink())+(loc?'&location='+encodeURIComponent(loc):'')+'&ctz=America/Sao_Paulo';
 }
 function shareText(g){
-  const p=S.party;let t='🍒 Você é minha convidada especial! '+p.name+' '+p.age+' anos, '+p.tagline;
+  const p=S.party;let t='🍒 Você é especial para mim e está convidado(a)! '+p.name+' '+p.age+' anos, '+p.tagline;
   if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
   t+='\nConfirme sua presença pelo convite: '+inviteLink(g);return t;
 }
@@ -574,7 +637,7 @@ function focusFirst(){setTimeout(()=>{const f=document.querySelector('#app .card
 function factRow(icon,label,value,extra){return '<div class="fact"><div class="ic">'+ic(icon)+'</div><div><div class="label">'+label+'</div><div class="v">'+value+'</div>'+(extra||'')+'</div></div>'}
 function viewInvite(){
   const p=S.party;const tbd='<span class="tbd">A confirmar</span>';
-  const falls=[8,22,40,58,74,90].map((l,i)=>'<svg viewBox="0 0 60 72" style="left:'+l+'%;animation-duration:'+(14+i*2.3)+'s;animation-delay:-'+(i*3.1)+'s"><use href="#cherry"/></svg>').join('');
+  const falls=[3,12,86,95].map((l,i)=>'<svg viewBox="0 0 60 72" style="left:'+l+'%;animation-duration:'+(14+i*2.3)+'s;animation-delay:-'+(i*3.1)+'s"><use href="#cherry"/></svg>').join('');
   const photo=p.photo?'<img src="'+p.photo+'" alt="Foto de '+esc(p.name)+'">':'<div class="ph">'+cherry()+'<span class="small">Foto da '+esc(p.name)+' em breve</span></div>';
   const closed=rsvpClosed();
   const maps=mapsLink();
@@ -584,26 +647,31 @@ function viewInvite(){
   if(p.parking)extras.push(factRow('car','Estacionamento',esc(p.parking)));
   if(p.notes)extras.push(factRow('note','Observações',esc(p.notes).replace(/\n/g,'<br>')));
   if(p.contactName||p.contactPhone)extras.push(factRow('phone','Contato',esc(p.contactName)+(p.contactName&&p.contactPhone?' · ':'')+'<span class="num">'+esc(fmtPhone(p.contactPhone))+'</span>',p.contactPhone?'<a class="small" href="'+waShare('Oi! Tenho uma dúvida sobre a festa da '+p.name+'.',p.contactPhone)+'" target="_blank" rel="noopener">Chamar no WhatsApp</a>':''));
+  const leaf=c=>'<svg class="leaf-deco '+c+'" aria-hidden="true"><use href="#leaf"/></svg>';
+  const welcome=(p.welcome||DEFAULT_WELCOME).trim();
   return '<main class="invite gutter">'+
-   '<section class="hero" aria-labelledby="ttl"><div class="fall" aria-hidden="true">'+falls+'</div>'+
+   '<section class="hero" aria-labelledby="ttl"><div class="fall" aria-hidden="true">'+falls+'</div>'+leaf('tl')+leaf('br')+
     '<div class="arch">'+photo+'</div>'+
-    (invitee?'<p class="label" style="margin-bottom:4px">Convite para '+esc(invitee.name.split(' ')[0])+'</p>':'')+
+    '<p class="kicker">'+(invitee?esc(invitee.name.split(' ')[0])+', este convite é para você':'Você está convidado(a) para celebrar')+'</p>'+
     '<h1 id="ttl"><span class="script">'+esc(p.name)+'</span><span class="forty" style="display:block"><b>'+esc(p.age)+'</b> anos</span></h1>'+
     '<p class="tag">'+esc(p.tagline)+'</p>'+
+    (p.date?'<span class="date-chip">'+ic('cal')+esc(fmtDateLong(p.date))+(p.time?' · '+esc(p.time.replace(':','h')):'')+'</span>':'')+
     (p.date?'<div class="countdown" id="cd" aria-label="Contagem regressiva"><div><b id="cd-d">0</b><span>dias</span></div><div><b id="cd-h">0</b><span>horas</span></div><div><b id="cd-m">0</b><span>min</span></div><div><b id="cd-s">0</b><span>seg</span></div></div>':'')+
    '</section>'+
-   '<section class="sect"><div class="facts">'+
+   '<div class="inv-col">'+
+   '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
+   '<section class="sect" aria-labelledby="h-when"><h2 class="sh" id="h-when">'+cherry()+'Quando e onde</h2><div class="facts">'+
      factRow('cal','Data',p.date?esc(fmtDateLong(p.date)):tbd)+
      factRow('clock','Horário',p.time?esc(p.time.replace(':','h'))+(p.endTime?' às '+esc(p.endTime.replace(':','h')):''):tbd)+
      factRow('pin','Local',place,maps?'<a class="btn sm" style="margin-top:8px" href="'+maps+'" target="_blank" rel="noopener">'+ic('pin')+'Abrir no mapa</a>':'')+
    '</div></section>'+
-   (extras.length?'<section class="sect"><div class="facts">'+extras.join('')+'</div></section>':'')+
-   '<div class="divider" aria-hidden="true">'+cherry()+'</div>'+
+   (extras.length?'<section class="sect" aria-labelledby="h-info"><h2 class="sh" id="h-info">'+cherry()+'Bom saber</h2><div class="facts">'+extras.join('')+'</div></section>':'')+
    '<div class="cta-bar">'+
      (closed?'<div class="notice info">'+ic('info')+'<span>'+esc(closed)+' Fale com a '+esc(p.name)+' se precisar.</span></div>':
       '<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
-     '</div><div class="row" style="justify-content:center;margin-top:4px"><a class="btn leaf" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar no WhatsApp</a>'+(p.date?'<a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+'</div>'+
+   '</div><div class="actions"><a class="btn leaf" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar no WhatsApp</a>'+(p.date?'<a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+'</div>'+
    '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
+   '</div>'+
   '</main>';
 }
 function startCountdown(){
@@ -618,15 +686,17 @@ function startCountdown(){
 /* ================= CONFIRMAÇÃO (RSVP) ================= */
 let rsvp=newRsvp();
 function newRsvp(){return {step:1,name:'',phone:'',consent:false,answer:'',count:0,companions:[],diet:'',notes:'',existingId:'',limit:S?Number(S.party.maxCompanions)||0:2,errors:{}}}
-const STEP_LABELS=['Seus dados','Resposta','Acompanhantes','Detalhes','Revisão'];
-function stepsFor(){return rsvp.answer==='no'?[1,2,4,5]:[1,2,3,4,5]}
+function stepLabel(n){return {1:'Seus dados',2:'Presença',3:rsvp.answer==='no'?'Recado':'Acompanhantes e observações',5:'Revisão'}[n]}
+function stepsFor(){return [1,2,3,5]}
 function viewRsvp(){
   const closed=rsvpClosed();const p=S.party;
   const head='<div class="rsvp-top"><a class="iconbtn" href="#convite" aria-label="Voltar ao convite">'+ic('back')+'</a><div><div class="label">'+esc(p.name)+' '+esc(p.age)+' anos</div><h1 style="font-size:1.5rem">Confirmar presença</h1></div></div>';
+  const when=[p.date?fmtDateLong(p.date):'Data a confirmar',p.time?p.time.replace(':','h'):'',p.venue||''].filter(Boolean);
+  const ticket='<div class="ticket">'+cherry()+'<div><b>Aniversário de '+esc(p.age)+' anos da '+esc(p.name)+'</b><div class="meta">'+when.map(w=>'<span>'+esc(w)+'</span>').join('')+'</div></div></div>';
   if(closed&&rsvp.step!==6)return '<main class="rsvp gutter">'+head+'<div class="card"><div class="notice info">'+ic('info')+'<span>'+esc(closed)+'</span></div><a class="btn block" style="margin-top:16px" href="#convite">Voltar ao convite</a></div></main>';
   if(rsvp.step===6)return '<main class="rsvp gutter">'+viewRsvpDone()+'</main>';
   const seq=stepsFor();const idx=seq.indexOf(rsvp.step);
-  const bar='<div class="steps" aria-hidden="true">'+seq.map((s,i)=>'<i class="'+(i<=idx?'on':'')+'"></i>').join('')+'</div><p class="label" style="margin-bottom:12px">Etapa '+(idx+1)+' de '+seq.length+' · '+STEP_LABELS[rsvp.step-1]+'</p>';
+  const bar='<ol class="progress" aria-label="Etapas da confirmação">'+seq.map((n,i)=>'<li class="'+(i<=idx?'on':'')+'"'+(i===idx?' aria-current="step"':'')+'><span>'+stepLabel(n)+'</span></li>').join('')+'</ol><p class="label" style="margin-bottom:12px">Etapa '+(idx+1)+' de '+seq.length+' · '+stepLabel(rsvp.step)+'</p>';
   let body='';const e=rsvp.errors;
   if(rsvp.step===1){
     body='<form data-form="rsvp1" class="stack" novalidate><h2>Que bom ver você por aqui!</h2><p class="muted">Conte quem é você para a '+esc(p.name)+' saber quem respondeu.</p>'+
@@ -640,16 +710,13 @@ function viewRsvp(){
       opt('yes',cherry(),'Vou','Conte comigo nessa celebração')+opt('no','<span aria-hidden="true">💌</span>','Não poderei ir','Vou mandar meu carinho de longe')+opt('maybe','<span aria-hidden="true">⏳</span>','Ainda não sei','Respondo assim que tiver certeza')+
       '</div>'+(e.answer?'<span class="err">'+e.answer+'</span>':'')+navBtns()+'</div>';
   } else if(rsvp.step===3){
-    const lim=rsvp.limit;
-    body='<form data-form="rsvp3" class="stack" novalidate><h2>Vai alguém com você?</h2>'+
-      (lim>0?'<p class="muted">Você pode levar até '+lim+' acompanhante'+(lim>1?'s':'')+'.</p><div class="stepper"><button type="button" data-act="rsvp-count" data-d="-1" aria-label="Menos um acompanhante" '+(rsvp.count<=0?'disabled':'')+'>−</button><output aria-live="polite" class="num">'+rsvp.count+'</output><button type="button" data-act="rsvp-count" data-d="1" aria-label="Mais um acompanhante" '+(rsvp.count>=lim?'disabled':'')+'>+</button><span class="muted">acompanhante'+(rsvp.count===1?'':'s')+'</span></div>'+
+    const lim=rsvp.limit,no=rsvp.answer==='no';
+    const comp=no?'':(lim>0?'<p class="muted">Você pode levar até '+lim+' acompanhante'+(lim>1?'s':'')+'.</p><div class="stepper"><button type="button" data-act="rsvp-count" data-d="-1" aria-label="Menos um acompanhante" '+(rsvp.count<=0?'disabled':'')+'>−</button><output aria-live="polite" class="num">'+rsvp.count+'</output><button type="button" data-act="rsvp-count" data-d="1" aria-label="Mais um acompanhante" '+(rsvp.count>=lim?'disabled':'')+'>+</button><span class="muted">acompanhante'+(rsvp.count===1?'':'s')+'</span></div>'+
       Array.from({length:rsvp.count},(_,i)=>'<label class="field"><span>Nome do acompanhante '+(i+1)+'</span><input class="input" name="c'+i+'" id="r-c'+i+'" value="'+esc(rsvp.companions[i]||'')+'" maxlength="80" aria-invalid="'+(!!e['c'+i])+'">'+(e['c'+i]?'<span class="err">'+e['c'+i]+'</span>':'')+'</label>').join('')
-      :'<div class="notice info">'+ic('info')+'<span>Este convite é individual. Se tiver alguma dúvida, fale com a '+esc(p.name)+'.</span></div>')+
-      navBtns(true)+'</form>';
-  } else if(rsvp.step===4){
-    body='<form data-form="rsvp4" class="stack" novalidate><h2>'+(rsvp.answer==='no'?'Quer deixar um recado?':'Algum detalhe importante?')+'</h2>'+
-      (rsvp.answer!=='no'?'<label class="field"><span>Restrições alimentares <span class="muted" style="font-weight:400">(opcional)</span></span><input class="input" id="r-diet" name="diet" maxlength="160" placeholder="Ex.: vegetariana, sem glúten, alergia a camarão" value="'+esc(rsvp.diet)+'"></label>':'')+
-      '<label class="field"><span>'+(rsvp.answer==='no'?'Recado para a '+esc(p.name):'Observações')+' <span class="muted" style="font-weight:400">(opcional)</span></span><textarea class="input" id="r-notes" name="notes" maxlength="400">'+esc(rsvp.notes)+'</textarea></label>'+
+      :'<div class="notice info">'+ic('info')+'<span>Este convite é individual. Se tiver alguma dúvida, fale com a '+esc(p.name)+'.</span></div>');
+    body='<form data-form="rsvp3" class="stack" novalidate><h2>'+(no?'Quer deixar um recado?':'Vai alguém com você?')+'</h2>'+comp+
+      (no?'':'<label class="field"><span>Restrições alimentares <span class="muted" style="font-weight:400">(opcional)</span></span><input class="input" id="r-diet" name="diet" maxlength="160" placeholder="Ex.: vegetariana, sem glúten, alergia a camarão" value="'+esc(rsvp.diet)+'"></label>')+
+      '<label class="field"><span>'+(no?'Recado para a '+esc(p.name):'Observações')+' <span class="muted" style="font-weight:400">(opcional)</span></span><textarea class="input" id="r-notes" name="notes" maxlength="400">'+esc(rsvp.notes)+'</textarea></label>'+
       navBtns(true)+'</form>';
   } else if(rsvp.step===5){
     const rows=[['Nome',esc(rsvp.name)],['WhatsApp',esc(fmtPhone(rsvp.phone))],['Resposta',esc({yes:'Vou',no:'Não poderei ir',maybe:'Ainda não sei'}[rsvp.answer])]];
@@ -657,10 +724,10 @@ function viewRsvp(){
     if(rsvp.notes)rows.push([rsvp.answer==='no'?'Recado':'Observações',esc(rsvp.notes)]);
     body='<div class="stack"><h2>Confira antes de enviar</h2><dl class="review">'+rows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>').join('')+'</dl>'+
       '<div class="row"><button class="btn" data-act="rsvp-back">Voltar</button><span class="spacer"></span><button class="btn primary big" data-act="rsvp-submit">'+ic('check')+'Confirmar resposta</button></div>'+
-      (e.submit?'<div class="notice" style="background:var(--bad-bg);color:var(--bad)">'+ic('alert')+'<span>'+esc(e.submit)+'</span></div>':'')+
+      (e.submit?'<div class="notice" role="alert" style="background:var(--bad-bg);color:var(--bad)">'+ic('alert')+'<span>'+esc(e.submit)+'</span></div>':'')+
       '<button class="btn ghost sm" data-act="rsvp-goto" data-s="1">Corrigir meus dados</button></div>';
   }
-  return '<main class="rsvp gutter">'+head+bar+'<div class="card">'+body+'</div><p class="privacy">Seus dados são usados apenas para a organização da comemoração e não aparecem para outros convidados.</p></main>';
+  return '<main class="rsvp gutter">'+head+ticket+bar+'<div class="card">'+body+'</div><p class="privacy">Seus dados são usados apenas para a organização da comemoração e não aparecem para outros convidados.</p></main>';
 }
 function navBtns(submit){return '<div class="row" style="margin-top:6px"><button type="button" class="btn" data-act="rsvp-back">Voltar</button><span class="spacer"></span>'+(submit?'<button class="btn primary" type="submit">Continuar</button>':'<button type="button" class="btn primary" data-act="rsvp-next2">Continuar</button>')+'</div>'}
 function rsvpNav(dir){const seq=stepsFor();const i=seq.indexOf(rsvp.step);rsvp.errors={};if(dir<0&&i===0){go('convite');return}rsvp.step=seq[Math.max(0,Math.min(seq.length-1,i+dir))];render();focusFirst()}
@@ -679,7 +746,7 @@ function rsvpSubmit(){
   const p=S.party;const now=new Date().toISOString().slice(0,10);
   const data={name:rsvp.name.trim(),phone:digits(rsvp.phone),status:rsvp.answer,companions:rsvp.answer==='no'?[]:rsvp.companions.slice(0,rsvp.count).map(s=>s.trim()),diet:rsvp.answer==='no'?'':rsvp.diet.trim(),notes:rsvp.notes.trim(),respondedAt:now};
   if(REMOTE){
-    const b=document.querySelector('[data-act=rsvp-submit]');if(b){b.disabled=true;b.textContent='Enviando…'}
+    const b=document.querySelector('[data-act=rsvp-submit]');if(b){b.setAttribute('aria-busy','true');b.textContent='Enviando sua resposta…'}
     rpc('submit_rsvp',{name:data.name,phone:normPh(data.phone),status:data.status,companions:data.companions,diet:data.diet,notes:data.notes})
       .then(()=>{rsvp.step=6;rsvp.errors={};render();window.scrollTo(0,0)})
       .catch(e=>{rsvp.errors={submit:RSVP_ERR[e.code]||'Não foi possível enviar agora. Verifique a conexão e tente de novo.'};render()});
@@ -750,7 +817,7 @@ function viewDash(){
     '<a class="shortcut" href="#convite">'+ic('eye')+'Ver convite</a></div></section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Dinheiro da festa</h3><span class="spacer"></span><a class="small" href="#financas">Ver finanças</a></div>'+budgetBlock(f)+'</section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Próximas tarefas</h3><span class="spacer"></span><span class="small muted">'+doneT+' de '+S.tasks.length+' concluídas</span></div>'+
-    (tasks.length?'<div class="list">'+tasks.map(t=>'<div class="li"><button class="iconbtn" data-act="task-toggle" data-id="'+t.id+'" aria-label="Marcar '+esc(t.name)+' como concluída">'+ic('check')+'</button><div class="main-t"><b>'+esc(t.name)+'</b><div class="meta"><span>'+esc(TCATS[t.category]||'')+'</span>'+(t.due?'<span>até '+fmtDate(t.due)+'</span>':'')+'</div></div><span class="pill '+T_ST_CLS[t.status]+'">'+T_ST[t.status]+'</span></div>').join('')+'</div>':'<p class="muted">Tudo em dia por aqui.</p>')+
+    (tasks.length?'<div class="list">'+tasks.map(t=>'<div class="li"><button class="iconbtn" data-act="task-toggle" data-id="'+t.id+'" aria-label="Marcar '+esc(t.name)+' como concluída">'+ic('check')+'</button><div class="main-t"><b>'+esc(t.name)+'</b><div class="meta">'+catChip(t.category)+''+(t.due?'<span>até '+fmtDate(t.due)+'</span>':'')+'</div></div><span class="pill '+T_ST_CLS[t.status]+'">'+T_ST[t.status]+'</span></div>').join('')+'</div>':'<p class="muted">Tudo em dia por aqui.</p>')+
     '<a class="btn sm" style="margin-top:10px" href="#checklist">Ver checklist</a></section>'+
    (bills.length?'<section class="panel"><h3>Contas para pagar em breve</h3>'+bills.map(expRow).join('')+'</section>':'')+
   '</div>';
@@ -841,7 +908,7 @@ function viewTasks(){
 }
 function taskRow(t){
   const ex=t.expenseId&&S.expenses.find(x=>x.id===t.expenseId);const late=t.due&&t.status!=='concluida'&&daysUntil(t.due)<0;
-  return '<div class="rec '+(t.status==='concluida'?'done':'')+(late?' overdue':'')+'"><div style="display:flex;gap:10px;min-width:0"><button class="iconbtn" style="border:1.5px solid var(--line);'+(t.status==='concluida'?'background:var(--leaf);color:#fff;border-color:var(--leaf)':'')+'" data-act="task-toggle" data-id="'+t.id+'" aria-label="'+(t.status==='concluida'?'Reabrir':'Concluir')+' '+esc(t.name)+'">'+ic('check')+'</button><div style="min-width:0"><div class="t">'+esc(t.name)+'</div><div class="meta"><span>'+esc(TCATS[t.category]||'')+'</span>'+(t.owner?'<span>'+esc(t.owner)+'</span>':'')+(t.due?'<span'+(late?' style="color:var(--bad);font-weight:600"':'')+'>prazo '+fmtDate(t.due)+(late?' (atrasada)':'')+'</span>':'')+(ex?'<span>💳 '+esc(ex.desc)+'</span>':'')+'</div>'+(t.notes?'<div class="meta"><span>'+esc(t.notes)+'</span></div>':'')+'</div></div>'+
+  return '<div class="rec '+(t.status==='concluida'?'done':'')+(late?' overdue':'')+'"><div style="display:flex;gap:10px;min-width:0"><button class="iconbtn" style="border:1.5px solid var(--line);'+(t.status==='concluida'?'background:var(--leaf);color:#fff;border-color:var(--leaf)':'')+'" data-act="task-toggle" data-id="'+t.id+'" aria-label="'+(t.status==='concluida'?'Reabrir':'Concluir')+' '+esc(t.name)+'">'+ic('check')+'</button><div style="min-width:0"><div class="t">'+esc(t.name)+'</div><div class="meta">'+catChip(t.category)+''+(t.owner?'<span>'+esc(t.owner)+'</span>':'')+(t.due?'<span'+(late?' style="color:var(--bad);font-weight:600"':'')+'>prazo '+fmtDate(t.due)+(late?' (atrasada)':'')+'</span>':'')+(ex?'<span>💳 '+esc(ex.desc)+'</span>':'')+'</div>'+(t.notes?'<div class="meta"><span>'+esc(t.notes)+'</span></div>':'')+'</div></div>'+
    '<div class="side"><span class="pill '+T_ST_CLS[t.status]+'">'+T_ST[t.status]+'</span></div>'+
    '<div class="acts"><button class="btn sm" data-act="task-edit" data-id="'+t.id+'">'+ic('edit')+'Editar</button><button class="btn sm danger" data-act="task-del" data-id="'+t.id+'">'+ic('trash')+'Remover</button></div></div>';
 }
@@ -879,25 +946,26 @@ function viewFinance(){
     '<div class="kpi '+(f.budget?(f.diff>=0?'pos':'neg'):'')+'"><div class="label">Orçamento − custo</div><div class="v">'+(f.budget?money(f.diff):'—')+'</div><div class="s">custo total: '+money(f.committed)+'</div></div>'+
    '</div>'+
    '<div class="dash" style="margin-top:16px">'+
-    '<section class="panel c6"><h3>Gastos por categoria</h3>'+(cats.length?'<div class="bars">'+cats.map(([k,v])=>'<div class="bar"><span>'+esc(CATS[k]||k)+'</span><div class="track" role="img" aria-label="'+esc(CATS[k])+': '+money(v.cost)+', pago '+money(v.paid)+'"><i class="cost" style="width:'+(v.cost/max*100)+'%"></i><i class="paid" style="width:'+(Math.min(v.paid,v.cost)/max*100)+'%"></i></div><span class="val">'+money(v.cost)+'</span></div>').join('')+'</div><div class="legend" style="margin-top:12px"><span><i style="background:var(--cherry)"></i>Pago</span><span><i style="background:color-mix(in srgb,var(--cherry) 30%,var(--paper))"></i>Custo total (final ou previsto)</span></div>':'<p class="muted">Lance despesas para ver o gráfico.</p>')+'</section>'+
+    '<section class="panel c6"><h3>Gastos por categoria</h3>'+(cats.length?'<div class="bars">'+cats.map(([k,v])=>'<div class="bar"><span>'+catChip(k)+'</span><div class="track" role="img" aria-label="'+esc(CATS[k])+': '+money(v.cost)+', pago '+money(v.paid)+'"><i class="cost" style="width:'+(v.cost/max*100)+'%"></i><i class="paid" style="width:'+(Math.min(v.paid,v.cost)/max*100)+'%"></i></div><span class="val">'+money(v.cost)+'</span></div>').join('')+'</div><div class="legend" style="margin-top:12px"><span><i style="background:var(--cherry)"></i>Pago</span><span><i style="background:color-mix(in srgb,var(--cherry) 30%,var(--paper))"></i>Custo total (final ou previsto)</span></div>':'<p class="muted">Lance despesas para ver o gráfico.</p>')+'</section>'+
     '<section class="panel c6"><h3>Avisos de vencimento</h3>'+(alerts.length?alerts.map(x=>{const d=daysUntil(x.due);return '<div class="notice'+(d<0?'" style="background:var(--bad-bg);color:var(--bad)':'')+'" style="margin-bottom:8px">'+ic('alert')+'<span style="flex:1"><b>'+esc(x.desc)+'</b>: '+money(balance(x))+' '+(d<0?'venceu há '+(-d)+' dia'+(d===-1?'':'s'):d===0?'vence hoje':'vence em '+d+' dia'+(d===1?'':'s'))+' ('+fmtDate(x.due)+')</span></div>'}).join(''):'<div class="notice ok">'+ic('check')+'<span>Nenhuma conta vencida ou vencendo nos próximos 7 dias.</span></div>')+'<h3 style="margin-top:18px">Resumo do orçamento</h3>'+budgetBlock(f)+'</section>'+
    '</div>'+
    '<h3 style="margin-top:24px">Despesas</h3>'+
    '<div class="toolbar"><input class="input" id="f-q" type="search" placeholder="Buscar despesa ou fornecedor" value="'+esc(fFilter.q)+'" data-filter="f-q" aria-label="Buscar despesas">'+
     '<select class="input" id="f-cat" data-filter="f-cat" aria-label="Filtrar por categoria"><option value="">Todas as categorias</option>'+Object.entries(CATS).map(([k,v])=>'<option value="'+k+'" '+(fFilter.cat===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
     '<select class="input" id="f-st" data-filter="f-st" aria-label="Filtrar por situação"><option value="">Todas as situações</option>'+Object.entries(EXP_ST).map(([k,v])=>'<option value="'+k+'" '+(fFilter.st===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
-    '<label class="field" style="flex:0 1 160px"><small>Vencimento de</small><input class="input" id="f-from" type="date" data-filter="f-from" value="'+esc(fFilter.from)+'"></label>'+
-    '<label class="field" style="flex:0 1 160px"><small>até</small><input class="input" id="f-to" type="date" data-filter="f-to" value="'+esc(fFilter.to)+'"></label>'+
+    '<details class="more"'+(fFilter.from||fFilter.to?' open':'')+'><summary>Filtrar por vencimento</summary><div class="in">'+
+    '<label class="field" style="flex:1 1 150px;max-width:220px"><small>Vence a partir de</small><input class="input" id="f-from" type="date" data-filter="f-from" value="'+esc(fFilter.from)+'"></label>'+
+    '<label class="field" style="flex:1 1 150px;max-width:220px"><small>até</small><input class="input" id="f-to" type="date" data-filter="f-to" value="'+esc(fFilter.to)+'"></label></div></details>'+
     ((fFilter.q||fFilter.cat||fFilter.st||fFilter.from||fFilter.to)?'<button class="btn sm ghost" data-act="f-clear">Limpar filtros</button>':'')+'</div>'+
    '<p class="small muted" style="margin-bottom:10px">'+list.length+' despesa(s) · custo '+money(filtTotal)+'</p>'+
    (list.length?list.map(expRow).join(''):(S.expenses.length?'<div class="empty">Nenhuma despesa com esses filtros.</div>':'<div class="empty">'+cherry()+'<p>Nenhuma despesa lançada ainda.</p><button class="btn primary" style="margin-top:12px" data-act="exp-new">Lançar a primeira despesa</button></div>'));
 }
 function expRow(x){
   const ds=dueState(x);const d=x.due?daysUntil(x.due):null;
-  return '<div class="rec '+(ds==='overdue'?'overdue':ds==='soon'?'alert':'')+'"><div style="min-width:0"><div class="t">'+esc(x.desc)+demoBadge(x)+'</div><div class="meta"><span class="pill">'+esc(CATS[x.category]||x.category)+'</span>'+(x.supplier?'<span>'+esc(x.supplier)+'</span>':'')+(x.due?'<span'+(ds?' style="color:var('+(ds==='overdue'?'--bad':'--warn')+');font-weight:600"':'')+'>vence '+fmtDate(x.due)+(ds==='overdue'?' · vencida':ds==='soon'?(d===0?' · hoje':' · em '+d+'d'):'')+'</span>':'')+(x.method?'<span>'+esc(x.method)+'</span>':'')+'</div>'+
+  return '<div class="rec '+(ds==='overdue'?'overdue':ds==='soon'?'alert':'')+'"><div style="min-width:0"><div class="t">'+esc(x.desc)+demoBadge(x)+'</div><div class="meta">'+catChip(x.category)+(x.supplier?'<span>'+esc(x.supplier)+'</span>':'')+(x.due?'<span'+(ds?' style="color:var('+(ds==='overdue'?'--bad':'--warn')+');font-weight:600"':'')+'>vence '+fmtDate(x.due)+(ds==='overdue'?' · vencida':ds==='soon'?(d===0?' · hoje':' · em '+d+'d'):'')+'</span>':'')+(x.method?'<span>'+esc(x.method)+'</span>':'')+'</div>'+
    '<div class="meta money-line"><span>Previsto '+money(x.planned)+'</span><span>Final '+(Number(x.final)>0?money(x.final):'—')+'</span><span>Pago '+money(x.paid)+'</span></div>'+
    (x.notes?'<div class="meta"><span>'+esc(x.notes)+'</span></div>':'')+(x.receipt?'<div class="meta"><span>Comprovante: '+(/^https?:\/\//.test(x.receipt)?'<a href="'+esc(x.receipt)+'" target="_blank" rel="noopener">abrir link</a>':esc(x.receipt))+'</span></div>':'')+'</div>'+
-   '<div class="side"><span class="pill '+EXP_ST_CLS[x.status]+'">'+EXP_ST[x.status]+'</span><span class="num" style="font-weight:700">'+(balance(x)>0?'Falta '+money(balance(x)):'Quitado')+'</span></div>'+
+   '<div class="side">'+stPill(x.status)+'<span class="num" style="font-weight:700">'+(balance(x)>0?'Falta '+money(balance(x)):'Quitado')+'</span></div>'+
    '<div class="acts"><button class="btn sm" data-act="exp-edit" data-id="'+x.id+'">'+ic('edit')+'Editar</button><button class="btn sm" data-act="exp-dup" data-id="'+x.id+'">'+ic('dup')+'Duplicar</button><button class="btn sm danger" data-act="exp-del" data-id="'+x.id+'">'+ic('trash')+'Excluir</button></div></div>';
 }
 function expForm(x,isDup){
@@ -941,6 +1009,7 @@ function viewParty(){
    '<div class="photo-edit"><div class="arch">'+(p.photo?'<img src="'+p.photo+'" alt="Foto atual">':'<div class="ph">'+cherry()+'</div>')+'</div><div class="stack" style="gap:8px"><b>Foto de capa</b><label class="btn sm" for="pf-photo" style="cursor:pointer">'+ic('upload')+(p.photo?'Trocar foto':'Adicionar foto')+'</label><input id="pf-photo" type="file" accept="image/*" class="sr" data-act="photo">'+(p.photo?'<button type="button" class="btn sm danger" data-act="photo-del">Remover foto</button>':'')+'<small class="muted">A foto é reduzida automaticamente para carregar rápido.</small></div></div>'+
    '<div class="grid2">'+f('name','Nome da aniversariante',p.name,'maxlength="40" required')+f('age','Idade',p.age,'type="number" min="1" max="120"')+'</div>'+
    f('tagline','Frase de destaque',p.tagline,'maxlength="120"')+
+   '<label class="field"><span>Recado para os convidados</span><textarea class="input" id="pf-welcome" name="welcome" maxlength="400" placeholder="'+esc(DEFAULT_WELCOME)+'">'+esc(p.welcome||'')+'</textarea><small>Aparece no convite assinado com o seu nome. Em branco, usamos o texto de exemplo.</small></label>'+
    '<div class="grid2">'+f('date','Data da festa',p.date,'type="date"')+f('time','Horário de início',p.time,'type="time"')+f('endTime','Horário de término (opcional)',p.endTime,'type="time"')+'</div>'+
    f('venue','Nome do local',p.venue,'maxlength="80" placeholder="Ex.: Salão, restaurante, casa"')+
    f('address','Endereço completo',p.address,'maxlength="200" placeholder="Rua, número, bairro, cidade"','Usado no botão “Abrir no mapa”.')+
@@ -1043,7 +1112,7 @@ function updSaldo(){
 }
 /* ---------------- rascunhos: nada se perde ao sair da tela ---------------- */
 function rsvpPersist(){try{const o=Object.assign({},rsvp);delete o.errors;localStorage.setItem(KEY+':rsvp',JSON.stringify(o))}catch(_){}}
-function rsvpRestore(){try{const o=JSON.parse(localStorage.getItem(KEY+':rsvp')||'null');if(o&&typeof o==='object')Object.assign(rsvp,o,{errors:{}})}catch(_){}}
+function rsvpRestore(){try{const o=JSON.parse(localStorage.getItem(KEY+':rsvp')||'null');if(o&&typeof o==='object'){Object.assign(rsvp,o,{errors:{}});if(rsvp.step===4)rsvp.step=3}}catch(_){}}
 const NO_DRAFT=['login','access'];
 function draftable(f){const k=f&&f.dataset&&f.dataset.form;return !!k&&!NO_DRAFT.includes(k)&&!k.startsWith('rsvp')}
 function draftKey(f){return KEY+':draft:'+f.dataset.form+':'+(f.dataset.id||'novo')}
@@ -1071,8 +1140,7 @@ function onFormEdit(e){
   if(draftable(f)){draftSave(f);return}
   const k=f.dataset.form,el=e.target;
   if(k==='rsvp1'){if(el.name==='name')rsvp.name=el.value;if(el.name==='phone')rsvp.phone=el.value;if(el.name==='consent')rsvp.consent=el.checked}
-  else if(k==='rsvp3')saveCompanionInputs();
-  else if(k==='rsvp4'){if(el.name==='diet')rsvp.diet=el.value;if(el.name==='notes')rsvp.notes=el.value}
+  else if(k==='rsvp3'){saveCompanionInputs();if(el.name==='diet')rsvp.diet=el.value;if(el.name==='notes')rsvp.notes=el.value}
   else return;
   rsvpPersist();
 }
@@ -1090,7 +1158,7 @@ document.addEventListener('submit',e=>{
     rsvp.errors=er;if(Object.keys(er).length){render();const f=document.querySelector('[aria-invalid="true"]');if(f)f.focus();return}
     const nd=d.length>11&&d.startsWith('55')?d.slice(2):d;
     if(REMOTE){
-      const b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Um momento…'}
+      const b=form.querySelector('button[type=submit]');if(b){b.setAttribute('aria-busy','true');b.textContent='Um momento…'}
       rpc('rsvp_limit',{phone:nd}).then(lim=>{rsvp.limit=Number(lim)||0;rsvp.existingId='';rsvp.count=Math.min(rsvp.count,rsvp.limit);rsvpNav(1)})
         .catch(()=>{rsvp.errors={phone:'Não foi possível continuar agora. Verifique a conexão e tente de novo.'};render()});
       return;
@@ -1101,8 +1169,7 @@ document.addEventListener('submit',e=>{
     rsvp.count=Math.min(rsvp.count,rsvp.limit);
     rsvpNav(1);return;
   }
-  if(kind==='rsvp3'){saveCompanionInputs();const er={};for(let i=0;i<rsvp.count;i++){if((rsvp.companions[i]||'').trim().length<2)er['c'+i]='Informe o nome do acompanhante '+(i+1)+'.'}rsvp.errors=er;if(Object.keys(er).length){render();return}rsvpNav(1);return}
-  if(kind==='rsvp4'){rsvp.diet=v('diet');rsvp.notes=v('notes');rsvpNav(1);return}
+  if(kind==='rsvp3'){saveCompanionInputs();rsvp.diet=v('diet');rsvp.notes=v('notes');const er={};for(let i=0;i<rsvp.count;i++){if((rsvp.companions[i]||'').trim().length<2)er['c'+i]='Informe o nome do acompanhante '+(i+1)+'.'}rsvp.errors=er;if(Object.keys(er).length){render();return}rsvpNav(1);return}
   if(kind==='login'){
     const email=v('email').toLowerCase(),pw=fd.get('password')||'';loginEmail=email;
     const done=()=>{loginErr='';if(LOGIN_PATH)history.replaceState(null,'','/#'+(form.dataset.target||'painel'));go(form.dataset.target||'painel');render()};
@@ -1110,7 +1177,7 @@ document.addEventListener('submit',e=>{
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){fail('Informe um e-mail válido.');return}
     if(!pw){fail('Informe a senha.');return}
     if(REMOTE){
-      const b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Entrando…'}
+      const b=form.querySelector('button[type=submit]');if(b){b.setAttribute('aria-busy','true');b.textContent='Entrando…'}
       adminLogin(email,pw).then(r=>{if(r.ok)done();else fail('E-mail ou senha incorretos.')})
         .catch(e=>fail(e.code==='locked'?'Muitas tentativas. Aguarde 30 segundos e tente de novo.':e.code==='not_configured'||e.code==='db_not_configured'?'O banco de dados ainda não foi conectado.':'Não foi possível entrar agora. Verifique a conexão.'));
       return;
@@ -1158,7 +1225,7 @@ document.addEventListener('submit',e=>{
     const budget=parseMoney(v('budget'));if(isNaN(budget)||budget<0){err.textContent='Orçamento inválido. Use números, por exemplo 15.000,00.';document.getElementById('pf-budget').focus();return}
     const cp=digits(v('contactPhone'));if(cp&&(cp.length<10||cp.length>13)){err.textContent='WhatsApp do contato inválido. Use DDD + número.';return}
     const url=v('inviteUrl');if(url&&!/^https?:\/\//i.test(url)){err.textContent='O link do convite precisa começar com https://';return}
-    Object.assign(p,{name:v('name'),age:parseInt(v('age'))||40,tagline:v('tagline')||p.tagline,date:v('date'),time:v('time'),endTime:v('endTime'),venue:v('venue'),address:v('address'),dress:v('dress'),parking:v('parking'),notes:v('notes'),contactName:v('contactName'),contactPhone:cp,rsvpOpen:!!fd.get('rsvpOpen'),rsvpDeadline:v('rsvpDeadline'),maxCompanions:Math.max(0,parseInt(v('maxCompanions'))||0),budget:budget||0,inviteUrl:url});
+    Object.assign(p,{name:v('name'),age:parseInt(v('age'))||40,tagline:v('tagline')||p.tagline,welcome:v('welcome'),date:v('date'),time:v('time'),endTime:v('endTime'),venue:v('venue'),address:v('address'),dress:v('dress'),parking:v('parking'),notes:v('notes'),contactName:v('contactName'),contactPhone:cp,rsvpOpen:!!fd.get('rsvpOpen'),rsvpDeadline:v('rsvpDeadline'),maxCompanions:Math.max(0,parseInt(v('maxCompanions'))||0),budget:budget||0,inviteUrl:url});
     save();render();toast('Dados da festa salvos');return;
   }
   if(kind==='access'){
