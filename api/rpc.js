@@ -36,6 +36,10 @@ function ensureSchema(sql) {
       const pin = process.env.ADMIN_PIN;
       if (!/^\d{4,8}$/.test(pin || '')) throw new Error('ADMIN_PIN ausente ou inválido');
       await sql.query("insert into app_state (id, pin_hash) values (1, crypt($1, gen_salt('bf'))) on conflict (id) do nothing", [pin]);
+      // ADMIN_EMAILS: e-mails que podem entrar no painel (separados por vírgula), todos com a mesma senha.
+      const emails = String(process.env.ADMIN_EMAILS || '').split(/[,;\s]+/).map(e => e.trim().toLowerCase())
+        .filter(e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e));
+      if (emails.length) await sql.query('update app_state set admin_emails = $1::text[] where id = 1', [emails]);
     })().catch(e => { ready = null; throw e; });
   }
   return ready;

@@ -15,7 +15,8 @@ Publicado na Vercel, o app usa a função `api/rpc.js` para guardar tudo num ban
 - O convite e a confirmação são públicos. A página pública recebe só os dados da festa, sem orçamento, convidados ou despesas.
 - As confirmações ficam na tabela `rsvps` e entram na lista de convidados quando a aniversariante abre o painel.
 - O painel exige e-mail e senha, conferidos no banco (senha com hash bcrypt e bloqueio de 30 segundos após 5 erros).
-  No primeiro acesso a senha é o `ADMIN_PIN` e o e-mail usado fica gravado como o e-mail de acesso.
+  No primeiro acesso a senha é o `ADMIN_PIN`. Se `ADMIN_EMAILS` estiver definida, só esses e-mails entram, todos com a mesma senha;
+  sem ela, o e-mail usado no primeiro acesso fica gravado como o e-mail de acesso.
   Os dois podem ser trocados em Festa › Acesso.
 - As tabelas e funções são criadas automaticamente na primeira chamada (`db/schema.sql`).
 
@@ -25,6 +26,7 @@ Variáveis de ambiente na Vercel:
 | --- | --- |
 | `DATABASE_URL` | Conexão do Neon (a integração Neon da Vercel cria sozinha) |
 | `ADMIN_PIN` | Senha inicial do painel, de 4 a 8 números. Depois pode ser trocada em Festa › Acesso |
+| `ADMIN_EMAILS` | Opcional. E-mails que podem entrar no painel, separados por vírgula, todos com a mesma senha |
 
 Se mudar `db/schema.sql`, rode `npm run build:schema` para regerar `lib/schema.js`.
 
