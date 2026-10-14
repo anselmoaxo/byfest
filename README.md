@@ -4,10 +4,10 @@ App web da festa de 40 anos da Priscila, tema Cherry 🍒
 
 Um único arquivo (`index.html`, HTML + JS puro, sem build) com:
 
-- **Convite público** (endereço principal, `/`): é o link enviado pelo WhatsApp, como um link de agendamento. Tem foto, contagem regressiva, mapa, agenda e compartilhamento pelo WhatsApp.
+- **Convite público** (endereço principal, `/`): é o link enviado pelo WhatsApp, como um link de agendamento. Tem foto, contagem regressiva, mapa, agenda e compartilhamento pelo WhatsApp. As tags Open Graph usam `og-convite.jpg` (1200×630) para o card de prévia do link; o card é genérico, sem dados de convidados.
 - **Confirmação de presença** (`#confirmar`): passo a passo com resposta, acompanhantes, restrições e revisão.
 - **Painel privado** (entrada em `/login`, com e-mail e senha): resumo, convidados (CSV e relatório em PDF dos confirmados), checklist e finanças (CSV, impressão e resumo em PDF).
-  Cadastro de convidado com nome e WhatsApp obrigatórios, sem WhatsApp repetido. “Salvar e abrir WhatsApp” abre o `wa.me` com o convite pessoal; o convite fica “Preparado no WhatsApp” até a anfitriã marcar como enviado. A presença só muda pela resposta no convite público.
+  Cadastro de convidado com nome e WhatsApp obrigatórios, sem WhatsApp repetido. “Salvar e abrir WhatsApp” abre o WhatsApp (`api.whatsapp.com/send`, que preserva os emojis; o `wa.me` os trocava por “�”) com o convite pessoal; o convite fica “Preparado no WhatsApp” até a anfitriã marcar como enviado. A presença só muda pela resposta no convite público.
   O PDF é gerado no navegador com [jsPDF](https://github.com/parallax/jsPDF) e jsPDF-AutoTable (MIT), copiados em `vendor/` e carregados só quando a aniversariante clica em “Baixar relatório em PDF”. Ele usa os dados já carregados no painel e não traz telefones nem valores. O resumo financeiro em PDF usa o mesmo layout e só existe dentro do painel.
 
 ## Como funciona online
