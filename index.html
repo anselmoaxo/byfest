@@ -677,7 +677,7 @@ function viewInvite(){
    '<div class="cta-bar">'+
      (closed?'<div class="notice info">'+ic('info')+'<span>'+esc(closed)+' Fale com a '+esc(p.name)+' se precisar.</span></div>':
       '<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
-   '</div><div class="actions"><a class="btn leaf" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar no WhatsApp</a>'+(p.date?'<a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+'</div>'+
+   '</div>'+(p.date?'<div class="actions"><a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a></div>':'')+
    '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
    (extras.length?'<section class="sect" aria-labelledby="h-info"><h2 class="sh" id="h-info">'+cherry()+'Bom saber</h2><div class="facts">'+extras.join('')+'</div></section>':'')+
    '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
@@ -747,7 +747,6 @@ function viewRsvpDone(){
   const sub={yes:'Que alegria! A '+esc(p.name)+' vai adorar celebrar com você'+(rsvp.count?' e com '+(rsvp.count===1?'seu acompanhante':'seus '+rsvp.count+' acompanhantes'):'')+'.',no:'Obrigada por avisar. Seu carinho chega até a '+esc(p.name)+'.',maybe:'Sem problema! Volte a este convite quando souber e atualize sua resposta.'}[a];
   return '<div class="card done stack"><div class="seal">'+cherry()+'</div><h1 style="font-size:1.8rem">'+msg+'</h1><p class="muted">'+sub+'</p>'+
    (a!=='no'&&p.date?'<div class="sect" style="margin:0;text-align:left">'+factRow('cal','Anote na agenda',esc(fmtDateLong(p.date))+(p.time?' às '+esc(p.time.replace(':','h')):''))+'</div><a class="btn primary block" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+
-   '<a class="btn leaf block" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar convite</a>'+
    '<button class="btn block" data-act="rsvp-edit">'+ic('edit')+'Alterar minha resposta</button>'+
    '<a class="btn ghost block" href="#convite">Voltar ao convite</a></div>';
 }
