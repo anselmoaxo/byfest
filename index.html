@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Priscila 40 · Cherry</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Priscila 40 anos: uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
+<meta property="og:title" content="Priscila 40 anos · Cherry">
+<meta property="og:description" content="Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
+<meta name="theme-color" content="#a3123a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Pinyon+Script&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: convite público em coluna estreita (mobile-first) + painel privado com barra de abas inferior no celular e superior no computador */
+:root{
+  --cherry:#a3123a; --cherry-deep:#6e0c27; --cherry-soft:#c8375b;
+  --blush:#f8e1e6; --blush-2:#fbeef1; --cream:#fff9f4; --paper:#ffffff;
+  --leaf:#3d7a4c; --leaf-soft:#e3f0e5;
+  --ink:#3b1a23; --ink-2:#6b4a53; --line:#ecd3da; --shadow:0 10px 30px -18px rgba(110,12,39,.45);
+  --ok:#2f7a45; --ok-bg:#e2f2e6; --warn:#9a5b00; --warn-bg:#fdf0d8; --bad:#b0232f; --bad-bg:#fbe3e5; --muted-bg:#f3e9ec;
+  --f-display:"Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --f-script:"Pinyon Script", "Snell Roundhand", "Segoe Script", cursive;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r:14px; --r-lg:22px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --cherry:#ef5b7d; --cherry-deep:#ffb3c4; --cherry-soft:#f27a96;
+  --blush:#3a1d26; --blush-2:#2b151c; --cream:#1b0f13; --paper:#25141a;
+  --leaf:#8fcf9c; --leaf-soft:#1f3326;
+  --ink:#f8e8ec; --ink-2:#cfb2ba; --line:#4a2b35; --shadow:0 10px 30px -18px rgba(0,0,0,.8);
+  --ok:#8fd6a2; --ok-bg:#1d3324; --warn:#f2c06b; --warn-bg:#3a2c12; --bad:#ff8f99; --bad-bg:#3f1a1f; --muted-bg:#33202a;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --cherry:#ef5b7d; --cherry-deep:#ffb3c4; --cherry-soft:#f27a96;
+  --blush:#3a1d26; --blush-2:#2b151c; --cream:#1b0f13; --paper:#25141a;
+  --leaf:#8fcf9c; --leaf-soft:#1f3326;
+  --ink:#f8e8ec; --ink-2:#cfb2ba; --line:#4a2b35; --shadow:0 10px 30px -18px rgba(0,0,0,.8);
+  --ok:#8fd6a2; --ok-bg:#1d3324; --warn:#f2c06b; --warn-bg:#3a2c12; --bad:#ff8f99; --bad-bg:#3f1a1f; --muted-bg:#33202a;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--cream);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;line-height:1.15;text-wrap:balance;margin:0}
+h2{font-size:1.6rem} h3{font-size:1.2rem}
+p{margin:0}
+a{color:var(--cherry)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cherry-soft);outline-offset:2px;border-radius:8px}
+.num{font-variant-numeric:tabular-nums}
+.label{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+.muted{color:var(--ink-2)}
+.small{font-size:.875rem}
+.gutter{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.spacer{flex:1}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font-weight:600;cursor:pointer;text-decoration:none;transition:transform .15s ease, background .15s ease;-webkit-tap-highlight-color:transparent}
+.btn:hover{background:var(--blush-2)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--cherry);border-color:var(--cherry);color:#fff}
+:root:not([data-theme="light"]) .btn.primary{color:#fff}
+.btn.primary:hover{background:var(--cherry-deep);border-color:var(--cherry-deep)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#2a0a13}:root:not([data-theme="light"]) .btn.primary:hover{background:var(--cherry-soft);color:#2a0a13}}
+:root[data-theme="dark"] .btn.primary{color:#2a0a13}
+:root[data-theme="dark"] .btn.primary:hover{background:var(--cherry-soft);color:#2a0a13}
+.btn.leaf{background:var(--leaf);border-color:var(--leaf);color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.leaf{color:#0f2016}}
+:root[data-theme="dark"] .btn.leaf{color:#0f2016}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.danger{color:var(--bad);border-color:var(--bad-bg)}
+.btn.danger.solid{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.sm{min-height:40px;padding:0 14px;font-size:.9rem}
+.btn.block{width:100%}
+.btn.big{min-height:58px;font-size:1.08rem}
+.btn svg{width:20px;height:20px;flex:none}
+.iconbtn{min-width:44px;min-height:44px;border-radius:12px;border:0;background:transparent;cursor:pointer;display:inline-grid;place-items:center;color:var(--ink-2)}
+.iconbtn:hover{background:var(--blush-2);color:var(--cherry)}
+.iconbtn svg{width:20px;height:20px}
+
+/* forms */
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>span{font-weight:600;font-size:.92rem}
+.field small{color:var(--ink-2);font-size:.82rem}
+.input,select.input,textarea.input{width:100%;min-height:50px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper);font-size:16px}
+textarea.input{min-height:90px;resize:vertical}
+.input:focus{outline:none;border-color:var(--cherry-soft);box-shadow:0 0 0 4px var(--blush)}
+.input[aria-invalid="true"]{border-color:var(--bad)}
+.err{color:var(--bad);font-size:.85rem;font-weight:500}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.check{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--cherry);flex:none;margin-top:2px}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:600;white-space:nowrap;background:var(--muted-bg);color:var(--ink-2)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.cherry{background:var(--blush);color:var(--cherry)}
+.pill.demo{background:transparent;border:1px dashed var(--ink-2);color:var(--ink-2);font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+
+/* ============ INVITE ============ */
+.invite{max-width:560px;margin:0 auto;padding-block:20px 48px;position:relative}
+.hero{position:relative;text-align:center;padding:28px 18px 30px;border-radius:var(--r-lg);background:radial-gradient(120% 80% at 50% 0%, var(--blush) 0%, var(--cream) 70%);overflow:hidden;border:1px solid var(--line)}
+.hero .fall{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hero .fall svg{position:absolute;top:-40px;width:22px;height:28px;opacity:.55;animation:fall linear infinite}
+@keyframes fall{from{transform:translateY(-40px) rotate(-10deg)}to{transform:translateY(760px) rotate(25deg)}}
+.arch{width:min(230px,62vw);aspect-ratio:3/4;max-width:100%;margin:6px auto 18px;border-radius:999px 999px 26px 26px;overflow:hidden;background:var(--blush);border:6px solid var(--paper);box-shadow:var(--shadow);display:grid;place-items:center;position:relative}
+.arch img{width:100%;height:100%;object-fit:cover}
+.arch .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--cherry);padding:16px;text-align:center}
+.arch .ph svg{width:64px;height:76px}
+.hero .script{font-family:var(--f-script);font-size:clamp(3.4rem,15vw,4.6rem);line-height:1;color:var(--cherry);position:relative}
+.hero .forty{font-family:var(--f-display);font-size:clamp(1.3rem,5vw,1.6rem);letter-spacing:.32em;text-transform:uppercase;color:var(--ink);margin-top:6px}
+.hero .forty b{font-weight:600;font-size:1.5em;letter-spacing:.08em;color:var(--cherry-deep);font-style:italic}
+.hero .tag{font-family:var(--f-display);font-style:italic;font-size:1.12rem;color:var(--ink-2);max-width:34ch;margin:14px auto 0}
+.theme-badge{display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:6px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--leaf)}
+.theme-badge svg{width:16px;height:16px}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}
+.countdown div{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 4px;text-align:center}
+.countdown b{display:block;font-family:var(--f-display);font-size:1.7rem;font-weight:500;color:var(--cherry);font-variant-numeric:tabular-nums;line-height:1.1}
+.countdown span{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
+.sect{margin-top:18px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px}
+.facts{display:grid;gap:14px}
+.fact{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
+.fact .ic{width:40px;height:40px;border-radius:12px;background:var(--blush-2);display:grid;place-items:center;color:var(--cherry)}
+.fact .ic svg{width:20px;height:20px}
+.fact .v{font-weight:600}
+.tbd{color:var(--ink-2);font-style:italic;font-weight:500}
+.cta-bar{position:sticky;bottom:0;margin-top:20px;padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--cream) 70%,transparent);display:grid;gap:10px;z-index:3}
+.privacy{font-size:.82rem;color:var(--ink-2);text-align:center;margin-top:18px}
+.host-link{display:block;text-align:center;margin-top:26px;font-size:.85rem;color:var(--ink-2)}
+.divider{display:flex;align-items:center;gap:12px;justify-content:center;color:var(--cherry);margin:4px 0}
+.divider::before,.divider::after{content:"";height:1px;flex:1;background:var(--line)}
+.divider svg{width:20px;height:24px}
+
+/* ============ RSVP ============ */
+.rsvp{max-width:560px;margin:0 auto;padding-block:16px 48px}
+.rsvp-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.steps{display:flex;gap:6px;margin:10px 0 18px}
+.steps i{flex:1;height:6px;border-radius:99px;background:var(--line)}
+.steps i.on{background:var(--cherry)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;box-shadow:var(--shadow)}
+.choice{display:grid;gap:12px}
+.choice button{display:grid;grid-template-columns:48px 1fr;gap:14px;align-items:center;text-align:left;padding:16px;border-radius:16px;border:2px solid var(--line);background:var(--paper);cursor:pointer;min-height:76px}
+.choice button:hover{border-color:var(--cherry-soft)}
+.choice button[aria-pressed="true"]{border-color:var(--cherry);background:var(--blush-2)}
+.choice .em{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--blush);color:var(--cherry);font-size:1.4rem}
+.choice b{display:block;font-size:1.05rem}
+.choice small{color:var(--ink-2)}
+.stepper{display:flex;align-items:center;gap:14px}
+.stepper button{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);font-size:1.5rem;cursor:pointer;color:var(--cherry)}
+.stepper button:disabled{opacity:.35;cursor:not-allowed}
+.stepper output{font-family:var(--f-display);font-size:2.2rem;min-width:2ch;text-align:center}
+.review{display:grid;gap:10px}
+.review div{display:grid;grid-template-columns:minmax(110px,40%) 1fr;gap:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.review dt{color:var(--ink-2)} .review dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.done{text-align:center}
+.done .seal{width:96px;height:96px;margin:0 auto 12px;border-radius:50%;background:var(--blush);display:grid;place-items:center;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+.done .seal svg{width:52px;height:62px}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ============ PRIVATE SHELL ============ */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--cream) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:12px;min-height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.brand svg{width:26px;height:32px}
+.brand b{font-family:var(--f-script);font-size:2rem;color:var(--cherry);font-weight:400;line-height:1}
+.brand span{font-family:var(--f-display);font-size:.95rem;letter-spacing:.18em;text-transform:uppercase}
+.tabs{display:flex;gap:4px}
+.tabs a{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;text-decoration:none;color:var(--ink-2);font-weight:600;font-size:.95rem}
+.tabs a svg{width:20px;height:20px}
+.tabs a[aria-current="page"]{background:var(--blush);color:var(--cherry)}
+.tabs a:hover{color:var(--cherry)}
+.main{max-width:1120px;margin:0 auto;padding-block:22px 110px}
+.page-head{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.page-head p{color:var(--ink-2)}
+@media (max-width:820px){
+  .topbar .tabs{display:none}
+  .bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  .bottomnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;min-height:54px;border-radius:12px;text-decoration:none;color:var(--ink-2);font-size:.72rem;font-weight:600}
+  .bottomnav a svg{width:22px;height:22px}
+  .bottomnav a[aria-current="page"]{color:var(--cherry);background:var(--blush-2)}
+}
+@media (min-width:821px){.bottomnav{display:none}}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;min-width:0}
+.panel h3{margin-bottom:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px 16px;min-width:0}
+.kpi .v{font-family:var(--f-display);font-size:clamp(1.2rem,4.6vw,1.65rem);white-space:nowrap;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:4px;overflow-wrap:anywhere}
+.kpi .s{font-size:.82rem;color:var(--ink-2)}
+.kpi.hl{background:var(--blush-2);border-color:var(--blush)}
+.kpi.hl .v{color:var(--cherry)}
+.kpi.neg .v{color:var(--bad)} .kpi.pos .v{color:var(--ok)}
+.dash{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.dash>*{grid-column:span 12}
+@media (min-width:900px){.dash .c6{grid-column:span 6}.dash .c7{grid-column:span 7}.dash .c5{grid-column:span 5}.dash .c4{grid-column:span 4}.dash .c8{grid-column:span 8}}
+.welcome{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;background:linear-gradient(120deg,var(--blush) 0%,var(--blush-2) 60%,var(--paper) 100%);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px}
+.welcome .script{font-family:var(--f-script);font-size:2.6rem;color:var(--cherry);line-height:1}
+.welcome .big{font-family:var(--f-display);font-size:2.6rem;color:var(--cherry-deep);line-height:1;text-align:center}
+.welcome .big small{display:block;font-family:var(--f-body);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-top:4px}
+.stackbar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--muted-bg);margin:10px 0}
+.stackbar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.85rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.meter{height:16px;border-radius:99px;background:var(--muted-bg);overflow:hidden;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.list{display:flex;flex-direction:column}
+.li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);min-width:0}
+.li:last-child{border-bottom:0}
+.li .main-t{flex:1;min-width:0}
+.li .main-t b{display:block;overflow-wrap:anywhere}
+.li .meta{font-size:.85rem;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:4px 12px}
+.shortcuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.shortcut{display:flex;align-items:center;gap:10px;padding:14px;border-radius:16px;background:var(--blush-2);text-decoration:none;color:var(--ink);font-weight:600;border:1px solid transparent;min-height:56px;cursor:pointer;font-size:.95rem;text-align:left}
+.shortcut:hover{border-color:var(--cherry-soft)}
+.shortcut svg{width:22px;height:22px;color:var(--cherry);flex:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0}
+.toolbar .input{min-height:46px;width:auto;flex:1 1 180px}
+.toolbar select.input{flex:0 1 190px}
+.empty{text-align:center;padding:36px 16px;color:var(--ink-2)}
+.empty svg{width:48px;height:58px;opacity:.6;margin-bottom:8px}
+.rec{display:grid;grid-template-columns:1fr auto;gap:8px 16px;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--paper);align-items:start}
+.rec+.rec{margin-top:10px}
+.rec .t{font-weight:700;overflow-wrap:anywhere}
+.rec .meta{font-size:.86rem;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px}
+.rec .side{text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.rec .acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;border-top:1px dashed var(--line);padding-top:8px}
+.rec.done .t{text-decoration:line-through;color:var(--ink-2)}
+.rec.alert{border-left:4px solid var(--warn)}
+.rec.overdue{border-left:4px solid var(--bad)}
+@media (max-width:520px){.rec{grid-template-columns:1fr}.rec .side{text-align:left;align-items:flex-start;flex-direction:row;flex-wrap:wrap}}
+.money-line{font-variant-numeric:tabular-nums;font-size:.9rem}
+.bars{display:grid;gap:12px}
+.bar{display:grid;grid-template-columns:minmax(90px,130px) 1fr auto;gap:10px;align-items:center;font-size:.9rem}
+.bar .track{height:14px;background:var(--muted-bg);border-radius:99px;overflow:hidden;position:relative}
+.bar .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.bar .track i.cost{background:var(--blush);background:color-mix(in srgb,var(--cherry) 30%,var(--paper))}
+.bar .track i.paid{background:var(--cherry)}
+.bar .val{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.notice{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--warn-bg);color:var(--warn);font-size:.92rem}
+.notice.info{background:var(--blush-2);color:var(--ink)}
+.notice.ok{background:var(--ok-bg);color:var(--ok)}
+.notice svg{width:20px;height:20px;flex:none;margin-top:2px}
+.switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-weight:600}
+.switch input{appearance:none;width:52px;height:30px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;transition:background .2s;flex:none}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.switch input:checked{background:var(--leaf)}
+.switch input:checked::after{left:25px}
+details.sec{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--paper);padding:0 20px}
+details.sec+details.sec{margin-top:12px}
+details.sec summary{cursor:pointer;padding:18px 0;font-family:var(--f-display);font-size:1.2rem;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.sec summary::after{content:"+";font-family:var(--f-body);font-size:1.4rem;color:var(--cherry)}
+details.sec[open] summary::after{content:"–"}
+details.sec .body{padding-bottom:20px}
+
+/* modal & toast */
+.overlay{position:fixed;inset:0;background:rgba(40,10,20,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;padding:0}
+@media (min-width:640px){.overlay{align-items:center;padding:24px}}
+.modal{background:var(--paper);width:100%;max-width:620px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:22px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));animation:up .25s ease}
+@media (min-width:640px){.modal{border-radius:22px}}
+@keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.modal-foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:20px}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--cream);padding:12px 18px;border-radius:999px;font-weight:600;z-index:60;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center;animation:up .2s ease}
+.login{max-width:420px;margin:0 auto;padding-block:48px}
+.pin{letter-spacing:.5em;text-align:center;font-size:1.5rem !important}
+.photo-edit{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.photo-edit .arch{width:120px;margin:0;border-width:4px}
+#printArea{display:none}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{display:block;position:absolute;left:0;top:0;width:100%;color:#000;background:#fff;padding:20px}
+  #printArea table{width:100%;border-collapse:collapse;font-size:12px}
+  #printArea td,#printArea th{border-bottom:1px solid #ccc;padding:4px;text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}.hero .fall{display:none}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tablewrap{overflow-x:auto}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="cherry" viewBox="0 0 60 72">
+      <path d="M30 4 C 28 20, 20 32, 15 46" fill="none" stroke="var(--leaf)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M30 4 C 33 22, 40 34, 44 48" fill="none" stroke="var(--leaf)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M30 5 C 40 0, 52 2, 56 10 C 46 14, 36 12, 30 5 Z" fill="var(--leaf)"/>
+      <circle cx="15" cy="55" r="13" fill="var(--cherry)"/>
+      <circle cx="45" cy="57" r="13" fill="var(--cherry)"/>
+      <ellipse cx="10" cy="50" rx="3.4" ry="2.2" fill="#fff" opacity=".55" transform="rotate(-30 10 50)"/>
+      <ellipse cx="40" cy="52" rx="3.4" ry="2.2" fill="#fff" opacity=".55" transform="rotate(-30 40 52)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="app" aria-live="polite"></div>
+<div id="modalRoot"></div>
+<div id="toastRoot" role="status" aria-live="polite"></div>
+<div id="printArea"></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------------- constantes ---------------- */
+const KEY='cherry40-priscila-v1';
+const CATS={local:'Local',buffet:'Buffet',churrasco:'Churrasco',decoracao:'Decoração',bolo:'Bolo e doces',bebidas:'Bebidas',musica:'Música',fotografia:'Fotografia',lembrancinhas:'Lembrancinhas',convites:'Convites',transporte:'Transporte',roupa:'Roupa',beleza:'Beleza',outros:'Outros'};
+const TCATS=Object.assign({geral:'Geral',convidados:'Convidados'},CATS);
+const EXP_ST={planejado:'Planejado',pendente:'Pendente',parcial:'Parcialmente pago',pago:'Pago'};
+const EXP_ST_CLS={planejado:'',pendente:'warn',parcial:'cherry',pago:'ok'};
+const PAY=['Pix','Dinheiro','Cartão de crédito','Cartão de débito','Boleto','Transferência','Outro'];
+const G_ST={pending:'Sem resposta',yes:'Vai',no:'Não vai',maybe:'Ainda não sabe'};
+const G_ST_CLS={pending:'',yes:'ok',no:'bad',maybe:'warn'};
+const T_ST={pendente:'Pendente',andamento:'Em andamento',concluida:'Concluída'};
+const T_ST_CLS={pendente:'',andamento:'warn',concluida:'ok'};
+const CHART_COLORS=['var(--cherry)','var(--leaf)','var(--warn)','var(--ink-2)'];
+const DEFAULT_PIN='4040';
+const inFrame=(function(){try{return window.self!==window.top}catch(e){return true}})();
+
+/* ---------------- ícones ---------------- */
+const I={
+ home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.8.7 3 2.4 3.4 5.2"/>',
+ list:'<path d="M9 6h12M9 12h12M9 18h12"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>',
+ wallet:'<rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/><path d="M6 6l9-3 1.5 3"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+ cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+ dress:'<path d="M9 3l-1 4 2 3-5 11h14l-5-11 2-3-1-4"/><path d="M9 3c1 1.5 5 1.5 6 0"/>',
+ car:'<path d="M5 16V11l2-5h10l2 5v5"/><path d="M3 16h18v3H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/>',
+ note:'<path d="M5 3h10l4 4v14H5z"/><path d="M14 3v5h5M8 12h8M8 16h6"/>',
+ phone:'<path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/>',
+ share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/>',
+ wa:'<path d="M4 20l1.3-4A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 2 1-.5 1.5c-3 .5-7.5-4-7-7l1.5-.5 1 2z"/>',
+ heart:'<path d="M12 20s-8-4.6-8-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 8 2.8C20 15.4 12 20 12 20z"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+ trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+ download:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+ upload:'<path d="M12 20V9M7 14l5-5 5 5M5 4h14"/>',
+ eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+ lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+ out:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
+ alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ printer:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><rect x="7" y="14" width="10" height="7"/>',
+ dup:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4h12"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
+ link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
+};
+function ic(n){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+I[n]+'</svg>'}
+function cherry(cls){return '<svg viewBox="0 0 60 72" aria-hidden="true"'+(cls?' class="'+cls+'"':'')+'><use href="#cherry"/></svg>'}
+
+/* ---------------- utilidades ---------------- */
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fmtBRL=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+const money=v=>fmtBRL.format(Number(v)||0);
+function parseMoney(s){if(typeof s==='number')return s;s=String(s||'').replace(/R\$|\s/g,'');if(!s)return 0;if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');const n=parseFloat(s);return isNaN(n)?NaN:Math.round(n*100)/100}
+const moneyInput=v=>v?String(Number(v).toFixed(2)).replace('.',','):'';
+function pad(n){return String(n).padStart(2,'0')}
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function today(){return ymd(new Date())}
+function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return ymd(d)}
+function fmtDate(s){if(!s)return '';const [y,m,d]=s.slice(0,10).split('-');return d+'/'+m+'/'+y}
+function fmtDateLong(s){if(!s)return '';const d=new Date(s+'T12:00');return d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function daysUntil(s){if(!s)return null;const a=new Date(s+'T00:00'),b=new Date(today()+'T00:00');return Math.round((a-b)/864e5)}
+const digits=s=>String(s||'').replace(/\D/g,'');
+function fmtPhone(s){let d=digits(s);if(d.length>11&&d.startsWith('55'))d=d.slice(2);if(d.length===11)return '('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7);if(d.length===10)return '('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6);return s||''}
+function waNumber(s){let d=digits(s);if(d.length===10||d.length===11)d='55'+d;return d}
+function hash(str){let h1=0xdeadbeef^7,h2=0x41c6ce57^7;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36)}
+const pinHash=p=>hash('cherry40:'+p);
+
+/* ---------------- dados ---------------- */
+function demoData(){
+  const g=(name,phone,group,allowed,status,companions,diet,notes,daysAgo)=>({id:uid(),name,phone,group,allowed,status,companions,diet,notes,respondedAt:status==='pending'?'':addDays(-daysAgo),demo:true});
+  const guests=[
+    g('Ana (exemplo)','11900000001','Família',2,'yes',['Bruno (exemplo)'],'Sem lactose','',3),
+    g('Carla (exemplo)','11900000002','Amigas do trabalho',1,'maybe',[],'','Confirma até o fim da semana',1),
+    g('Diego (exemplo)','11900000003','Amigos',1,'no',[],'','Estará viajando',2),
+    g('Elisa (exemplo)','11900000004','Família',3,'pending',[],'','',0)
+  ];
+  const e=(desc,category,supplier,planned,fin,due,status,method,paid,notes)=>({id:uid(),desc,category,supplier,planned,final:fin,due,status,method,paid,notes,receipt:'',demo:true});
+  const local=e('Aluguel do espaço (exemplo)','local','Fornecedor exemplo',3000,3200,addDays(5),'parcial','Pix',1600,'Sinal de 50% pago');
+  const expenses=[local,
+    e('Buffet completo (exemplo)','buffet','Fornecedor exemplo',4500,0,addDays(30),'planejado','',0,''),
+    e('Bolo de cereja (exemplo)','bolo','Fornecedor exemplo',450,480,addDays(-4),'pago','Cartão de crédito',480,''),
+    e('Arranjos e balões (exemplo)','decoracao','Fornecedor exemplo',900,850,addDays(2),'pendente','Boleto',0,''),
+    e('Vestido (exemplo)','roupa','',600,0,'','planejado','',0,''),
+    e('Fotógrafo (exemplo)','fotografia','Fornecedor exemplo',1200,1200,addDays(-1),'pendente','Transferência',0,'')];
+  const t=(name,category,status,expenseId)=>({id:uid(),name,category,owner:'Priscila',due:'',status,notes:'',expenseId:expenseId||''});
+  const tasks=[
+    t('Reservar o local','local','andamento',local.id),
+    t('Definir a lista de convidados','convidados','pendente'),
+    t('Contratar o buffet','buffet','pendente'),
+    t('Escolher o bolo e os doces','bolo','pendente'),
+    t('Comprar as bebidas','bebidas','pendente'),
+    t('Enviar os convites pelo WhatsApp','convites','pendente'),
+    t('Organizar a decoração Cherry','decoracao','pendente'),
+    t('Confirmar todos os fornecedores','geral','pendente'),
+    t('Escolher a roupa da festa','roupa','pendente')];
+  return {guests,expenses,tasks};
+}
+function defaults(){
+  const d=demoData();
+  return {v:1,party:{name:'Priscila',age:40,tagline:'uma celebração doce, cheia de amor e boas histórias.',date:'',time:'',endTime:'',venue:'',address:'',dress:'',parking:'',notes:'',contactName:'',contactPhone:'',photo:'',rsvpDeadline:'',maxCompanions:2,rsvpOpen:true,budget:0,inviteUrl:''},
+    guests:d.guests,expenses:d.expenses,tasks:d.tasks,pinHash:pinHash(DEFAULT_PIN),pinDefault:true};
+}
+let S;let storageOk=true;
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);const def=defaults();S=Object.assign({},def,o);S.party=Object.assign({},def.party,o.party||{});return}}catch(e){storageOk=false}S=defaults()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false;toast('Não foi possível salvar neste navegador. Libere espaço ou remova a foto.')}}
+let authed=false;try{authed=sessionStorage.getItem(KEY+':auth')===S?.pinHash}catch(e){}
+
+/* ---------------- cálculos ---------------- */
+function cost(x){return Number(x.final)>0?Number(x.final):Number(x.planned)||0}
+function balance(x){return Math.max(0,cost(x)-(Number(x.paid)||0))}
+function fin(){
+  const ex=S.expenses;const sum=f=>ex.reduce((a,x)=>a+f(x),0);
+  const planned=sum(x=>Number(x.planned)||0),spent=sum(x=>Number(x.final)||0),committed=sum(cost),paid=sum(x=>Number(x.paid)||0),pending=sum(balance);
+  const budget=Number(S.party.budget)||0;
+  return {planned,spent,committed,paid,pending,budget,diff:budget-committed};
+}
+function dueState(x){if(x.status==='pago'||balance(x)<=0||!x.due)return '';const d=daysUntil(x.due);if(d<0)return 'overdue';if(d<=7)return 'soon';return ''}
+function guestStats(){
+  const gs=S.guests;const c={total:gs.length,yes:0,no:0,maybe:0,pending:0,people:0,maybePeople:0};
+  gs.forEach(g=>{c[g.status]=(c[g.status]||0)+1;if(g.status==='yes')c.people+=1+(g.companions||[]).length;if(g.status==='maybe')c.maybePeople+=1+(g.companions||[]).length});
+  return c;
+}
+function partyDate(){const p=S.party;if(!p.date)return null;return new Date(p.date+'T'+(p.time||'00:00'))}
+function rsvpClosed(){const p=S.party;if(!p.rsvpOpen)return 'As confirmações estão encerradas.';if(p.rsvpDeadline&&daysUntil(p.rsvpDeadline)<0)return 'O prazo para confirmar presença terminou em '+fmtDate(p.rsvpDeadline)+'.';return ''}
+function inviteLink(){return S.party.inviteUrl||(location.href.split('#')[0]+'#convite')}
+function mapsLink(){const p=S.party;const q=[p.venue,p.address].filter(Boolean).join(', ');return q?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q):''}
+function gcalLink(){
+  const p=S.party;if(!p.date)return '';const d=p.date.replace(/-/g,'');let dates;
+  const compact=dt=>ymd(dt).replace(/-/g,'')+'T'+pad(dt.getHours())+pad(dt.getMinutes())+'00';
+  if(p.time){const st=new Date(p.date+'T'+p.time);let et;if(p.endTime){et=new Date(p.date+'T'+p.endTime);if(et<=st)et.setDate(et.getDate()+1)}else{et=new Date(st);et.setHours(et.getHours()+5)}dates=compact(st)+'/'+compact(et)}
+  else{const n=new Date(p.date+'T12:00');n.setDate(n.getDate()+1);dates=d+'/'+ymd(n).replace(/-/g,'')}
+  const loc=[p.venue,p.address].filter(Boolean).join(', ');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Aniversário de 40 anos da '+p.name+' 🍒')+'&dates='+dates+'&details='+encodeURIComponent('Tema Cherry. Convite: '+inviteLink())+(loc?'&location='+encodeURIComponent(loc):'')+'&ctz=America/Sao_Paulo';
+}
+function shareText(){
+  const p=S.party;let t='🍒 Você é minha convidada especial! '+p.name+' '+p.age+' anos, '+p.tagline;
+  if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
+  t+='\nConfirme sua presença pelo convite: '+inviteLink();return t;
+}
+const waShare=(txt,num)=>'https://wa.me/'+(num?waNumber(num):'')+'?text='+encodeURIComponent(txt);
+
+/* ---------------- toast, modal ---------------- */
+let toastT;
+function toast(msg){const r=document.getElementById('toastRoot');r.innerHTML='<div class="toast">'+esc(msg)+'</div>';clearTimeout(toastT);toastT=setTimeout(()=>r.innerHTML='',2800)}
+let lastFocus=null;
+function openModal(title,body,foot){
+  lastFocus=document.activeElement;
+  document.getElementById('modalRoot').innerHTML='<div class="overlay" data-act="overlay"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="modal-head"><h2 id="mt" style="font-size:1.4rem">'+title+'</h2><button class="iconbtn" data-act="close" aria-label="Fechar">'+ic('x')+'</button></div>'+body+(foot?'<div class="modal-foot">'+foot+'</div>':'')+'</div></div>';
+  document.body.style.overflow='hidden';
+  const f=document.querySelector('#modalRoot input:not([type=hidden]),#modalRoot select,#modalRoot textarea,#modalRoot .modal-foot .btn');if(f)setTimeout(()=>f.focus(),30);
+}
+function closeModal(){document.getElementById('modalRoot').innerHTML='';document.body.style.overflow='';if(lastFocus&&lastFocus.focus)try{lastFocus.focus()}catch(e){}}
+let pendingConfirm=null;
+function confirmDialog(title,msg,yesLabel,onYes){
+  pendingConfirm=onYes;
+  openModal(esc(title),'<p>'+msg+'</p>','<button class="btn" data-act="close">Cancelar</button><button class="btn danger solid" data-act="confirm-yes">'+esc(yesLabel)+'</button>');
+}
+async function copyText(txt,ok){
+  try{await navigator.clipboard.writeText(txt);toast(ok||'Copiado!')}
+  catch(e){openModal('Copiar texto','<p class="small muted" style="margin-bottom:8px">Selecione e copie o texto abaixo.</p><textarea class="input" id="copyArea" rows="8" readonly>'+esc(txt)+'</textarea>','<button class="btn primary" data-act="close">Pronto</button>');setTimeout(()=>{const a=document.getElementById('copyArea');if(a){a.focus();a.select()}},50)}
+}
+function downloadFile(name,content,type){
+  try{const blob=new Blob(['﻿'+content],{type:type||'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('Arquivo gerado: '+name)}catch(e){toast('O download não está disponível aqui. Use o botão Copiar.')}
+}
+function exportModal(title,name,content){
+  window.__export={name,content};
+  openModal(esc(title),'<p class="small muted" style="margin-bottom:8px">Arquivo CSV separado por ponto e vírgula, pronto para abrir no Excel ou Google Planilhas.'+(inFrame?' Nesta prévia o download pode estar bloqueado; use Copiar e cole numa planilha.':'')+'</p><textarea class="input" rows="8" readonly style="font-size:.8rem;font-family:ui-monospace,monospace">'+esc(content)+'</textarea>',
+    '<button class="btn'+(inFrame?' primary':'')+'" data-act="export-copy">'+ic('copy')+'Copiar</button>'+(inFrame?'':'<button class="btn primary" data-act="export-dl">'+ic('download')+'Baixar CSV</button>'));
+}
+
+/* ---------------- CSV ---------------- */
+function csvCell(v){v=String(v==null?'':v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function toCSV(rows){return rows.map(r=>r.map(csvCell).join(';')).join('\n')}
+function parseCSV(text){
+  text=text.replace(/^﻿/,'');const first=text.split('\n')[0]||'';const sep=(first.split(';').length>=first.split(',').length)?';':',';
+  const rows=[];let row=[],cell='',q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){cell+='"';i++}else q=false}else cell+=c}
+    else if(c==='"')q=true;else if(c===sep){row.push(cell);cell=''}else if(c==='\n'){row.push(cell);rows.push(row);row=[];cell=''}else if(c!=='\r')cell+=c}
+  if(cell||row.length){row.push(cell);rows.push(row)}
+  return rows.filter(r=>r.some(x=>x.trim()));
+}
+
+/* ---------------- roteamento ---------------- */
+const PRIVATE=['painel','convidados','checklist','financas','festa'];
+function route(){return (location.hash||'').replace('#','')||'convite'}
+function go(r){if(location.hash==='#'+r)render();else location.hash=r}
+window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
+
+let cdTimer=null;
+function render(){
+  const r=route();clearInterval(cdTimer);
+  const app=document.getElementById('app');
+  if(PRIVATE.includes(r)){
+    if(!authed){app.innerHTML=viewLogin(r);return}
+    app.innerHTML=shell(r,({painel:viewDash,convidados:viewGuests,checklist:viewTasks,financas:viewFinance,festa:viewParty})[r]());
+    return;
+  }
+  if(r==='confirmar'){app.innerHTML=viewRsvp();focusFirst();return}
+  if(r==='entrar'){app.innerHTML=viewLogin('painel');return}
+  app.innerHTML=viewInvite();startCountdown();
+}
+function focusFirst(){setTimeout(()=>{const f=document.querySelector('#app .card input,#app .card button');if(f&&rsvp.step>1)f.focus()},30)}
+
+/* ================= CONVITE PÚBLICO ================= */
+function factRow(icon,label,value,extra){return '<div class="fact"><div class="ic">'+ic(icon)+'</div><div><div class="label">'+label+'</div><div class="v">'+value+'</div>'+(extra||'')+'</div></div>'}
+function viewInvite(){
+  const p=S.party;const tbd='<span class="tbd">A confirmar</span>';
+  const falls=[8,22,40,58,74,90].map((l,i)=>'<svg viewBox="0 0 60 72" style="left:'+l+'%;animation-duration:'+(14+i*2.3)+'s;animation-delay:-'+(i*3.1)+'s"><use href="#cherry"/></svg>').join('');
+  const photo=p.photo?'<img src="'+p.photo+'" alt="Foto de '+esc(p.name)+'">':'<div class="ph">'+cherry()+'<span class="small">Foto da '+esc(p.name)+' em breve</span></div>';
+  const closed=rsvpClosed();
+  const maps=mapsLink();
+  const place=(p.venue||p.address)?esc(p.venue)+(p.venue&&p.address?'<br>':'')+'<span style="font-weight:400">'+esc(p.address)+'</span>':tbd;
+  const extras=[];
+  if(p.dress)extras.push(factRow('dress','Traje',esc(p.dress)));
+  if(p.parking)extras.push(factRow('car','Estacionamento',esc(p.parking)));
+  if(p.notes)extras.push(factRow('note','Observações',esc(p.notes).replace(/\n/g,'<br>')));
+  if(p.contactName||p.contactPhone)extras.push(factRow('phone','Contato',esc(p.contactName)+(p.contactName&&p.contactPhone?' · ':'')+'<span class="num">'+esc(fmtPhone(p.contactPhone))+'</span>',p.contactPhone?'<a class="small" href="'+waShare('Oi! Tenho uma dúvida sobre a festa da '+p.name+'.',p.contactPhone)+'" target="_blank" rel="noopener">Chamar no WhatsApp</a>':''));
+  return '<main class="invite gutter">'+
+   '<section class="hero" aria-labelledby="ttl"><div class="fall" aria-hidden="true">'+falls+'</div>'+
+    '<div class="arch">'+photo+'</div>'+
+    '<h1 id="ttl"><span class="script">'+esc(p.name)+'</span><span class="forty" style="display:block"><b>'+esc(p.age)+'</b> anos</span></h1>'+
+    '<p class="tag">'+esc(p.tagline)+'</p>'+
+    '<span class="theme-badge">'+cherry()+'Tema Cherry</span>'+
+    (p.date?'<div class="countdown" id="cd" aria-label="Contagem regressiva"><div><b id="cd-d">0</b><span>dias</span></div><div><b id="cd-h">0</b><span>horas</span></div><div><b id="cd-m">0</b><span>min</span></div><div><b id="cd-s">0</b><span>seg</span></div></div>':'')+
+   '</section>'+
+   '<section class="sect"><div class="facts">'+
+     factRow('cal','Data',p.date?esc(fmtDateLong(p.date)):tbd)+
+     factRow('clock','Horário',p.time?esc(p.time.replace(':','h'))+(p.endTime?' às '+esc(p.endTime.replace(':','h')):''):tbd)+
+     factRow('pin','Local',place,maps?'<a class="btn sm" style="margin-top:8px" href="'+maps+'" target="_blank" rel="noopener">'+ic('pin')+'Abrir no mapa</a>':'')+
+   '</div></section>'+
+   (extras.length?'<section class="sect"><div class="facts">'+extras.join('')+'</div></section>':'')+
+   '<div class="divider" aria-hidden="true">'+cherry()+'</div>'+
+   '<div class="cta-bar">'+
+     (closed?'<div class="notice info">'+ic('info')+'<span>'+esc(closed)+' Fale com a '+esc(p.name)+' se precisar.</span></div>':
+      '<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
+     '</div><div class="row" style="justify-content:center;margin-top:4px"><a class="btn leaf" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar no WhatsApp</a>'+(p.date?'<a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+'</div>'+
+   '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
+   '<a class="host-link" href="#painel">Área da aniversariante</a>'+
+  '</main>';
+}
+function startCountdown(){
+  const t=partyDate();if(!t||!document.getElementById('cd'))return;
+  const tick=()=>{let ms=t-new Date();const el=document.getElementById('cd');if(!el){clearInterval(cdTimer);return}
+    if(ms<=0){el.outerHTML='<p class="tag" style="margin-top:16px;color:var(--cherry)">É hoje! Que comece a festa 🍒</p>';clearInterval(cdTimer);return}
+    const d=Math.floor(ms/864e5);ms-=d*864e5;const h=Math.floor(ms/36e5);ms-=h*36e5;const m=Math.floor(ms/6e4);const s=Math.floor((ms-m*6e4)/1e3);
+    document.getElementById('cd-d').textContent=d;document.getElementById('cd-h').textContent=pad(h);document.getElementById('cd-m').textContent=pad(m);document.getElementById('cd-s').textContent=pad(s)};
+  tick();cdTimer=setInterval(tick,1000);
+}
+
+/* ================= CONFIRMAÇÃO (RSVP) ================= */
+let rsvp=newRsvp();
+function newRsvp(){return {step:1,name:'',phone:'',consent:false,answer:'',count:0,companions:[],diet:'',notes:'',existingId:'',limit:S?Number(S.party.maxCompanions)||0:2,errors:{}}}
+const STEP_LABELS=['Seus dados','Resposta','Acompanhantes','Detalhes','Revisão'];
+function stepsFor(){return rsvp.answer==='no'?[1,2,4,5]:[1,2,3,4,5]}
+function viewRsvp(){
+  const closed=rsvpClosed();const p=S.party;
+  const head='<div class="rsvp-top"><a class="iconbtn" href="#convite" aria-label="Voltar ao convite">'+ic('back')+'</a><div><div class="label">'+esc(p.name)+' '+esc(p.age)+' anos</div><h1 style="font-size:1.5rem">Confirmar presença</h1></div></div>';
+  if(closed&&rsvp.step!==6)return '<main class="rsvp gutter">'+head+'<div class="card"><div class="notice info">'+ic('info')+'<span>'+esc(closed)+'</span></div><a class="btn block" style="margin-top:16px" href="#convite">Voltar ao convite</a></div></main>';
+  if(rsvp.step===6)return '<main class="rsvp gutter">'+viewRsvpDone()+'</main>';
+  const seq=stepsFor();const idx=seq.indexOf(rsvp.step);
+  const bar='<div class="steps" aria-hidden="true">'+seq.map((s,i)=>'<i class="'+(i<=idx?'on':'')+'"></i>').join('')+'</div><p class="label" style="margin-bottom:12px">Etapa '+(idx+1)+' de '+seq.length+' · '+STEP_LABELS[rsvp.step-1]+'</p>';
+  let body='';const e=rsvp.errors;
+  if(rsvp.step===1){
+    body='<form data-form="rsvp1" class="stack" novalidate><h2>Que bom ver você por aqui!</h2><p class="muted">Conte quem é você para a '+esc(p.name)+' saber quem respondeu.</p>'+
+     '<label class="field"><span>Seu nome completo</span><input class="input" id="r-name" name="name" autocomplete="name" value="'+esc(rsvp.name)+'" aria-invalid="'+(!!e.name)+'" maxlength="80" required>'+(e.name?'<span class="err">'+e.name+'</span>':'')+'</label>'+
+     '<label class="field"><span>WhatsApp com DDD</span><input class="input" id="r-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="(11) 91234-5678" value="'+esc(rsvp.phone)+'" aria-invalid="'+(!!e.phone)+'" maxlength="20" required><small>Usado só para a '+esc(p.name)+' falar com você sobre a festa.</small>'+(e.phone?'<span class="err">'+e.phone+'</span>':'')+'</label>'+
+     '<label class="check"><input type="checkbox" id="r-consent" name="consent" '+(rsvp.consent?'checked':'')+'><span class="small">Concordo que meus dados sejam usados apenas para a organização desta comemoração.</span></label>'+(e.consent?'<span class="err">'+e.consent+'</span>':'')+
+     '<button class="btn primary big block" type="submit">Continuar</button></form>';
+  } else if(rsvp.step===2){
+    const opt=(k,em,t,s)=>'<button type="button" data-act="rsvp-answer" data-v="'+k+'" aria-pressed="'+(rsvp.answer===k)+'"><span class="em">'+em+'</span><span><b>'+t+'</b><small>'+s+'</small></span></button>';
+    body='<div class="stack">'+(rsvp.existingId?'<div class="notice ok">'+ic('check')+'<span>Encontramos sua resposta anterior. Você pode atualizá-la agora.</span></div>':'')+'<h2>Você vem, '+esc(rsvp.name.split(' ')[0])+'?</h2><div class="choice" role="group" aria-label="Sua resposta">'+
+      opt('yes',cherry(),'Vou','Conte comigo nessa celebração')+opt('no','<span aria-hidden="true">💌</span>','Não poderei ir','Vou mandar meu carinho de longe')+opt('maybe','<span aria-hidden="true">⏳</span>','Ainda não sei','Respondo assim que tiver certeza')+
+      '</div>'+(e.answer?'<span class="err">'+e.answer+'</span>':'')+navBtns()+'</div>';
+  } else if(rsvp.step===3){
+    const lim=rsvp.limit;
+    body='<form data-form="rsvp3" class="stack" novalidate><h2>Vai alguém com você?</h2>'+
+      (lim>0?'<p class="muted">Você pode levar até '+lim+' acompanhante'+(lim>1?'s':'')+'.</p><div class="stepper"><button type="button" data-act="rsvp-count" data-d="-1" aria-label="Menos um acompanhante" '+(rsvp.count<=0?'disabled':'')+'>−</button><output aria-live="polite" class="num">'+rsvp.count+'</output><button type="button" data-act="rsvp-count" data-d="1" aria-label="Mais um acompanhante" '+(rsvp.count>=lim?'disabled':'')+'>+</button><span class="muted">acompanhante'+(rsvp.count===1?'':'s')+'</span></div>'+
+      Array.from({length:rsvp.count},(_,i)=>'<label class="field"><span>Nome do acompanhante '+(i+1)+'</span><input class="input" name="c'+i+'" id="r-c'+i+'" value="'+esc(rsvp.companions[i]||'')+'" maxlength="80" aria-invalid="'+(!!e['c'+i])+'">'+(e['c'+i]?'<span class="err">'+e['c'+i]+'</span>':'')+'</label>').join('')
+      :'<div class="notice info">'+ic('info')+'<span>Este convite é individual. Se tiver alguma dúvida, fale com a '+esc(p.name)+'.</span></div>')+
+      navBtns(true)+'</form>';
+  } else if(rsvp.step===4){
+    body='<form data-form="rsvp4" class="stack" novalidate><h2>'+(rsvp.answer==='no'?'Quer deixar um recado?':'Algum detalhe importante?')+'</h2>'+
+      (rsvp.answer!=='no'?'<label class="field"><span>Restrições alimentares <span class="muted" style="font-weight:400">(opcional)</span></span><input class="input" id="r-diet" name="diet" maxlength="160" placeholder="Ex.: vegetariana, sem glúten, alergia a camarão" value="'+esc(rsvp.diet)+'"></label>':'')+
+      '<label class="field"><span>'+(rsvp.answer==='no'?'Recado para a '+esc(p.name):'Observações')+' <span class="muted" style="font-weight:400">(opcional)</span></span><textarea class="input" id="r-notes" name="notes" maxlength="400">'+esc(rsvp.notes)+'</textarea></label>'+
+      navBtns(true)+'</form>';
+  } else if(rsvp.step===5){
+    const rows=[['Nome',esc(rsvp.name)],['WhatsApp',esc(fmtPhone(rsvp.phone))],['Resposta',esc({yes:'Vou',no:'Não poderei ir',maybe:'Ainda não sei'}[rsvp.answer])]];
+    if(rsvp.answer!=='no'){rows.push(['Acompanhantes',rsvp.count?esc(rsvp.companions.slice(0,rsvp.count).join(', ')):'Nenhum']);rows.push(['Total de pessoas','<span class="num">'+(1+rsvp.count)+'</span>']);if(rsvp.diet)rows.push(['Restrições',esc(rsvp.diet)])}
+    if(rsvp.notes)rows.push([rsvp.answer==='no'?'Recado':'Observações',esc(rsvp.notes)]);
+    body='<div class="stack"><h2>Confira antes de enviar</h2><dl class="review">'+rows.map(r=>'<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>').join('')+'</dl>'+
+      '<div class="row"><button class="btn" data-act="rsvp-back">Voltar</button><span class="spacer"></span><button class="btn primary big" data-act="rsvp-submit">'+ic('check')+'Confirmar resposta</button></div>'+
+      '<button class="btn ghost sm" data-act="rsvp-goto" data-s="1">Corrigir meus dados</button></div>';
+  }
+  return '<main class="rsvp gutter">'+head+bar+'<div class="card">'+body+'</div><p class="privacy">Seus dados são usados apenas para a organização da comemoração e não aparecem para outros convidados.</p></main>';
+}
+function navBtns(submit){return '<div class="row" style="margin-top:6px"><button type="button" class="btn" data-act="rsvp-back">Voltar</button><span class="spacer"></span>'+(submit?'<button class="btn primary" type="submit">Continuar</button>':'<button type="button" class="btn primary" data-act="rsvp-next2">Continuar</button>')+'</div>'}
+function rsvpNav(dir){const seq=stepsFor();const i=seq.indexOf(rsvp.step);rsvp.errors={};if(dir<0&&i===0){go('convite');return}rsvp.step=seq[Math.max(0,Math.min(seq.length-1,i+dir))];render();focusFirst()}
+function viewRsvpDone(){
+  const p=S.party;const a=rsvp.answer;
+  const msg={yes:'Presença confirmada!',no:'Resposta registrada',maybe:'Resposta registrada'}[a];
+  const sub={yes:'Que alegria! A '+esc(p.name)+' vai adorar celebrar com você'+(rsvp.count?' e com '+(rsvp.count===1?'seu acompanhante':'seus '+rsvp.count+' acompanhantes'):'')+'.',no:'Obrigada por avisar. Seu carinho chega até a '+esc(p.name)+'.',maybe:'Sem problema! Volte a este convite quando souber e atualize sua resposta.'}[a];
+  return '<div class="card done stack"><div class="seal">'+cherry()+'</div><h1 style="font-size:1.8rem">'+msg+'</h1><p class="muted">'+sub+'</p>'+
+   (a!=='no'&&p.date?'<div class="sect" style="margin:0;text-align:left">'+factRow('cal','Anote na agenda',esc(fmtDateLong(p.date))+(p.time?' às '+esc(p.time.replace(':','h')):''))+'</div><a class="btn primary block" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+
+   '<a class="btn leaf block" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar convite</a>'+
+   '<button class="btn block" data-act="rsvp-edit">'+ic('edit')+'Alterar minha resposta</button>'+
+   '<a class="btn ghost block" href="#convite">Voltar ao convite</a></div>';
+}
+function rsvpSubmit(){
+  const p=S.party;const now=new Date().toISOString().slice(0,10);
+  const data={name:rsvp.name.trim(),phone:digits(rsvp.phone),status:rsvp.answer,companions:rsvp.answer==='no'?[]:rsvp.companions.slice(0,rsvp.count).map(s=>s.trim()),diet:rsvp.answer==='no'?'':rsvp.diet.trim(),notes:rsvp.notes.trim(),respondedAt:now};
+  let g=rsvp.existingId&&S.guests.find(x=>x.id===rsvp.existingId);
+  if(g){Object.assign(g,data)}else{S.guests.push(Object.assign({id:uid(),group:'Pelo convite',allowed:Number(p.maxCompanions)||0,demo:false},data))}
+  save();rsvp.step=6;render();window.scrollTo(0,0);
+}
+
+/* ================= LOGIN ================= */
+let pinFails=0,pinLockUntil=0,loginErr='';
+function viewLogin(target){
+  return '<main class="login gutter"><div class="card stack" style="text-align:center"><div style="width:56px;margin:0 auto">'+cherry()+'</div><h1 style="font-size:1.7rem">Área da aniversariante</h1><p class="muted">Painel privado de '+esc(S.party.name)+'. Digite o PIN para continuar.</p>'+
+   '<form data-form="login" data-target="'+esc(target)+'" class="stack" novalidate><label class="field"><span class="sr">PIN</span><input class="input pin" id="pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" aria-invalid="'+(!!loginErr)+'" placeholder="••••"></label>'+(loginErr?'<span class="err">'+esc(loginErr)+'</span>':'')+
+   '<button class="btn primary big block" type="submit">'+ic('lock')+'Entrar</button></form>'+
+   (S.pinDefault?'<div class="notice info small" style="text-align:left">'+ic('info')+'<span>PIN inicial desta versão: <b>4040</b>. Troque em Festa › Segurança no primeiro acesso.</span></div>':'')+
+   '<a class="btn ghost" href="#convite">Voltar ao convite</a></div></main>';
+}
+
+/* ================= SHELL PRIVADO ================= */
+const NAV=[['painel','home','Início'],['convidados','users','Convidados'],['checklist','list','Tarefas'],['financas','wallet','Finanças'],['festa','gear','Festa']];
+function shell(r,content){
+  const links=NAV.map(n=>'<a href="#'+n[0]+'" '+(r===n[0]?'aria-current="page"':'')+'>'+ic(n[1])+'<span>'+n[2]+'</span></a>').join('');
+  return '<header class="topbar"><div class="in gutter"><a class="brand" href="#painel">'+cherry()+'<b>'+esc(S.party.name)+'</b><span>'+esc(S.party.age)+'</span></a><nav class="tabs" aria-label="Seções">'+links+'</nav><span class="spacer"></span>'+
+   '<a class="iconbtn" href="#convite" title="Ver convite" aria-label="Ver convite público">'+ic('eye')+'</a><button class="iconbtn" data-act="logout" title="Sair" aria-label="Sair do painel">'+ic('out')+'</button></div></header>'+
+   '<main class="main gutter">'+(storageOk?'':'<div class="notice" style="margin-bottom:14px">'+ic('alert')+'<span>Este navegador não está salvando os dados. As alterações serão perdidas ao fechar a página.</span></div>')+content+'</main>'+
+   '<nav class="bottomnav" aria-label="Seções">'+links+'</nav>';
+}
+function demoBadge(x){return x.demo?' <span class="pill demo">Exemplo</span>':''}
+function hasDemo(){return S.guests.some(x=>x.demo)||S.expenses.some(x=>x.demo)}
+function demoNotice(){return hasDemo()?'<div class="notice info" style="margin-bottom:16px">'+ic('info')+'<span style="flex:1">Os itens marcados como <b>Exemplo</b> são fictícios e servem só para mostrar como o app funciona.</span><button class="btn sm" data-act="clear-demo">Remover exemplos</button></div>':''}
+
+/* ---------------- painel ---------------- */
+function viewDash(){
+  const p=S.party,gs=guestStats(),f=fin();
+  const dleft=p.date?daysUntil(p.date):null;
+  const missing=[];if(!p.date)missing.push('data');if(!p.time)missing.push('horário');if(!p.address&&!p.venue)missing.push('endereço');if(!f.budget)missing.push('orçamento');
+  const pct=n=>gs.total?(n/gs.total*100):0;
+  const tasks=S.tasks.filter(t=>t.status!=='concluida').sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,5);
+  const bills=S.expenses.filter(x=>dueState(x)).sort((a,b)=>a.due.localeCompare(b.due));
+  const doneT=S.tasks.filter(t=>t.status==='concluida').length;
+  return demoNotice()+
+  '<div class="dash">'+
+   '<section class="welcome"><div><div class="label">Painel da aniversariante</div><div class="script">Oi, '+esc(p.name)+'!</div><p class="muted" style="margin-top:6px">'+(p.date?esc(fmtDateLong(p.date))+(p.time?' · '+esc(p.time.replace(':','h')):''):'Defina a data da festa para iniciar a contagem.')+'</p>'+
+    (missing.length?'<a class="btn sm" style="margin-top:12px" href="#festa">'+ic('edit')+'Preencher '+missing.join(', ')+'</a>':'')+'</div>'+
+    (dleft!=null?'<div class="big num">'+(dleft>=0?dleft:'✓')+'<small>'+(dleft>0?'dias para a festa':dleft===0?'é hoje!':'festa realizada')+'</small></div>':'')+'</section>'+
+   '<div class="kpis">'+
+    '<div class="kpi hl"><div class="label">Pessoas confirmadas</div><div class="v">'+gs.people+'</div><div class="s">com acompanhantes</div></div>'+
+    '<div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div><div class="s">convites</div></div>'+
+    '<div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div><div class="s">convites</div></div>'+
+    '<div class="kpi"><div class="label">Sem resposta</div><div class="v">'+(gs.pending+gs.maybe)+'</div><div class="s">'+gs.maybe+' ainda não sabe'+(gs.maybe===1?'':'m')+'</div></div>'+
+   '</div>'+
+   '<section class="panel c7"><div class="row"><h3 style="margin:0">Respostas</h3><span class="spacer"></span><span class="pill '+(rsvpClosed()?'bad':'ok')+'"><i class="dot"></i>'+(rsvpClosed()?'Confirmações fechadas':'Confirmações abertas')+'</span></div>'+
+    '<div class="stackbar" role="img" aria-label="'+gs.yes+' vão, '+gs.maybe+' talvez, '+gs.no+' não vão, '+gs.pending+' sem resposta"><i style="width:'+pct(gs.yes)+'%;background:var(--ok)"></i><i style="width:'+pct(gs.maybe)+'%;background:var(--warn)"></i><i style="width:'+pct(gs.no)+'%;background:var(--bad)"></i></div>'+
+    '<div class="legend"><span><i style="background:var(--ok)"></i>Vão '+gs.yes+'</span><span><i style="background:var(--warn)"></i>Talvez '+gs.maybe+'</span><span><i style="background:var(--bad)"></i>Não vão '+gs.no+'</span><span><i style="background:var(--muted-bg);border:1px solid var(--line)"></i>Sem resposta '+gs.pending+'</span></div>'+
+    '<p class="small muted" style="margin-top:10px">'+gs.total+' convites na lista'+(p.rsvpDeadline?' · prazo para confirmar: '+fmtDate(p.rsvpDeadline):'')+'</p></section>'+
+   '<section class="panel c5"><h3>Atalhos</h3><div class="shortcuts">'+
+    '<button class="shortcut" data-act="guest-new">'+ic('plus')+'Adicionar convidado</button>'+
+    '<button class="shortcut" data-act="exp-new">'+ic('wallet')+'Lançar despesa</button>'+
+    '<button class="shortcut" data-act="task-new">'+ic('list')+'Nova tarefa</button>'+
+    '<button class="shortcut" data-act="copy-invite">'+ic('link')+'Copiar link do convite</button>'+
+    '<a class="shortcut" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>'+
+    '<a class="shortcut" href="#convite">'+ic('eye')+'Ver convite</a></div></section>'+
+   '<section class="panel c6"><div class="row"><h3 style="margin:0">Dinheiro da festa</h3><span class="spacer"></span><a class="small" href="#financas">Ver finanças</a></div>'+budgetBlock(f)+'</section>'+
+   '<section class="panel c6"><div class="row"><h3 style="margin:0">Próximas tarefas</h3><span class="spacer"></span><span class="small muted">'+doneT+' de '+S.tasks.length+' concluídas</span></div>'+
+    (tasks.length?'<div class="list">'+tasks.map(t=>'<div class="li"><button class="iconbtn" data-act="task-toggle" data-id="'+t.id+'" aria-label="Marcar '+esc(t.name)+' como concluída">'+ic('check')+'</button><div class="main-t"><b>'+esc(t.name)+'</b><div class="meta"><span>'+esc(TCATS[t.category]||'')+'</span>'+(t.due?'<span>até '+fmtDate(t.due)+'</span>':'')+'</div></div><span class="pill '+T_ST_CLS[t.status]+'">'+T_ST[t.status]+'</span></div>').join('')+'</div>':'<p class="muted">Tudo em dia por aqui.</p>')+
+    '<a class="btn sm" style="margin-top:10px" href="#checklist">Ver checklist</a></section>'+
+   (bills.length?'<section class="panel"><h3>Contas para pagar em breve</h3>'+bills.map(expRow).join('')+'</section>':'')+
+  '</div>';
+}
+function budgetBlock(f){
+  const base=Math.max(f.budget,f.committed,1);
+  return '<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin:12px 0">'+
+    '<div><div class="label">Orçamento</div><div class="num" style="font-size:1.2rem;font-weight:700">'+(f.budget?money(f.budget):'<a href="#festa" class="small">Definir</a>')+'</div></div>'+
+    '<div><div class="label">Custo total</div><div class="num" style="font-size:1.2rem;font-weight:700">'+money(f.committed)+'</div></div>'+
+    '<div><div class="label">Já pago</div><div class="num" style="font-size:1.2rem;font-weight:700;color:var(--ok)">'+money(f.paid)+'</div></div>'+
+    '<div><div class="label">Falta pagar</div><div class="num" style="font-size:1.2rem;font-weight:700;color:var(--cherry)">'+money(f.pending)+'</div></div></div>'+
+   '<div class="meter" role="img" aria-label="Pago '+money(f.paid)+' de '+money(f.committed)+'"><i style="width:'+(f.committed/base*100)+'%;background:color-mix(in srgb,var(--cherry) 30%,var(--paper))"></i><i style="width:'+(f.paid/base*100)+'%;background:var(--cherry)"></i></div>'+
+   '<div class="legend" style="margin-top:8px"><span><i style="background:var(--cherry)"></i>Pago</span><span><i style="background:color-mix(in srgb,var(--cherry) 30%,var(--paper))"></i>A pagar</span>'+(f.budget?'<span>'+(f.diff>=0?'Sobram <b class="num" style="color:var(--ok)">'+money(f.diff)+'</b> do orçamento':'Orçamento estourado em <b class="num" style="color:var(--bad)">'+money(-f.diff)+'</b>')+'</span>':'')+'</div>';
+}
+
+/* ---------------- convidados ---------------- */
+let gFilter={q:'',status:'',group:''};
+function viewGuests(){
+  const gs=guestStats();const p=S.party;
+  const groups=[...new Set(S.guests.map(g=>g.group).filter(Boolean))].sort();
+  const q=gFilter.q.toLowerCase();
+  const list=S.guests.filter(g=>(!gFilter.status||g.status===gFilter.status)&&(!gFilter.group||g.group===gFilter.group)&&(!q||(g.name+' '+g.phone+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
+  return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button><button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
+   '<div class="kpis"><div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div></div><div class="kpi"><div class="label">Ainda não sabem</div><div class="v" style="color:var(--warn)">'+gs.maybe+'</div></div><div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div></div><div class="kpi"><div class="label">Sem resposta</div><div class="v">'+gs.pending+'</div></div></div>'+
+   '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div></div>'+
+   '<div class="toolbar"><input class="input" id="g-q" type="search" placeholder="Buscar por nome ou WhatsApp" value="'+esc(gFilter.q)+'" data-filter="g-q" aria-label="Buscar convidados">'+
+    '<select class="input" id="g-st" data-filter="g-st" aria-label="Filtrar por status"><option value="">Todos os status</option>'+Object.entries(G_ST).map(([k,v])=>'<option value="'+k+'" '+(gFilter.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
+    '<select class="input" id="g-gr" data-filter="g-gr" aria-label="Filtrar por grupo"><option value="">Todos os grupos</option>'+groups.map(g=>'<option '+(gFilter.group===g?'selected':'')+'>'+esc(g)+'</option>').join('')+'</select></div>'+
+   '<div id="g-list">'+(list.length?list.map(guestRow).join(''):(S.guests.length?'<div class="empty">Nenhum convidado encontrado com esses filtros.</div>':'<div class="empty">'+cherry()+'<p>Sua lista ainda está vazia.</p><button class="btn primary" style="margin-top:12px" data-act="guest-new">Adicionar o primeiro convidado</button></div>'))+'</div>';
+}
+function guestRow(g){
+  const people=g.status==='yes'?1+(g.companions||[]).length:0;
+  return '<div class="rec"><div style="min-width:0"><div class="t">'+esc(g.name)+demoBadge(g)+'</div><div class="meta">'+(g.group?'<span>'+esc(g.group)+'</span>':'')+(g.phone?'<span class="num">'+esc(fmtPhone(g.phone))+'</span>':'')+'<span>até '+(Number(g.allowed)||0)+' acomp.</span>'+(g.respondedAt?'<span>respondeu em '+fmtDate(g.respondedAt)+'</span>':'')+'</div>'+
+    ((g.companions||[]).length?'<div class="meta"><span>Com: '+esc(g.companions.join(', '))+'</span></div>':'')+
+    (g.diet?'<div class="meta"><span>🍽 '+esc(g.diet)+'</span></div>':'')+(g.notes?'<div class="meta"><span>'+esc(g.notes)+'</span></div>':'')+'</div>'+
+   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
+   '<div class="acts">'+(g.phone?'<a class="btn sm leaf" href="'+waShare('Oi, '+g.name.split(' ')[0]+'! '+shareText(),g.phone)+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
+}
+function guestForm(g){
+  g=g||{name:'',phone:'',group:'',allowed:S.party.maxCompanions,status:'pending',companions:[],diet:'',notes:''};
+  openModal(g.id?'Editar convidado':'Novo convidado','<form data-form="guest" data-id="'+(g.id||'')+'" class="stack" novalidate>'+
+   '<label class="field"><span>Nome *</span><input class="input" id="gf-name" name="name" required maxlength="80" value="'+esc(g.name)+'"></label>'+
+   '<div class="grid2"><label class="field"><span>WhatsApp</span><input class="input" id="gf-phone" name="phone" inputmode="tel" maxlength="20" placeholder="(11) 91234-5678" value="'+esc(fmtPhone(g.phone))+'"></label>'+
+   '<label class="field"><span>Grupo ou família</span><input class="input" id="gf-group" name="group" maxlength="60" list="groupsList" value="'+esc(g.group)+'"><datalist id="groupsList">'+[...new Set(S.guests.map(x=>x.group).filter(Boolean))].map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label>'+
+   '<label class="field"><span>Acompanhantes permitidos</span><input class="input" id="gf-allowed" name="allowed" type="number" min="0" max="20" value="'+(Number(g.allowed)||0)+'"></label>'+
+   '<label class="field"><span>Status</span><select class="input" id="gf-status" name="status">'+Object.entries(G_ST).map(([k,v])=>'<option value="'+k+'" '+(g.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label></div>'+
+   '<label class="field"><span>Acompanhantes confirmados</span><input class="input" id="gf-comp" name="companions" maxlength="300" placeholder="Nomes separados por vírgula" value="'+esc((g.companions||[]).join(', '))+'"><small>A quantidade de pessoas é calculada a partir destes nomes.</small></label>'+
+   '<label class="field"><span>Restrições alimentares</span><input class="input" id="gf-diet" name="diet" maxlength="160" value="'+esc(g.diet)+'"></label>'+
+   '<label class="field"><span>Observações</span><textarea class="input" id="gf-notes" name="notes" maxlength="400">'+esc(g.notes)+'</textarea></label>'+
+   '<div class="err" id="gf-err"></div><div class="modal-foot"><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div></form>');
+}
+function importModal(){
+  openModal('Importar convidados','<div class="stack"><p class="small muted">Use um arquivo CSV com cabeçalho. A coluna <b>nome</b> é obrigatória; <b>whatsapp</b>, <b>grupo</b> e <b>acompanhantes_permitidos</b> são opcionais. Exporte a lista atual para ver o modelo completo.</p>'+
+   '<label class="field"><span>Arquivo CSV</span><input class="input" id="imp-file" type="file" accept=".csv,text/csv,text/plain" data-act="imp-file"></label>'+
+   '<label class="field"><span>Ou cole as linhas aqui</span><textarea class="input" id="imp-text" rows="6" placeholder="nome;whatsapp;grupo;acompanhantes_permitidos&#10;Maria Souza;11912345678;Família;2"></textarea></label><div class="err" id="imp-err"></div></div>',
+   '<button class="btn" data-act="close">Cancelar</button><button class="btn primary" data-act="imp-run">'+ic('upload')+'Importar</button>');
+}
+function runImport(){
+  const txt=document.getElementById('imp-text').value.trim();const err=document.getElementById('imp-err');
+  if(!txt){err.textContent='Escolha um arquivo ou cole as linhas para importar.';return}
+  const rows=parseCSV(txt);if(rows.length<2){err.textContent='Não encontramos linhas de convidados. Confira se a primeira linha é o cabeçalho.';return}
+  const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z_]/g,'');
+  const h=rows[0].map(norm);const col=(...names)=>h.findIndex(x=>names.includes(x));
+  const ci={name:col('nome','name'),phone:col('whatsapp','telefone','celular','phone'),group:col('grupo','familia','grupoufamilia','group'),allowed:col('acompanhantes_permitidos','acompanhantespermitidos','acompanhantes_perm','permitidos'),status:col('status'),comp:col('acompanhantes','acompanhantes_confirmados'),diet:col('restricoes','restricoes_alimentares','restricoesalimentares'),notes:col('observacoes','obs'),date:col('data_resposta','dataresposta')};
+  if(ci.name<0){err.textContent='A coluna "nome" não foi encontrada no cabeçalho.';return}
+  const stMap={'vai':'yes','sim':'yes','yes':'yes','nao vai':'no','nao':'no','no':'no','ainda nao sabe':'maybe','talvez':'maybe','maybe':'maybe'};
+  let added=0,updated=0;
+  rows.slice(1).forEach(r=>{const v=i=>i>=0?(r[i]||'').trim():'';const name=v(ci.name);if(!name)return;
+    const st=stMap[v(ci.status).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')]||'pending';
+    const data={name,phone:digits(v(ci.phone)),group:v(ci.group),allowed:parseInt(v(ci.allowed))||Number(S.party.maxCompanions)||0,status:st,companions:v(ci.comp)?v(ci.comp).split(',').map(s=>s.trim()).filter(Boolean):[],diet:v(ci.diet),notes:v(ci.notes),respondedAt:st!=='pending'?(v(ci.date).match(/^(\d{2})\/(\d{2})\/(\d{4})$/)?v(ci.date).replace(/^(\d{2})\/(\d{2})\/(\d{4})$/,'$3-$2-$1'):today()):''};
+    const ex=data.phone&&S.guests.find(g=>digits(g.phone)===data.phone);
+    if(ex){Object.assign(ex,data);ex.demo=false;updated++}else{S.guests.push(Object.assign({id:uid(),demo:false},data));added++}});
+  save();closeModal();render();toast(added+' adicionado(s), '+updated+' atualizado(s)');
+}
+function guestsCSV(){
+  return toCSV([['nome','whatsapp','grupo','acompanhantes_permitidos','status','pessoas_confirmadas','acompanhantes','restricoes','observacoes','data_resposta']].concat(S.guests.map(g=>[g.name,fmtPhone(g.phone),g.group,g.allowed,G_ST[g.status],g.status==='yes'?1+(g.companions||[]).length:0,(g.companions||[]).join(', '),g.diet,g.notes,fmtDate(g.respondedAt)])));
+}
+
+/* ---------------- checklist ---------------- */
+let tFilter='';
+function viewTasks(){
+  const list=S.tasks.filter(t=>!tFilter||t.status===tFilter).sort((a,b)=>(a.status==='concluida')-(b.status==='concluida')||(a.due||'9999').localeCompare(b.due||'9999'));
+  const done=S.tasks.filter(t=>t.status==='concluida').length;const pc=S.tasks.length?Math.round(done/S.tasks.length*100):0;
+  return '<div class="page-head"><div><h2>Checklist da festa</h2><p>'+done+' de '+S.tasks.length+' tarefas concluídas</p></div><button class="btn primary" data-act="task-new">'+ic('plus')+'Nova tarefa</button></div>'+
+   '<div class="meter" role="img" aria-label="'+pc+'% concluído"><i style="width:'+pc+'%;background:var(--leaf)"></i></div>'+
+   '<div class="toolbar" role="group" aria-label="Filtrar tarefas">'+[['','Todas'],['pendente','Pendentes'],['andamento','Em andamento'],['concluida','Concluídas']].map(o=>'<button class="btn sm '+(tFilter===o[0]?'primary':'')+'" data-act="task-filter" data-v="'+o[0]+'">'+o[1]+'</button>').join('')+'</div>'+
+   (list.length?list.map(taskRow).join(''):'<div class="empty">'+cherry()+'<p>Nenhuma tarefa por aqui.</p><button class="btn primary" style="margin-top:12px" data-act="task-new">Criar tarefa</button></div>');
+}
+function taskRow(t){
+  const ex=t.expenseId&&S.expenses.find(x=>x.id===t.expenseId);const late=t.due&&t.status!=='concluida'&&daysUntil(t.due)<0;
+  return '<div class="rec '+(t.status==='concluida'?'done':'')+(late?' overdue':'')+'"><div style="display:flex;gap:10px;min-width:0"><button class="iconbtn" style="border:1.5px solid var(--line);'+(t.status==='concluida'?'background:var(--leaf);color:#fff;border-color:var(--leaf)':'')+'" data-act="task-toggle" data-id="'+t.id+'" aria-label="'+(t.status==='concluida'?'Reabrir':'Concluir')+' '+esc(t.name)+'">'+ic('check')+'</button><div style="min-width:0"><div class="t">'+esc(t.name)+'</div><div class="meta"><span>'+esc(TCATS[t.category]||'')+'</span>'+(t.owner?'<span>'+esc(t.owner)+'</span>':'')+(t.due?'<span'+(late?' style="color:var(--bad);font-weight:600"':'')+'>prazo '+fmtDate(t.due)+(late?' (atrasada)':'')+'</span>':'')+(ex?'<span>💳 '+esc(ex.desc)+'</span>':'')+'</div>'+(t.notes?'<div class="meta"><span>'+esc(t.notes)+'</span></div>':'')+'</div></div>'+
+   '<div class="side"><span class="pill '+T_ST_CLS[t.status]+'">'+T_ST[t.status]+'</span></div>'+
+   '<div class="acts"><button class="btn sm" data-act="task-edit" data-id="'+t.id+'">'+ic('edit')+'Editar</button><button class="btn sm danger" data-act="task-del" data-id="'+t.id+'">'+ic('trash')+'Remover</button></div></div>';
+}
+function taskForm(t){
+  t=t||{name:'',category:'geral',owner:'Priscila',due:'',status:'pendente',notes:'',expenseId:''};
+  openModal(t.id?'Editar tarefa':'Nova tarefa','<form data-form="task" data-id="'+(t.id||'')+'" class="stack" novalidate>'+
+   '<label class="field"><span>Tarefa *</span><input class="input" id="tf-name" name="name" maxlength="100" value="'+esc(t.name)+'" required></label>'+
+   '<div class="grid2"><label class="field"><span>Categoria</span><select class="input" id="tf-cat" name="category">'+Object.entries(TCATS).map(([k,v])=>'<option value="'+k+'" '+(t.category===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'+
+   '<label class="field"><span>Responsável</span><input class="input" id="tf-owner" name="owner" maxlength="60" value="'+esc(t.owner)+'"></label>'+
+   '<label class="field"><span>Prazo</span><input class="input" id="tf-due" name="due" type="date" value="'+esc(t.due)+'"></label>'+
+   '<label class="field"><span>Situação</span><select class="input" id="tf-st" name="status">'+Object.entries(T_ST).map(([k,v])=>'<option value="'+k+'" '+(t.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label></div>'+
+   '<label class="field"><span>Despesa relacionada</span><select class="input" id="tf-exp" name="expenseId"><option value="">Nenhuma</option>'+S.expenses.map(x=>'<option value="'+x.id+'" '+(t.expenseId===x.id?'selected':'')+'>'+esc(x.desc)+'</option>').join('')+'</select></label>'+
+   '<label class="field"><span>Observações</span><textarea class="input" id="tf-notes" name="notes" maxlength="400">'+esc(t.notes)+'</textarea></label>'+
+   '<div class="err" id="tf-err"></div><div class="modal-foot"><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div></form>');
+}
+
+/* ---------------- finanças ---------------- */
+let fFilter={q:'',cat:'',st:'',from:'',to:''};
+function viewFinance(){
+  const f=fin();
+  const q=fFilter.q.toLowerCase();
+  const list=S.expenses.filter(x=>(!fFilter.cat||x.category===fFilter.cat)&&(!fFilter.st||x.status===fFilter.st)&&(!fFilter.from||(x.due&&x.due>=fFilter.from))&&(!fFilter.to||(x.due&&x.due<=fFilter.to))&&(!q||(x.desc+' '+x.supplier).toLowerCase().includes(q)))
+    .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+  const alerts=S.expenses.filter(x=>dueState(x)).sort((a,b)=>a.due.localeCompare(b.due));
+  const byCat={};S.expenses.forEach(x=>{const c=x.category;byCat[c]=byCat[c]||{cost:0,paid:0};byCat[c].cost+=cost(x);byCat[c].paid+=Number(x.paid)||0});
+  const cats=Object.entries(byCat).filter(c=>c[1].cost>0).sort((a,b)=>b[1].cost-a[1].cost);const max=Math.max(1,...cats.map(c=>c[1].cost));
+  const filtTotal=list.reduce((a,x)=>a+cost(x),0);
+  return demoNotice()+'<div class="page-head"><div><h2>Finanças da festa</h2><p>Registro e acompanhamento dos gastos. Nenhum pagamento é feito pelo app.</p></div><div class="row"><button class="btn primary" data-act="exp-new">'+ic('plus')+'Nova despesa</button><button class="btn" data-act="fin-export">'+ic('download')+'Exportar</button><button class="btn" data-act="fin-copy">'+ic('copy')+'Copiar resumo</button>'+(inFrame?'':'<button class="btn" data-act="fin-print">'+ic('printer')+'Imprimir</button>')+'</div></div>'+
+   '<div class="kpis">'+
+    '<div class="kpi"><div class="label">Orçamento total</div><div class="v">'+(f.budget?money(f.budget):'—')+'</div><div class="s">'+(f.budget?'<a href="#" data-act="budget-edit">Alterar</a>':'<a href="#" data-act="budget-edit">Definir orçamento</a>')+'</div></div>'+
+    '<div class="kpi"><div class="label">Total previsto</div><div class="v">'+money(f.planned)+'</div><div class="s">soma dos valores previstos</div></div>'+
+    '<div class="kpi"><div class="label">Total gasto</div><div class="v">'+money(f.spent)+'</div><div class="s">soma dos valores finais</div></div>'+
+    '<div class="kpi pos"><div class="label">Já pago</div><div class="v">'+money(f.paid)+'</div><div class="s">'+(f.committed?Math.round(f.paid/f.committed*100):0)+'% do custo total</div></div>'+
+    '<div class="kpi hl"><div class="label">Falta pagar</div><div class="v">'+money(f.pending)+'</div><div class="s">saldo de todas as despesas</div></div>'+
+    '<div class="kpi '+(f.budget?(f.diff>=0?'pos':'neg'):'')+'"><div class="label">Orçamento − custo</div><div class="v">'+(f.budget?money(f.diff):'—')+'</div><div class="s">custo total: '+money(f.committed)+'</div></div>'+
+   '</div>'+
+   '<div class="dash" style="margin-top:16px">'+
+    '<section class="panel c6"><h3>Gastos por categoria</h3>'+(cats.length?'<div class="bars">'+cats.map(([k,v])=>'<div class="bar"><span>'+esc(CATS[k]||k)+'</span><div class="track" role="img" aria-label="'+esc(CATS[k])+': '+money(v.cost)+', pago '+money(v.paid)+'"><i class="cost" style="width:'+(v.cost/max*100)+'%"></i><i class="paid" style="width:'+(Math.min(v.paid,v.cost)/max*100)+'%"></i></div><span class="val">'+money(v.cost)+'</span></div>').join('')+'</div><div class="legend" style="margin-top:12px"><span><i style="background:var(--cherry)"></i>Pago</span><span><i style="background:color-mix(in srgb,var(--cherry) 30%,var(--paper))"></i>Custo total (final ou previsto)</span></div>':'<p class="muted">Lance despesas para ver o gráfico.</p>')+'</section>'+
+    '<section class="panel c6"><h3>Avisos de vencimento</h3>'+(alerts.length?alerts.map(x=>{const d=daysUntil(x.due);return '<div class="notice'+(d<0?'" style="background:var(--bad-bg);color:var(--bad)':'')+'" style="margin-bottom:8px">'+ic('alert')+'<span style="flex:1"><b>'+esc(x.desc)+'</b>: '+money(balance(x))+' '+(d<0?'venceu há '+(-d)+' dia'+(d===-1?'':'s'):d===0?'vence hoje':'vence em '+d+' dia'+(d===1?'':'s'))+' ('+fmtDate(x.due)+')</span></div>'}).join(''):'<div class="notice ok">'+ic('check')+'<span>Nenhuma conta vencida ou vencendo nos próximos 7 dias.</span></div>')+'<h3 style="margin-top:18px">Resumo do orçamento</h3>'+budgetBlock(f)+'</section>'+
+   '</div>'+
+   '<h3 style="margin-top:24px">Despesas</h3>'+
+   '<div class="toolbar"><input class="input" id="f-q" type="search" placeholder="Buscar despesa ou fornecedor" value="'+esc(fFilter.q)+'" data-filter="f-q" aria-label="Buscar despesas">'+
+    '<select class="input" id="f-cat" data-filter="f-cat" aria-label="Filtrar por categoria"><option value="">Todas as categorias</option>'+Object.entries(CATS).map(([k,v])=>'<option value="'+k+'" '+(fFilter.cat===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
+    '<select class="input" id="f-st" data-filter="f-st" aria-label="Filtrar por situação"><option value="">Todas as situações</option>'+Object.entries(EXP_ST).map(([k,v])=>'<option value="'+k+'" '+(fFilter.st===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
+    '<label class="field" style="flex:0 1 160px"><small>Vencimento de</small><input class="input" id="f-from" type="date" data-filter="f-from" value="'+esc(fFilter.from)+'"></label>'+
+    '<label class="field" style="flex:0 1 160px"><small>até</small><input class="input" id="f-to" type="date" data-filter="f-to" value="'+esc(fFilter.to)+'"></label>'+
+    ((fFilter.q||fFilter.cat||fFilter.st||fFilter.from||fFilter.to)?'<button class="btn sm ghost" data-act="f-clear">Limpar filtros</button>':'')+'</div>'+
+   '<p class="small muted" style="margin-bottom:10px">'+list.length+' despesa(s) · custo '+money(filtTotal)+'</p>'+
+   (list.length?list.map(expRow).join(''):(S.expenses.length?'<div class="empty">Nenhuma despesa com esses filtros.</div>':'<div class="empty">'+cherry()+'<p>Nenhuma despesa lançada ainda.</p><button class="btn primary" style="margin-top:12px" data-act="exp-new">Lançar a primeira despesa</button></div>'));
+}
+function expRow(x){
+  const ds=dueState(x);const d=x.due?daysUntil(x.due):null;
+  return '<div class="rec '+(ds==='overdue'?'overdue':ds==='soon'?'alert':'')+'"><div style="min-width:0"><div class="t">'+esc(x.desc)+demoBadge(x)+'</div><div class="meta"><span class="pill">'+esc(CATS[x.category]||x.category)+'</span>'+(x.supplier?'<span>'+esc(x.supplier)+'</span>':'')+(x.due?'<span'+(ds?' style="color:var('+(ds==='overdue'?'--bad':'--warn')+');font-weight:600"':'')+'>vence '+fmtDate(x.due)+(ds==='overdue'?' · vencida':ds==='soon'?(d===0?' · hoje':' · em '+d+'d'):'')+'</span>':'')+(x.method?'<span>'+esc(x.method)+'</span>':'')+'</div>'+
+   '<div class="meta money-line"><span>Previsto '+money(x.planned)+'</span><span>Final '+(Number(x.final)>0?money(x.final):'—')+'</span><span>Pago '+money(x.paid)+'</span></div>'+
+   (x.notes?'<div class="meta"><span>'+esc(x.notes)+'</span></div>':'')+(x.receipt?'<div class="meta"><span>Comprovante: '+(/^https?:\/\//.test(x.receipt)?'<a href="'+esc(x.receipt)+'" target="_blank" rel="noopener">abrir link</a>':esc(x.receipt))+'</span></div>':'')+'</div>'+
+   '<div class="side"><span class="pill '+EXP_ST_CLS[x.status]+'">'+EXP_ST[x.status]+'</span><span class="num" style="font-weight:700">'+(balance(x)>0?'Falta '+money(balance(x)):'Quitado')+'</span></div>'+
+   '<div class="acts"><button class="btn sm" data-act="exp-edit" data-id="'+x.id+'">'+ic('edit')+'Editar</button><button class="btn sm" data-act="exp-dup" data-id="'+x.id+'">'+ic('dup')+'Duplicar</button><button class="btn sm danger" data-act="exp-del" data-id="'+x.id+'">'+ic('trash')+'Excluir</button></div></div>';
+}
+function expForm(x,isDup){
+  x=x||{desc:'',category:'outros',supplier:'',planned:'',final:'',due:'',status:'planejado',method:'',paid:'',notes:'',receipt:''};
+  const id=isDup?'':(x.id||'');
+  openModal(id?'Editar despesa':(isDup?'Duplicar despesa':'Nova despesa'),'<form data-form="exp" data-id="'+id+'" class="stack" novalidate>'+
+   '<label class="field"><span>Descrição do gasto *</span><input class="input" id="ef-desc" name="desc" maxlength="100" value="'+esc(isDup?x.desc+' (cópia)':x.desc)+'"></label>'+
+   '<div class="grid2"><label class="field"><span>Categoria *</span><select class="input" id="ef-cat" name="category">'+Object.entries(CATS).map(([k,v])=>'<option value="'+k+'" '+(x.category===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'+
+   '<label class="field"><span>Fornecedor</span><input class="input" id="ef-sup" name="supplier" maxlength="80" value="'+esc(x.supplier)+'"></label>'+
+   '<label class="field"><span>Valor previsto (R$)</span><input class="input num" id="ef-planned" name="planned" inputmode="decimal" placeholder="0,00" value="'+moneyInput(x.planned)+'" data-calc></label>'+
+   '<label class="field"><span>Valor final (R$)</span><input class="input num" id="ef-final" name="final" inputmode="decimal" placeholder="0,00" value="'+moneyInput(x.final)+'" data-calc><small>Preencha quando o valor for fechado.</small></label>'+
+   '<label class="field"><span>Data de vencimento</span><input class="input" id="ef-due" name="due" type="date" value="'+esc(x.due)+'"></label>'+
+   '<label class="field"><span>Situação</span><select class="input" id="ef-st" name="status" data-calc>'+Object.entries(EXP_ST).map(([k,v])=>'<option value="'+k+'" '+(x.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'+
+   '<label class="field"><span>Forma de pagamento</span><select class="input" id="ef-method" name="method"><option value="">Não definida</option>'+PAY.map(m=>'<option '+(x.method===m?'selected':'')+'>'+m+'</option>').join('')+'</select></label>'+
+   '<label class="field"><span>Valor pago (R$)</span><input class="input num" id="ef-paid" name="paid" inputmode="decimal" placeholder="0,00" value="'+moneyInput(x.paid)+'" data-calc></label></div>'+
+   '<div class="notice info" id="ef-saldo">'+ic('wallet')+'<span>Saldo restante: <b class="num">'+money(balance(x))+'</b></span></div>'+
+   '<label class="field"><span>Observações</span><textarea class="input" id="ef-notes" name="notes" maxlength="400">'+esc(x.notes)+'</textarea></label>'+
+   '<label class="field"><span>Comprovante (link ou referência)</span><input class="input" id="ef-rec" name="receipt" maxlength="300" placeholder="https://… ou nº do recibo" value="'+esc(x.receipt)+'"></label>'+
+   '<div class="err" id="ef-err"></div><div class="modal-foot"><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div></form>');
+}
+function finSummaryText(){
+  const f=fin();const L=['RESUMO FINANCEIRO · '+S.party.name+' '+S.party.age+' anos','Gerado em '+fmtDate(today()),'',
+   'Orçamento: '+(f.budget?money(f.budget):'não definido'),'Total previsto: '+money(f.planned),'Total gasto (valores finais): '+money(f.spent),'Custo total considerado: '+money(f.committed),'Já pago: '+money(f.paid),'Falta pagar: '+money(f.pending),(f.budget?'Orçamento − custo: '+money(f.diff):''),'','DESPESAS'];
+  S.expenses.forEach(x=>L.push('• '+x.desc+' ['+(CATS[x.category]||x.category)+'] · '+EXP_ST[x.status]+' · custo '+money(cost(x))+' · pago '+money(x.paid)+' · saldo '+money(balance(x))+(x.due?' · vence '+fmtDate(x.due):'')));
+  return L.filter((l,i)=>l!==''||i<3||true).join('\n');
+}
+function finCSV(){return toCSV([['descricao','categoria','fornecedor','valor_previsto','valor_final','vencimento','situacao','forma_pagamento','valor_pago','saldo','observacoes','comprovante']].concat(S.expenses.map(x=>[x.desc,CATS[x.category],x.supplier,moneyInput(x.planned),moneyInput(x.final),fmtDate(x.due),EXP_ST[x.status],x.method,moneyInput(x.paid),moneyInput(balance(x)),x.notes,x.receipt])))}
+function finPrint(){
+  const f=fin();
+  document.getElementById('printArea').innerHTML='<h1>Resumo financeiro · '+esc(S.party.name)+' '+esc(S.party.age)+' anos</h1><p>Gerado em '+fmtDate(today())+'</p><p>Orçamento: '+(f.budget?money(f.budget):'—')+' · Previsto: '+money(f.planned)+' · Gasto: '+money(f.spent)+' · Pago: '+money(f.paid)+' · Falta pagar: '+money(f.pending)+(f.budget?' · Orçamento − custo: '+money(f.diff):'')+'</p><table><tr><th>Despesa</th><th>Categoria</th><th>Situação</th><th>Vencimento</th><th>Custo</th><th>Pago</th><th>Saldo</th></tr>'+S.expenses.map(x=>'<tr><td>'+esc(x.desc)+'</td><td>'+esc(CATS[x.category])+'</td><td>'+EXP_ST[x.status]+'</td><td>'+fmtDate(x.due)+'</td><td>'+money(cost(x))+'</td><td>'+money(x.paid)+'</td><td>'+money(balance(x))+'</td></tr>').join('')+'</table>';
+  window.print();
+}
+
+/* ---------------- configurações da festa ---------------- */
+function viewParty(){
+  const p=S.party;
+  const f=(id,label,val,attrs,hint)=>'<label class="field"><span>'+label+'</span><input class="input" id="pf-'+id+'" name="'+id+'" value="'+esc(val)+'" '+(attrs||'')+'>'+(hint?'<small>'+hint+'</small>':'')+'</label>';
+  return '<div class="page-head"><div><h2>Dados da festa</h2><p>Tudo o que aparece no convite público. Campos vazios aparecem como “A confirmar”.</p></div><a class="btn" href="#convite">'+ic('eye')+'Ver convite</a></div>'+
+  '<form data-form="party" novalidate>'+
+  '<details class="sec" open><summary>Convite</summary><div class="body stack">'+
+   '<div class="photo-edit"><div class="arch">'+(p.photo?'<img src="'+p.photo+'" alt="Foto atual">':'<div class="ph">'+cherry()+'</div>')+'</div><div class="stack" style="gap:8px"><b>Foto de capa</b><label class="btn sm" for="pf-photo" style="cursor:pointer">'+ic('upload')+(p.photo?'Trocar foto':'Adicionar foto')+'</label><input id="pf-photo" type="file" accept="image/*" class="sr" data-act="photo">'+(p.photo?'<button type="button" class="btn sm danger" data-act="photo-del">Remover foto</button>':'')+'<small class="muted">A foto é reduzida automaticamente para carregar rápido.</small></div></div>'+
+   '<div class="grid2">'+f('name','Nome da aniversariante',p.name,'maxlength="40" required')+f('age','Idade',p.age,'type="number" min="1" max="120"')+'</div>'+
+   f('tagline','Frase de destaque',p.tagline,'maxlength="120"')+
+   '<div class="grid2">'+f('date','Data da festa',p.date,'type="date"')+f('time','Horário de início',p.time,'type="time"')+f('endTime','Horário de término (opcional)',p.endTime,'type="time"')+'</div>'+
+   f('venue','Nome do local',p.venue,'maxlength="80" placeholder="Ex.: Salão, restaurante, casa"')+
+   f('address','Endereço completo',p.address,'maxlength="200" placeholder="Rua, número, bairro, cidade"','Usado no botão “Abrir no mapa”.')+
+   '<div class="grid2">'+f('dress','Traje',p.dress,'maxlength="80" placeholder="Ex.: esporte fino com um toque de vermelho"')+f('parking','Estacionamento',p.parking,'maxlength="120"')+'</div>'+
+   '<label class="field"><span>Observações para os convidados</span><textarea class="input" id="pf-notes" name="notes" maxlength="500">'+esc(p.notes)+'</textarea></label>'+
+   '<div class="grid2">'+f('contactName','Contato para dúvidas',p.contactName,'maxlength="60"')+f('contactPhone','WhatsApp do contato',fmtPhone(p.contactPhone),'inputmode="tel" maxlength="20"')+'</div>'+
+  '</div></details>'+
+  '<details class="sec" open><summary>Confirmações de presença</summary><div class="body stack">'+
+   '<label class="switch"><input type="checkbox" id="pf-rsvpOpen" name="rsvpOpen" '+(p.rsvpOpen?'checked':'')+'>Receber confirmações</label>'+
+   '<div class="grid2">'+f('rsvpDeadline','Data limite para confirmar',p.rsvpDeadline,'type="date"')+f('maxCompanions','Acompanhantes por convidado',p.maxCompanions,'type="number" min="0" max="10"','Vale para quem confirma pelo link sem estar na lista. Na lista, ajuste por convidado.')+'</div>'+
+   f('inviteUrl','Link público do convite',p.inviteUrl,'type="url" placeholder="https://…"','Cole aqui o endereço onde o convite estiver publicado. É ele que vai na mensagem do WhatsApp.')+
+  '</div></details>'+
+  '<details class="sec" open><summary>Orçamento</summary><div class="body stack">'+f('budget','Orçamento total da festa (R$)',moneyInput(p.budget),'inputmode="decimal" placeholder="0,00" class="input num"')+'</div></details>'+
+  '<div class="err" id="pf-err" style="margin-top:10px"></div><div class="row" style="margin:16px 0 24px"><button class="btn primary big" type="submit">'+ic('check')+'Salvar dados da festa</button></div></form>'+
+  '<details class="sec"><summary>Segurança</summary><div class="body"><form data-form="pin" class="stack" novalidate><p class="small muted">O PIN protege o painel, a lista de convidados e as finanças. Compartilhe só com quem você autorizar.</p><div class="grid2"><label class="field"><span>Novo PIN (4 a 8 números)</span><input class="input pin" id="np1" name="p1" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"></label><label class="field"><span>Repita o PIN</span><input class="input pin" id="np2" name="p2" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"></label></div><div class="err" id="pin-err"></div><button class="btn" type="submit">'+ic('lock')+'Trocar PIN</button></form></div></details>'+
+  '<details class="sec"><summary>Dados do app</summary><div class="body stack">'+(hasDemo()?'<div class="row"><button class="btn" data-act="clear-demo">Remover dados de exemplo</button><span class="small muted">Apaga só os itens marcados como Exemplo.</span></div>':'<p class="small muted">Não há dados de exemplo.</p>')+'<div class="row"><button class="btn danger" data-act="reset-all">'+ic('trash')+'Apagar tudo e recomeçar</button></div></div></details>';
+}
+function resizeImage(file,cb){
+  const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const max=900;let w=img.width,h=img.height;if(w>max||h>max){const k=max/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',.82))};img.onerror=()=>toast('Não conseguimos abrir essa imagem. Tente JPG ou PNG.');img.src=r.result};r.readAsDataURL(file);
+}
+
+/* ================= EVENTOS ================= */
+function byId(arr,id){return arr.find(x=>x.id===id)}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;const a=el.dataset.act,id=el.dataset.id;
+  if(a==='overlay'){if(e.target===el)closeModal();return}
+  if(el.tagName==='INPUT'&&(el.type==='checkbox'||el.type==='file'))return;
+  if(el.tagName==='A'&&el.getAttribute('href')==='#')e.preventDefault();
+  switch(a){
+   case 'close':closeModal();break;
+   case 'confirm-yes':{const f=pendingConfirm;pendingConfirm=null;closeModal();f&&f();break}
+   case 'logout':authed=false;try{sessionStorage.removeItem(KEY+':auth')}catch(_){}go('convite');break;
+   /* rsvp */
+   case 'rsvp-answer':rsvp.answer=el.dataset.v;rsvp.errors={};if(rsvp.answer==='no'){rsvp.count=0}render();break;
+   case 'rsvp-next2':if(!rsvp.answer){rsvp.errors={answer:'Escolha uma das opções para continuar.'};render();break}rsvpNav(1);break;
+   case 'rsvp-back':rsvpNav(-1);break;
+   case 'rsvp-goto':rsvp.step=Number(el.dataset.s);render();focusFirst();break;
+   case 'rsvp-count':{saveCompanionInputs();rsvp.count=Math.max(0,Math.min(rsvp.limit,rsvp.count+Number(el.dataset.d)));render();break}
+   case 'rsvp-submit':rsvpSubmit();break;
+   case 'rsvp-edit':rsvp.step=1;rsvp.errors={};render();break;
+   /* convidados */
+   case 'guest-new':guestForm();break;
+   case 'guest-edit':guestForm(byId(S.guests,id));break;
+   case 'guest-del':{const g=byId(S.guests,id);confirmDialog('Remover convidado','Remover <b>'+esc(g.name)+'</b> da lista? A resposta dessa pessoa também será apagada.','Remover',()=>{S.guests=S.guests.filter(x=>x.id!==id);save();render();toast('Convidado removido')});break}
+   case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],respondedAt:''});save();render();toast('Resposta cancelada')});break}
+   case 'guest-import':importModal();break;
+   case 'imp-run':runImport();break;
+   case 'guest-export':exportModal('Exportar convidados','convidados-priscila-40.csv',guestsCSV());break;
+   case 'export-copy':copyText(window.__export.content,'CSV copiado. Cole numa planilha.');break;
+   case 'export-dl':downloadFile(window.__export.name,window.__export.content);break;
+   /* tarefas */
+   case 'task-new':taskForm();break;
+   case 'task-edit':taskForm(byId(S.tasks,id));break;
+   case 'task-del':{const t=byId(S.tasks,id);confirmDialog('Remover tarefa','Remover a tarefa <b>'+esc(t.name)+'</b>?','Remover',()=>{S.tasks=S.tasks.filter(x=>x.id!==id);save();render();toast('Tarefa removida')});break}
+   case 'task-toggle':{const t=byId(S.tasks,id);t.status=t.status==='concluida'?'pendente':'concluida';save();render();toast(t.status==='concluida'?'Tarefa concluída 🍒':'Tarefa reaberta');break}
+   case 'task-filter':tFilter=el.dataset.v;render();break;
+   /* despesas */
+   case 'exp-new':expForm();break;
+   case 'exp-edit':expForm(byId(S.expenses,id));break;
+   case 'exp-dup':expForm(Object.assign({},byId(S.expenses,id),{demo:false}),true);break;
+   case 'exp-del':{const x=byId(S.expenses,id);confirmDialog('Excluir despesa','Excluir <b>'+esc(x.desc)+'</b> ('+money(cost(x))+')? Tarefas ligadas a ela perdem o vínculo.','Excluir',()=>{S.expenses=S.expenses.filter(y=>y.id!==id);S.tasks.forEach(t=>{if(t.expenseId===id)t.expenseId=''});save();render();toast('Despesa excluída')});break}
+   case 'fin-export':exportModal('Exportar despesas','financeiro-priscila-40.csv',finCSV());break;
+   case 'fin-copy':copyText(finSummaryText(),'Resumo financeiro copiado');break;
+   case 'fin-print':finPrint();break;
+   case 'f-clear':fFilter={q:'',cat:'',st:'',from:'',to:''};render();break;
+   case 'budget-edit':go('festa');setTimeout(()=>{const b=document.getElementById('pf-budget');if(b){b.scrollIntoView({block:'center'});b.focus()}},80);break;
+   /* outros */
+   case 'copy-invite':copyText(inviteLink(),'Link do convite copiado');break;
+   case 'clear-demo':confirmDialog('Remover exemplos','Apagar todos os convidados e despesas marcados como Exemplo? Seus dados reais continuam.','Remover exemplos',()=>{const ids=S.expenses.filter(x=>x.demo).map(x=>x.id);S.guests=S.guests.filter(x=>!x.demo);S.expenses=S.expenses.filter(x=>!x.demo);S.tasks.forEach(t=>{if(ids.includes(t.expenseId))t.expenseId=''});save();render();toast('Exemplos removidos')});break;
+   case 'reset-all':confirmDialog('Apagar tudo','Isso apaga dados da festa, convidados, tarefas, despesas e volta o PIN para 4040. Não dá para desfazer.','Apagar tudo',()=>{S=defaults();S.guests=[];S.expenses=[];S.tasks.forEach(t=>t.expenseId='');save();authed=false;go('convite');toast('Tudo apagado')});break;
+   case 'photo-del':S.party.photo='';save();render();toast('Foto removida');break;
+  }
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.dataset.act==='toggle-rsvp'){S.party.rsvpOpen=el.checked;save();render();toast(el.checked?'Confirmações abertas':'Confirmações fechadas');return}
+  if(el.dataset.act==='photo'&&el.files[0]){resizeImage(el.files[0],url=>{const old=S.party.photo;S.party.photo=url;save();if(!storageOk){S.party.photo=old}render();if(storageOk)toast('Foto atualizada')});return}
+  if(el.dataset.act==='imp-file'&&el.files[0]){const r=new FileReader();r.onload=()=>{document.getElementById('imp-text').value=r.result};r.readAsText(el.files[0]);return}
+  if(el.id==='ef-st'&&el.value==='pago'){const v=parseMoney(document.getElementById('ef-final').value)||parseMoney(document.getElementById('ef-planned').value);if(v>0)document.getElementById('ef-paid').value=moneyInput(v)}
+  if(el.dataset.filter)applyFilter(el);
+  if(el.hasAttribute('data-calc'))updSaldo();
+});
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.dataset.filter&&el.type==='search'){applyFilter(el,true)}
+  if(el.hasAttribute('data-calc'))updSaldo();
+});
+function applyFilter(el,keepFocus){
+  const m={'g-q':v=>gFilter.q=v,'g-st':v=>gFilter.status=v,'g-gr':v=>gFilter.group=v,'f-q':v=>fFilter.q=v,'f-cat':v=>fFilter.cat=v,'f-st':v=>fFilter.st=v,'f-from':v=>fFilter.from=v,'f-to':v=>fFilter.to=v};
+  m[el.dataset.filter](el.value);const pos=el.selectionStart;render();
+  if(keepFocus){const n=document.getElementById(el.id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
+}
+function updSaldo(){
+  const el=document.getElementById('ef-saldo');if(!el)return;const fv=parseMoney(document.getElementById('ef-final').value)||0,pv=parseMoney(document.getElementById('ef-planned').value)||0,pd=parseMoney(document.getElementById('ef-paid').value)||0;
+  const c=fv>0?fv:pv;el.querySelector('span').innerHTML='Saldo restante: <b class="num">'+money(Math.max(0,c-pd))+'</b>'+(pd>c&&c>0?' · <span style="color:var(--bad)">valor pago maior que o custo</span>':'');
+}
+function saveCompanionInputs(){for(let i=0;i<rsvp.count;i++){const n=document.getElementById('r-c'+i);if(n)rsvp.companions[i]=n.value}}
+
+document.addEventListener('submit',e=>{
+  const form=e.target;const kind=form.dataset.form;if(!kind)return;e.preventDefault();
+  const fd=new FormData(form);const v=k=>String(fd.get(k)||'').trim();
+  if(kind==='rsvp1'){
+    rsvp.name=v('name');rsvp.phone=v('phone');rsvp.consent=!!fd.get('consent');const er={};
+    if(rsvp.name.length<3||!/\s|^.{3,}$/.test(rsvp.name))er.name='Digite seu nome (pelo menos 3 letras).';
+    const d=digits(rsvp.phone);if(d.length<10||d.length>13)er.phone='Digite um WhatsApp com DDD, por exemplo (11) 91234-5678.';
+    if(!rsvp.consent)er.consent='Marque a caixa para concordar com o uso dos dados.';
+    rsvp.errors=er;if(Object.keys(er).length){render();const f=document.querySelector('[aria-invalid="true"]');if(f)f.focus();return}
+    const nd=d.length>11&&d.startsWith('55')?d.slice(2):d;
+    const g=S.guests.find(x=>{let p=digits(x.phone);if(p.length>11&&p.startsWith('55'))p=p.slice(2);return p&&p===nd});
+    rsvp.existingId=g?g.id:'';rsvp.limit=g?(Number(g.allowed)||0):(Number(S.party.maxCompanions)||0);
+    if(g&&g.status!=='pending'&&!rsvp.answer){rsvp.answer=g.status;rsvp.companions=(g.companions||[]).slice();rsvp.count=Math.min(rsvp.companions.length,rsvp.limit);rsvp.diet=g.diet||'';rsvp.notes=g.notes||''}
+    rsvp.count=Math.min(rsvp.count,rsvp.limit);
+    rsvpNav(1);return;
+  }
+  if(kind==='rsvp3'){saveCompanionInputs();const er={};for(let i=0;i<rsvp.count;i++){if((rsvp.companions[i]||'').trim().length<2)er['c'+i]='Informe o nome do acompanhante '+(i+1)+'.'}rsvp.errors=er;if(Object.keys(er).length){render();return}rsvpNav(1);return}
+  if(kind==='rsvp4'){rsvp.diet=v('diet');rsvp.notes=v('notes');rsvpNav(1);return}
+  if(kind==='login'){
+    if(Date.now()<pinLockUntil){loginErr='Muitas tentativas. Aguarde alguns segundos e tente de novo.';render();return}
+    if(pinHash(v('pin'))===S.pinHash){authed=true;pinFails=0;loginErr='';try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}go(form.dataset.target||'painel');render()}
+    else{pinFails++;if(pinFails>=5){pinLockUntil=Date.now()+30000;pinFails=0;loginErr='PIN incorreto. Aguarde 30 segundos para tentar de novo.'}else loginErr='PIN incorreto. Tente novamente.';render();const p=document.getElementById('pin');if(p)p.focus()}
+    return;
+  }
+  if(kind==='guest'){
+    const err=document.getElementById('gf-err');const name=v('name');const ph=digits(v('phone'));
+    if(name.length<2){err.textContent='Informe o nome do convidado.';document.getElementById('gf-name').focus();return}
+    if(ph&&(ph.length<10||ph.length>13)){err.textContent='WhatsApp inválido. Use DDD + número.';document.getElementById('gf-phone').focus();return}
+    const allowed=Math.max(0,parseInt(v('allowed'))||0);const comps=v('companions').split(',').map(s=>s.trim()).filter(Boolean);
+    if(comps.length>allowed){err.textContent='Há '+comps.length+' acompanhantes, mas o limite é '+allowed+'. Aumente o limite ou remova nomes.';return}
+    const dupe=ph&&S.guests.find(g=>digits(g.phone)===ph&&g.id!==form.dataset.id);if(dupe){err.textContent='Esse WhatsApp já está cadastrado para '+dupe.name+'.';return}
+    const status=v('status');const id=form.dataset.id;const old=id&&byId(S.guests,id);
+    const data={name,phone:ph,group:v('group'),allowed,status,companions:status==='no'||status==='pending'?[]:comps,diet:v('diet'),notes:v('notes')};
+    data.respondedAt=status==='pending'?'':(old&&old.status===status&&old.respondedAt?old.respondedAt:today());
+    if(old)Object.assign(old,data,{demo:false});else S.guests.push(Object.assign({id:uid(),demo:false},data));
+    save();closeModal();render();toast(old?'Convidado atualizado':'Convidado adicionado');return;
+  }
+  if(kind==='task'){
+    const err=document.getElementById('tf-err');const name=v('name');if(name.length<2){err.textContent='Dê um nome para a tarefa.';document.getElementById('tf-name').focus();return}
+    const data={name,category:v('category'),owner:v('owner'),due:v('due'),status:v('status'),notes:v('notes'),expenseId:v('expenseId')};
+    const old=form.dataset.id&&byId(S.tasks,form.dataset.id);if(old)Object.assign(old,data);else S.tasks.push(Object.assign({id:uid()},data));
+    save();closeModal();render();toast(old?'Tarefa atualizada':'Tarefa criada');return;
+  }
+  if(kind==='exp'){
+    const err=document.getElementById('ef-err');const desc=v('desc');
+    const planned=parseMoney(v('planned')),final=parseMoney(v('final')),paid=parseMoney(v('paid'));
+    if(desc.length<2){err.textContent='Descreva o gasto.';document.getElementById('ef-desc').focus();return}
+    if([planned,final,paid].some(n=>isNaN(n)||n<0)){err.textContent='Use apenas números nos valores, por exemplo 1.250,00.';return}
+    if(!(planned>0)&&!(final>0)){err.textContent='Informe o valor previsto ou o valor final.';document.getElementById('ef-planned').focus();return}
+    const c=final>0?final:planned;if(paid>c){err.textContent='O valor pago ('+money(paid)+') é maior que o custo ('+money(c)+'). Confira os valores.';return}
+    let status=v('status');
+    if(paid>0&&paid>=c)status='pago';else if(paid>0&&paid<c)status='parcial';else if(status==='pago'||status==='parcial'){status='pendente'}
+    const data={desc,category:v('category'),supplier:v('supplier'),planned:planned||0,final:final||0,due:v('due'),status,method:v('method'),paid:paid||0,notes:v('notes'),receipt:v('receipt')};
+    const old=form.dataset.id&&byId(S.expenses,form.dataset.id);if(old)Object.assign(old,data,{demo:false});else S.expenses.push(Object.assign({id:uid(),demo:false},data));
+    save();closeModal();render();toast(old?'Despesa atualizada':'Despesa salva');return;
+  }
+  if(kind==='party'){
+    const err=document.getElementById('pf-err');const p=S.party;
+    if(v('name').length<2){err.textContent='Informe o nome da aniversariante.';return}
+    const budget=parseMoney(v('budget'));if(isNaN(budget)||budget<0){err.textContent='Orçamento inválido. Use números, por exemplo 15.000,00.';document.getElementById('pf-budget').focus();return}
+    const cp=digits(v('contactPhone'));if(cp&&(cp.length<10||cp.length>13)){err.textContent='WhatsApp do contato inválido. Use DDD + número.';return}
+    const url=v('inviteUrl');if(url&&!/^https?:\/\//i.test(url)){err.textContent='O link do convite precisa começar com https://';return}
+    Object.assign(p,{name:v('name'),age:parseInt(v('age'))||40,tagline:v('tagline')||p.tagline,date:v('date'),time:v('time'),endTime:v('endTime'),venue:v('venue'),address:v('address'),dress:v('dress'),parking:v('parking'),notes:v('notes'),contactName:v('contactName'),contactPhone:cp,rsvpOpen:!!fd.get('rsvpOpen'),rsvpDeadline:v('rsvpDeadline'),maxCompanions:Math.max(0,parseInt(v('maxCompanions'))||0),budget:budget||0,inviteUrl:url});
+    save();render();toast('Dados da festa salvos');return;
+  }
+  if(kind==='pin'){
+    const err=document.getElementById('pin-err');const a=v('p1'),b=v('p2');
+    if(!/^\d{4,8}$/.test(a)){err.textContent='O PIN precisa ter de 4 a 8 números.';return}
+    if(a!==b){err.textContent='Os dois PINs não são iguais.';return}
+    S.pinHash=pinHash(a);S.pinDefault=false;save();try{sessionStorage.setItem(KEY+':auth',S.pinHash)}catch(_){}render();toast('PIN alterado');return;
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('#modalRoot .overlay'))closeModal()});
+
+/* ---------------- início ---------------- */
+load();
+try{authed=sessionStorage.getItem(KEY+':auth')===S.pinHash}catch(e){authed=false}
+rsvp=newRsvp();
+render();
+})();
+</script>
+</body>
+</html>
