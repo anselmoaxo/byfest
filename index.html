@@ -409,7 +409,7 @@ function defaults(){
 let S;let storageOk=true;
 function freshRemote(){const d=defaults();d.guests=[];d.expenses=[];d.tasks.forEach(t=>t.expenseId='');d.pinDefault=false;delete d.pinHash;d.rsvpSeen={};return d}
 function load(){try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);const def=defaults();S=Object.assign({},def,o);S.party=Object.assign({},def.party,o.party||{});return}}catch(e){storageOk=false}S=defaults()}
-function save(){if(REMOTE){if(authed)queuePush();return}try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false;toast('Não foi possível salvar neste navegador. Libere espaço ou remova a foto.')}}
+function save(){if(curSubmit&&draftable(curSubmit))draftClear(curSubmit);if(REMOTE){if(authed)queuePush();return}try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false;toast('Não foi possível salvar neste navegador. Libere espaço ou remova a foto.')}}
 let authed=false;
 
 /* ---------------- sincronização com o banco (modo online) ---------------- */
@@ -476,7 +476,20 @@ function guestStats(){
 }
 function partyDate(){const p=S.party;if(!p.date)return null;return new Date(p.date+'T'+(p.time||'00:00'))}
 function rsvpClosed(){const p=S.party;if(!p.rsvpOpen)return 'As confirmações estão encerradas.';if(p.rsvpDeadline&&daysUntil(p.rsvpDeadline)<0)return 'O prazo para confirmar presença terminou em '+fmtDate(p.rsvpDeadline)+'.';return ''}
-function inviteLink(){return S.party.inviteUrl||(REMOTE?location.origin+'/':location.href.split('#')[0]+'#convite')}
+const PUBLIC_URL='https://myfest.blogdapriscila.com.br/';
+function inviteLink(g){
+  const base=S.party.inviteUrl||(REMOTE?PUBLIC_URL:location.href.split('#')[0].split('?')[0]);
+  if(!g||!g.name)return REMOTE||S.party.inviteUrl?base:base+'#convite';
+  // link pessoal, como um link de agendamento: já abre com o nome e o WhatsApp do convidado
+  let c='';try{c=btoa(unescape(encodeURIComponent(g.name+'|'+(g.phone||'')))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}catch(_){}
+  return base+(base.includes('?')?'&':'?')+'c='+c;
+}
+function readGuestParam(){
+  try{const c=new URLSearchParams(location.search).get('c');if(!c)return null;
+    const t=decodeURIComponent(escape(atob(c.replace(/-/g,'+').replace(/_/g,'/'))));const i=t.lastIndexOf('|');
+    const name=t.slice(0,i).trim().slice(0,80),phone=digits(t.slice(i+1)).slice(0,13);return name?{name,phone}:null}catch(_){return null}
+}
+let invitee=null;
 function mapsLink(){const p=S.party;const q=[p.venue,p.address].filter(Boolean).join(', ');return q?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q):''}
 function gcalLink(){
   const p=S.party;if(!p.date)return '';const d=p.date.replace(/-/g,'');let dates;
@@ -486,10 +499,10 @@ function gcalLink(){
   const loc=[p.venue,p.address].filter(Boolean).join(', ');
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Aniversário de 40 anos da '+p.name+' 🍒')+'&dates='+dates+'&details='+encodeURIComponent('Convite: '+inviteLink())+(loc?'&location='+encodeURIComponent(loc):'')+'&ctz=America/Sao_Paulo';
 }
-function shareText(){
+function shareText(g){
   const p=S.party;let t='🍒 Você é minha convidada especial! '+p.name+' '+p.age+' anos, '+p.tagline;
   if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
-  t+='\nConfirme sua presença pelo convite: '+inviteLink();return t;
+  t+='\nConfirme sua presença pelo convite: '+inviteLink(g);return t;
 }
 const waShare=(txt,num)=>'https://wa.me/'+(num?waNumber(num):'')+'?text='+encodeURIComponent(txt);
 
@@ -551,7 +564,7 @@ function render(){
     app.innerHTML=shell(r,({painel:viewDash,convidados:viewGuests,checklist:viewTasks,financas:viewFinance,festa:viewParty})[r]());
     return;
   }
-  if(r==='confirmar'){app.innerHTML=viewRsvp();focusFirst();return}
+  if(r==='confirmar'){rsvpPersist();app.innerHTML=viewRsvp();focusFirst();return}
   if(r==='entrar'){if(authed){go('painel');return}app.innerHTML=viewLogin('painel');focusLogin();return}
   app.innerHTML=viewInvite();startCountdown();
 }
@@ -574,6 +587,7 @@ function viewInvite(){
   return '<main class="invite gutter">'+
    '<section class="hero" aria-labelledby="ttl"><div class="fall" aria-hidden="true">'+falls+'</div>'+
     '<div class="arch">'+photo+'</div>'+
+    (invitee?'<p class="label" style="margin-bottom:4px">Convite para '+esc(invitee.name.split(' ')[0])+'</p>':'')+
     '<h1 id="ttl"><span class="script">'+esc(p.name)+'</span><span class="forty" style="display:block"><b>'+esc(p.age)+'</b> anos</span></h1>'+
     '<p class="tag">'+esc(p.tagline)+'</p>'+
     (p.date?'<div class="countdown" id="cd" aria-label="Contagem regressiva"><div><b id="cd-d">0</b><span>dias</span></div><div><b id="cd-h">0</b><span>horas</span></div><div><b id="cd-m">0</b><span>min</span></div><div><b id="cd-s">0</b><span>seg</span></div></div>':'')+
@@ -773,7 +787,7 @@ function guestRow(g){
     ((g.companions||[]).length?'<div class="meta"><span>Com: '+esc(g.companions.join(', '))+'</span></div>':'')+
     (g.diet?'<div class="meta"><span>🍽 '+esc(g.diet)+'</span></div>':'')+(g.notes?'<div class="meta"><span>'+esc(g.notes)+'</span></div>':'')+'</div>'+
    '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
-   '<div class="acts">'+(g.phone?'<a class="btn sm leaf" href="'+waShare('Oi, '+g.name.split(' ')[0]+'! '+shareText(),g.phone)+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
+   '<div class="acts">'+(g.phone?'<a class="btn sm leaf" href="'+waShare('Oi, '+g.name.split(' ')[0]+'! '+shareText(g),g.phone)+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
 }
 function guestForm(g){
   g=g||{name:'',phone:'',group:'',allowed:S.party.maxCompanions,status:'pending',companions:[],diet:'',notes:''};
@@ -937,7 +951,7 @@ function viewParty(){
   '<details class="sec" open><summary>Confirmações de presença</summary><div class="body stack">'+
    '<label class="switch"><input type="checkbox" id="pf-rsvpOpen" name="rsvpOpen" '+(p.rsvpOpen?'checked':'')+'>Receber confirmações</label>'+
    '<div class="grid2">'+f('rsvpDeadline','Data limite para confirmar',p.rsvpDeadline,'type="date"')+f('maxCompanions','Acompanhantes por convidado',p.maxCompanions,'type="number" min="0" max="10"','Vale para quem confirma pelo link sem estar na lista. Na lista, ajuste por convidado.')+'</div>'+
-   f('inviteUrl','Link público do convite',p.inviteUrl,'type="url" placeholder="https://…"','Cole aqui o endereço onde o convite estiver publicado. É ele que vai na mensagem do WhatsApp.')+
+   f('inviteUrl','Link público do convite',p.inviteUrl,'type="url" placeholder="https://…"','Deixe em branco para usar '+esc(REMOTE?PUBLIC_URL:'o endereço desta página')+'. É ele que vai na mensagem do WhatsApp; o botão Enviar convite de cada convidado manda um link pessoal, que já abre com o nome dele.')+
   '</div></details>'+
   '<details class="sec" open><summary>Orçamento</summary><div class="body stack">'+f('budget','Orçamento total da festa (R$)',moneyInput(p.budget),'inputmode="decimal" placeholder="0,00" class="input num"')+'</div></details>'+
   '<div class="err" id="pf-err" style="margin-top:10px"></div><div class="row" style="margin:16px 0 24px"><button class="btn primary big" type="submit">'+ic('check')+'Salvar dados da festa</button></div></form>'+
@@ -999,6 +1013,7 @@ document.addEventListener('click',e=>{
    case 'reset-all':confirmDialog('Apagar tudo','Isso apaga dados da festa, convidados, tarefas e despesas'+(REMOTE?'':' e volta o PIN para 4040')+'. Não dá para desfazer.','Apagar tudo',()=>{if(REMOTE){const seen=S.rsvpSeen;S=freshRemote();S.rsvpSeen=seen;save();render();toast('Tudo apagado');return}S=defaults();S.guests=[];S.expenses=[];S.tasks.forEach(t=>t.expenseId='');save();authed=false;go('convite');toast('Tudo apagado')});break;
    case 'refresh':refreshRemote(false);break;
    case 'reload':location.reload();break;
+   case 'draft-discard':{const f=el.closest('form');if(f){draftClear(f);f.reset();el.closest('.draft-note').remove();if(document.getElementById('ef-saldo'))updSaldo()}break}
    case 'toggle-pw':{const i=document.getElementById('lpw');if(i){const show=i.type==='password';i.type=show?'text':'password';el.textContent=show?'Ocultar':'Mostrar';el.setAttribute('aria-pressed',String(show));el.setAttribute('aria-label',show?'Ocultar senha':'Mostrar senha')}break}
    case 'photo-del':S.party.photo='';save();render();toast('Foto removida');break;
   }
@@ -1026,6 +1041,42 @@ function updSaldo(){
   const el=document.getElementById('ef-saldo');if(!el)return;const fv=parseMoney(document.getElementById('ef-final').value)||0,pv=parseMoney(document.getElementById('ef-planned').value)||0,pd=parseMoney(document.getElementById('ef-paid').value)||0;
   const c=fv>0?fv:pv;el.querySelector('span').innerHTML='Saldo restante: <b class="num">'+money(Math.max(0,c-pd))+'</b>'+(pd>c&&c>0?' · <span style="color:var(--bad)">valor pago maior que o custo</span>':'');
 }
+/* ---------------- rascunhos: nada se perde ao sair da tela ---------------- */
+function rsvpPersist(){try{const o=Object.assign({},rsvp);delete o.errors;localStorage.setItem(KEY+':rsvp',JSON.stringify(o))}catch(_){}}
+function rsvpRestore(){try{const o=JSON.parse(localStorage.getItem(KEY+':rsvp')||'null');if(o&&typeof o==='object')Object.assign(rsvp,o,{errors:{}})}catch(_){}}
+const NO_DRAFT=['login','access'];
+function draftable(f){const k=f&&f.dataset&&f.dataset.form;return !!k&&!NO_DRAFT.includes(k)&&!k.startsWith('rsvp')}
+function draftKey(f){return KEY+':draft:'+f.dataset.form+':'+(f.dataset.id||'novo')}
+function draftSave(f){
+  const o={};f.querySelectorAll('input[name],select[name],textarea[name]').forEach(el=>{if(el.type==='file'||el.type==='password')return;if(el.type==='checkbox')o[el.name]=el.checked;else if(el.type==='radio'){if(el.checked)o[el.name]=el.value}else o[el.name]=el.value});
+  try{localStorage.setItem(draftKey(f),JSON.stringify(o))}catch(_){}
+}
+function draftClear(f){try{localStorage.removeItem(draftKey(f))}catch(_){}}
+function draftRestore(f){
+  let o=null;try{o=JSON.parse(localStorage.getItem(draftKey(f))||'null')}catch(_){}
+  if(!o)return;let changed=false;
+  f.querySelectorAll('input[name],select[name],textarea[name]').forEach(el=>{if(!(el.name in o)||el.type==='file'||el.type==='password')return;
+    if(el.type==='checkbox'){if(el.checked!==!!o[el.name]){el.checked=!!o[el.name];changed=true}}
+    else if(el.type==='radio'){const c=el.value===o[el.name];if(el.checked!==c){el.checked=c;changed=true}}
+    else if(el.value!==String(o[el.name])){el.value=o[el.name];changed=true}});
+  if(!changed){draftClear(f);return}
+  if(!f.querySelector('.draft-note'))f.insertAdjacentHTML('afterbegin','<div class="notice info small draft-note">'+ic('info')+'<span>Recuperamos o que você estava preenchendo e ainda não foi salvo.</span><button type="button" class="btn sm ghost" data-act="draft-discard">Descartar</button></div>');
+  if(document.getElementById('ef-saldo'))updSaldo();
+}
+let curSubmit=null;
+document.addEventListener('submit',e=>{curSubmit=e.target;setTimeout(()=>{curSubmit=null},0)},true);
+new MutationObserver(ms=>{ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;(n.matches('form[data-form]')?[n]:[...n.querySelectorAll('form[data-form]')]).forEach(f=>{if(draftable(f))draftRestore(f)})}))}).observe(document.body,{childList:true,subtree:true});
+function onFormEdit(e){
+  const f=e.target.closest&&e.target.closest('form[data-form]');if(!f)return;
+  if(draftable(f)){draftSave(f);return}
+  const k=f.dataset.form,el=e.target;
+  if(k==='rsvp1'){if(el.name==='name')rsvp.name=el.value;if(el.name==='phone')rsvp.phone=el.value;if(el.name==='consent')rsvp.consent=el.checked}
+  else if(k==='rsvp3')saveCompanionInputs();
+  else if(k==='rsvp4'){if(el.name==='diet')rsvp.diet=el.value;if(el.name==='notes')rsvp.notes=el.value}
+  else return;
+  rsvpPersist();
+}
+document.addEventListener('input',onFormEdit);document.addEventListener('change',onFormEdit);
 function saveCompanionInputs(){for(let i=0;i<rsvp.count;i++){const n=document.getElementById('r-c'+i);if(n)rsvp.companions[i]=n.value}}
 
 document.addEventListener('submit',e=>{
@@ -1136,7 +1187,10 @@ async function boot(){
     }
   }
   if(!REMOTE){try{authed=sessionStorage.getItem(KEY+':auth')===S.pinHash}catch(e){authed=false}}
-  rsvp=newRsvp();render();
+  rsvp=newRsvp();rsvpRestore();
+  invitee=readGuestParam();
+  if(invitee&&!rsvp.name&&rsvp.step===1){rsvp.name=invitee.name;rsvp.phone=invitee.phone?fmtPhone(invitee.phone):''}
+  render();
 }
 boot();
 })();
