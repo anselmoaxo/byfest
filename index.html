@@ -13,7 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Pinyon+Script&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: convite público em coluna estreita (mobile-first) + painel privado com barra de abas inferior no celular e superior no computador */
+/* Visual sempre claro (creme e cereja), mesmo com o celular no modo escuro.
+   Layout: convite público em coluna estreita (mobile-first) + painel privado com barra de abas inferior no celular e superior no computador */
 :root{
   --cherry:#a3123a; --cherry-deep:#6e0c27; --cherry-soft:#c8375b;
   --blush:#f8e1e6; --blush-2:#fbeef1; --cream:#fff9f4; --paper:#ffffff;
@@ -24,21 +25,8 @@
   --f-script:"Pinyon Script", "Snell Roundhand", "Segoe Script", cursive;
   --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --r:14px; --r-lg:22px;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --cherry:#ef5b7d; --cherry-deep:#ffb3c4; --cherry-soft:#f27a96;
-  --blush:#3a1d26; --blush-2:#2b151c; --cream:#1b0f13; --paper:#25141a;
-  --leaf:#8fcf9c; --leaf-soft:#1f3326;
-  --ink:#f8e8ec; --ink-2:#cfb2ba; --line:#4a2b35; --shadow:0 10px 30px -18px rgba(0,0,0,.8);
-  --ok:#8fd6a2; --ok-bg:#1d3324; --warn:#f2c06b; --warn-bg:#3a2c12; --bad:#ff8f99; --bad-bg:#3f1a1f; --muted-bg:#33202a;
-  color-scheme:dark}}
-:root[data-theme="dark"]{
-  --cherry:#ef5b7d; --cherry-deep:#ffb3c4; --cherry-soft:#f27a96;
-  --blush:#3a1d26; --blush-2:#2b151c; --cream:#1b0f13; --paper:#25141a;
-  --leaf:#8fcf9c; --leaf-soft:#1f3326;
-  --ink:#f8e8ec; --ink-2:#cfb2ba; --line:#4a2b35; --shadow:0 10px 30px -18px rgba(0,0,0,.8);
-  --ok:#8fd6a2; --ok-bg:#1d3324; --warn:#f2c06b; --warn-bg:#3a2c12; --bad:#ff8f99; --bad-bg:#3f1a1f; --muted-bg:#33202a;
-  color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--cream);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--f-display);font-weight:500;line-height:1.15;text-wrap:balance;margin:0}
@@ -61,14 +49,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn:hover{background:var(--blush-2)}
 .btn:active{transform:scale(.98)}
 .btn.primary{background:var(--cherry);border-color:var(--cherry);color:#fff}
-:root:not([data-theme="light"]) .btn.primary{color:#fff}
 .btn.primary:hover{background:var(--cherry-deep);border-color:var(--cherry-deep)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#2a0a13}:root:not([data-theme="light"]) .btn.primary:hover{background:var(--cherry-soft);color:#2a0a13}}
-:root[data-theme="dark"] .btn.primary{color:#2a0a13}
-:root[data-theme="dark"] .btn.primary:hover{background:var(--cherry-soft);color:#2a0a13}
 .btn.leaf{background:var(--leaf);border-color:var(--leaf);color:#fff}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.leaf{color:#0f2016}}
-:root[data-theme="dark"] .btn.leaf{color:#0f2016}
 .btn.ghost{background:transparent;border-color:transparent}
 .btn.danger{color:var(--bad);border-color:var(--bad-bg)}
 .btn.danger.solid{background:var(--bad);border-color:var(--bad);color:#fff}
