@@ -668,6 +668,7 @@ function parseCSV(text){
 /* ---------------- roteamento ---------------- */
 const PRIVATE=['painel','convidados','checklist','financas','festa','fotos'];
 const LOGIN_PATH=/^\/login\/?$/.test(location.pathname);
+const ALBUM_PATH=/^\/fotos\/?$/.test(location.pathname);
 function route(){return (location.hash||'').replace('#','')||(LOGIN_PATH?'entrar':'convite')}
 function go(r){if(location.hash==='#'+r)render();else location.hash=r}
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
@@ -677,6 +678,7 @@ function render(){
   const r=route();clearInterval(cdTimer);
   document.title=S.party.name+' '+partyAge()+' anos · Cherry';
   const app=document.getElementById('app');
+  if(ALBUM_PATH){app.innerHTML=viewGuestAlbum();loadGuestGallery();return}
   if(PRIVATE.includes(r)){
     if(!authed){app.innerHTML=viewLogin(r);focusLogin();return}
     app.innerHTML=shell(r,({painel:viewDash,convidados:viewGuests,checklist:viewTasks,financas:viewFinance,festa:viewParty,fotos:viewPhotosAdmin})[r]());if(r==='fotos'&&REMOTE)loadAdminAlbum();
@@ -684,7 +686,7 @@ function render(){
   }
   if(r==='confirmar'){rsvpPersist();app.innerHTML=viewRsvp();focusFirst();return}
   if(r==='entrar'){if(authed){go('painel');return}app.innerHTML=viewLogin('painel');focusLogin();return}
-  app.innerHTML=viewInvite();startCountdown();loadGuestGallery();
+  app.innerHTML=viewInvite();startCountdown();
 }
 function focusFirst(){setTimeout(()=>{const f=document.querySelector('#app .card input,#app .card button');if(f&&rsvp.step>1)f.focus()},30)}
 
@@ -693,10 +695,11 @@ function factRow(icon,label,value,extra){return '<div class="fact"><div class="i
 /* ---------------- album privado de fotos ---------------- */
 const PHOTO_API='/api/photos';let albumPhotos=[],albumToken='',albumBusy=false,photoFiles=[],albumQrSvg='',adminPhotoRows=[],adminShown=0;
 async function photoCall(data){const r=await fetch(PHOTO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({},data,{email:cred.email,password:cred.password}))});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'request_failed');return j}
-function albumLink(token){const base=S.party.inviteUrl||(REMOTE?PUBLIC_URL:location.origin+location.pathname);try{const u=new URL(base,location.origin);u.searchParams.delete('album');u.hash='album='+encodeURIComponent(token);return u.toString()}catch(_){return base.split('#')[0]+'#album='+encodeURIComponent(token)}}
+function albumLink(token){const base=S.party.inviteUrl||(REMOTE?PUBLIC_URL:location.origin);try{const u=new URL(base,location.origin),a=new URL('/fotos',u.origin);a.hash='album='+encodeURIComponent(token);return a.toString()}catch(_){return location.origin+'/fotos#album='+encodeURIComponent(token)}}
 function guestAlbum(){try{return new URLSearchParams(location.hash.slice(1)).get('album')||new URLSearchParams(location.search).get('album')||''}catch(_){return ''}}
 function photoGrid(rows,token,admin){return rows.length?'<div class="grid2" style="grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px">'+rows.map(p=>'<article class="panel" style="padding:8px"><img loading="lazy" src="'+(admin?'#':'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=')+'" '+(admin?'data-photo-id="'+esc(p.id)+'"':'data-gallery-photo="'+esc(p.id)+'"')+' alt="Foto enviada por '+esc(p.sender_name)+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px"><p class="small" style="margin:6px 0">'+esc(p.sender_name)+' · '+esc(p.status||'aprovada')+'</p>'+(admin?'<div class="row"><button class="btn sm" data-act="photo-approve" data-id="'+esc(p.id)+'">Aprovar</button><button class="btn sm" data-act="photo-hide" data-id="'+esc(p.id)+'">Ocultar</button><button class="btn sm" data-act="photo-download" data-id="'+esc(p.id)+'">Baixar</button><button class="btn sm danger" data-act="photo-delete" data-id="'+esc(p.id)+'">Excluir</button></div>':'')+'</article>').join('')+'</div>':'<div class="notice info"><span>A galeria ainda está vazia. As fotos aprovadas aparecerão aqui.</span></div>'}
 function guestPhotoSection(){const token=guestAlbum();if(!token)return '';return '<section class="sect" id="album"><h2 class="sh">'+cherry()+'Fotos da festa</h2><p class="muted">Compartilhe seus momentos com os participantes autorizados desta festa.</p><form id="photo-upload" class="stack"><label class="field"><span>Seu nome</span><input class="input" name="sender" maxlength="80" required minlength="2"></label><label class="btn primary big block" for="photo-input">'+ic('upload')+'Enviar minhas fotos</label><input id="photo-input" class="sr" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" multiple><div id="photo-preview" class="grid2" style="grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px"></div><p class="small muted">JPEG, PNG ou WebP · até 3 MB por foto. Ao enviar, você concorda que as imagens poderão ser vistas pelos participantes autorizados da festa.</p><div id="photo-progress" class="small" role="status" aria-live="polite"></div><button class="btn" id="photo-submit" type="submit" disabled>Enviar fotos selecionadas</button></form><div id="guest-gallery" style="margin-top:18px"></div></section>'}
+function viewGuestAlbum(){const p=S.party,token=guestAlbum();return '<main class="rsvp gutter"><div class="rsvp-top"><a class="btn sm" href="'+esc((S.party.inviteUrl||(REMOTE?PUBLIC_URL:location.origin)).split('#')[0])+'">← Voltar ao convite</a></div><div class="card stack"><div><p class="label">Álbum privado da festa</p><h1 style="font-size:2rem">Fotos da festa</h1><p class="muted">'+esc(p.name)+' · '+esc(p.age||partyAge())+' anos</p></div>'+(token?guestPhotoSection():'<div class="notice info">Este link do álbum está incompleto. Peça o link exclusivo ou QR Code ao anfitrião.</div>')+'</div></main>'}
 function hydrateGuestImages(root,token){const imgs=root.querySelectorAll('img[data-gallery-photo]');const load=async img=>{try{const r=await fetch(PHOTO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'image',id:img.dataset.galleryPhoto,token})});if(!r.ok)throw new Error();const url=URL.createObjectURL(await r.blob());img.src=url;img.dataset.objectUrl=url}catch(_){img.alt+=' (indisponível)'}};if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>entries.forEach(x=>{if(x.isIntersecting){observer.unobserve(x.target);load(x.target)}}),{rootMargin:'160px'});imgs.forEach(i=>observer.observe(i))}else imgs.forEach(load)}
 function loadGuestGallery(){const t=guestAlbum();if(!t)return;fetch(PHOTO_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'gallery',token:t})}).then(r=>r.json()).then(j=>{const el=document.getElementById('guest-gallery');if(!el)return;el.querySelectorAll('img[data-object-url]').forEach(i=>URL.revokeObjectURL(i.dataset.objectUrl));el.innerHTML=j.ok?photoGrid(j.photos,t,false):'<div class="notice info">Este link do álbum não está válido. Peça um link atualizado à anfitriã.</div>';if(j.ok)hydrateGuestImages(el,t)}).catch(()=>{const el=document.getElementById('guest-gallery');if(el)el.innerHTML='<div class="notice info">Não foi possível carregar as fotos. Verifique a conexão e tente novamente.</div>'});}
 function photoPreview(){const root=document.getElementById('photo-preview');if(!root)return;root.innerHTML=photoFiles.map((f,i)=>'<div style="position:relative"><img src="'+f.url+'" alt="Prévia de '+esc(f.file.name)+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px"><button type="button" class="btn sm" data-act="photo-remove" data-index="'+i+'" aria-label="Remover '+esc(f.file.name)+'" style="position:absolute;right:4px;top:4px">×</button></div>').join('');const b=document.getElementById('photo-submit');if(b)b.disabled=!photoFiles.length||albumBusy}
@@ -741,7 +744,6 @@ function viewInvite(){
    '</div>'+(p.date?'<div class="actions"><a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a></div>':'')+
    '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
    (extras.length?'<section class="sect" aria-labelledby="h-info"><h2 class="sh" id="h-info">'+cherry()+'Bom saber</h2><div class="facts">'+extras.join('')+'</div></section>':'')+
-   guestPhotoSection()+
    '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
    '</div>'+
   '</main>';
