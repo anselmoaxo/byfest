@@ -23,12 +23,16 @@
   --ok:#2f7a45; --ok-bg:#e2f2e6; --warn:#9a5b00; --warn-bg:#fdf0d8; --bad:#b0232f; --bad-bg:#fbe3e5; --muted-bg:#f3e9ec;
   --f-display:"Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
   --f-script:"Pinyon Script", "Snell Roundhand", "Segoe Script", cursive;
+  --f-num:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --r:14px; --r-lg:22px;
   color-scheme:light;
 }
 *{box-sizing:border-box}
 body{background:var(--cream);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.forty,.tag,.kicker,.msg,.ticket b,details.sec summary{font-variation-settings:"opsz" 18}
+/* Bodoni Moda é variável: no automático, em tamanho grande o traço fino some e o 4 de "40" parece 1. Fixamos um tamanho óptico baixo. */
+.hero .forty b{font-variation-settings:"opsz" 11}
 h1,h2,h3{font-family:var(--f-display);font-weight:500;line-height:1.15;text-wrap:balance;margin:0}
 h2{font-size:1.6rem} h3{font-size:1.2rem}
 p{margin:0}
@@ -90,19 +94,19 @@ textarea.input{min-height:90px;resize:vertical}
 .hero .fall{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hero .fall svg{position:absolute;top:-40px;width:22px;height:28px;opacity:.55;animation:fall linear infinite}
 @keyframes fall{from{transform:translateY(-40px) rotate(-10deg)}to{transform:translateY(760px) rotate(25deg)}}
-.arch{width:min(230px,62vw);aspect-ratio:3/4;max-width:100%;margin:6px auto 18px;border-radius:999px 999px 26px 26px;overflow:hidden;background:var(--blush);border:6px solid var(--paper);box-shadow:var(--shadow);display:grid;place-items:center;position:relative}
+.arch{width:min(200px,52vw);aspect-ratio:3/4;max-width:100%;margin:6px auto 18px;border-radius:999px 999px 26px 26px;overflow:hidden;background:var(--blush);border:6px solid var(--paper);box-shadow:var(--shadow);display:grid;place-items:center;position:relative}
 .arch img{width:100%;height:100%;object-fit:cover}
 .arch .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--cherry);padding:16px;text-align:center}
 .arch .ph svg{width:64px;height:76px}
 .hero .script{font-family:var(--f-script);font-size:clamp(3.4rem,15vw,4.6rem);line-height:1;color:var(--cherry);position:relative}
 .hero .forty{font-family:var(--f-display);font-size:clamp(1.3rem,5vw,1.6rem);letter-spacing:.32em;text-transform:uppercase;color:var(--ink);margin-top:6px}
-.hero .forty b{font-weight:600;font-size:1.5em;letter-spacing:.08em;color:var(--cherry-deep);font-style:italic}
+.hero .forty b{font-weight:600;font-size:1.6em;letter-spacing:.04em;color:var(--cherry-deep);font-style:italic;margin-right:.12em}
 .hero .tag{font-family:var(--f-display);font-style:italic;font-size:1.12rem;color:var(--ink-2);max-width:34ch;margin:14px auto 0}
 .theme-badge{display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:6px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--leaf)}
 .theme-badge svg{width:16px;height:16px}
 .countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}
 .countdown div{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 4px;text-align:center}
-.countdown b{display:block;font-family:var(--f-display);font-size:1.7rem;font-weight:500;color:var(--cherry);font-variant-numeric:tabular-nums;line-height:1.1}
+.countdown b{display:block;font-family:var(--f-num);font-size:1.6rem;font-weight:600;color:var(--cherry);font-variant-numeric:tabular-nums;line-height:1.1}
 .countdown span{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-2)}
 .sect{margin-top:18px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px}
 .facts{display:grid;gap:14px}
@@ -110,8 +114,10 @@ textarea.input{min-height:90px;resize:vertical}
 .fact .ic{width:40px;height:40px;border-radius:12px;background:var(--blush-2);display:grid;place-items:center;color:var(--cherry)}
 .fact .ic svg{width:20px;height:20px}
 .fact .v{font-weight:600}
-.tbd{color:var(--ink-2);font-style:italic;font-weight:500}
-.cta-bar{position:sticky;bottom:0;margin-top:20px;padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--cream) 70%,transparent);display:grid;gap:10px;z-index:3}
+.tbd{display:inline-block;color:var(--ink-2);font-style:normal;font-weight:600;font-size:.9rem;padding:1px 10px;border:1.5px dashed color-mix(in srgb,var(--cherry) 30%,var(--line));border-radius:999px;background:var(--paper)}
+.cta-bar{margin-top:20px;display:grid;gap:10px}
+/* no celular o botão de confirmar fica sempre ao alcance do polegar */
+@media (max-width:640px){.cta-bar{position:sticky;bottom:0;z-index:3;padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--cream) 70%,transparent)}}
 .privacy{font-size:.82rem;color:var(--ink-2);text-align:center;margin-top:18px}
 .host-link{display:block;text-align:center;margin-top:26px;font-size:.85rem;color:var(--ink-2)}
 .divider{display:flex;align-items:center;gap:12px;justify-content:center;color:var(--cherry);margin:4px 0}
@@ -135,7 +141,7 @@ textarea.input{min-height:90px;resize:vertical}
 .stepper{display:flex;align-items:center;gap:14px}
 .stepper button{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);font-size:1.5rem;cursor:pointer;color:var(--cherry)}
 .stepper button:disabled{opacity:.35;cursor:not-allowed}
-.stepper output{font-family:var(--f-display);font-size:2.2rem;min-width:2ch;text-align:center}
+.stepper output{font-family:var(--f-num);font-weight:600;font-size:2rem;min-width:2ch;text-align:center}
 .review{display:grid;gap:10px}
 .review div{display:grid;grid-template-columns:minmax(110px,40%) 1fr;gap:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
 .review dt{color:var(--ink-2)} .review dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
@@ -150,7 +156,7 @@ textarea.input{min-height:90px;resize:vertical}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
 .brand svg{width:26px;height:32px}
 .brand b{font-family:var(--f-script);font-size:2rem;color:var(--cherry);font-weight:400;line-height:1}
-.brand span{font-family:var(--f-display);font-size:.95rem;letter-spacing:.18em;text-transform:uppercase}
+.brand span{font-family:var(--f-num);font-weight:600;font-size:.9rem;letter-spacing:.08em;color:var(--cherry-deep);text-transform:uppercase}
 .tabs{display:flex;gap:4px}
 .tabs a{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;text-decoration:none;color:var(--ink-2);font-weight:600;font-size:.95rem}
 .tabs a svg{width:20px;height:20px}
@@ -171,7 +177,7 @@ textarea.input{min-height:90px;resize:vertical}
 .panel h3{margin-bottom:12px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .kpi{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px 16px;min-width:0}
-.kpi .v{font-family:var(--f-display);font-size:clamp(1.2rem,4.6vw,1.65rem);white-space:nowrap;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:4px;overflow-wrap:anywhere}
+.kpi .v{font-family:var(--f-num);font-size:clamp(1.15rem,4.4vw,1.55rem);white-space:nowrap;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:4px;overflow-wrap:anywhere}
 .kpi .s{font-size:.82rem;color:var(--ink-2)}
 .kpi.hl{background:var(--blush-2);border-color:var(--blush)}
 .kpi.hl .v{color:var(--cherry)}
@@ -181,7 +187,7 @@ textarea.input{min-height:90px;resize:vertical}
 @media (min-width:900px){.dash .c6{grid-column:span 6}.dash .c7{grid-column:span 7}.dash .c5{grid-column:span 5}.dash .c4{grid-column:span 4}.dash .c8{grid-column:span 8}}
 .welcome{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;background:linear-gradient(120deg,var(--blush) 0%,var(--blush-2) 60%,var(--paper) 100%);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px}
 .welcome .script{font-family:var(--f-script);font-size:2.6rem;color:var(--cherry);line-height:1}
-.welcome .big{font-family:var(--f-display);font-size:2.6rem;color:var(--cherry-deep);line-height:1;text-align:center}
+.welcome .big{font-family:var(--f-num);font-weight:600;font-size:2.4rem;color:var(--cherry-deep);line-height:1;text-align:center}
 .welcome .big small{display:block;font-family:var(--f-body);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-top:4px}
 .stackbar{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--muted-bg);margin:10px 0}
 .stackbar i{display:block;height:100%}
@@ -275,7 +281,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .leaf-deco.br{bottom:-30px;right:-26px;transform:rotate(156deg)}
 .hero>*:not(.fall):not(.leaf-deco){position:relative;z-index:1}
 .kicker{font-family:var(--f-display);font-style:italic;color:var(--leaf);font-size:1.05rem;margin-bottom:2px;position:relative}
-.date-chip{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 16px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-weight:600;font-size:.92rem;color:var(--cherry-deep);position:relative}
+.date-chip{white-space:nowrap;display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 16px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-weight:600;font-size:.92rem;color:var(--cherry-deep);position:relative}
 .date-chip svg{width:18px;height:18px;color:var(--cherry)}
 .sh{font-size:1.3rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}
 .sh svg{width:18px;height:22px;flex:none}
@@ -426,6 +432,7 @@ function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate
 function today(){return ymd(new Date())}
 function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return ymd(d)}
 function fmtDate(s){if(!s)return '';const [y,m,d]=s.slice(0,10).split('-');return d+'/'+m+'/'+y}
+function fmtDateChip(s){if(!s)return '';const d=new Date(s+'T12:00');return d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'')}
 function fmtDateLong(s){if(!s)return '';const d=new Date(s+'T12:00');return d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
 function daysUntil(s){if(!s)return null;const a=new Date(s+'T00:00'),b=new Date(today()+'T00:00');return Math.round((a-b)/864e5)}
 const digits=s=>String(s||'').replace(/\D/g,'');
@@ -562,8 +569,9 @@ function gcalLink(){
   const loc=[p.venue,p.address].filter(Boolean).join(', ');
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Aniversário de 40 anos da '+p.name+' 🍒')+'&dates='+dates+'&details='+encodeURIComponent('Convite: '+inviteLink())+(loc?'&location='+encodeURIComponent(loc):'')+'&ctz=America/Sao_Paulo';
 }
+function partyAge(){const n=parseInt(S.party.age,10);return n>0&&n<130?n:40}
 function shareText(g){
-  const p=S.party;let t='🍒 Você é especial para mim e está convidado(a)! '+p.name+' '+p.age+' anos, '+p.tagline;
+  const p=S.party;let t='🍒 Você é especial para mim e está convidado(a)! '+p.name+' '+partyAge()+' anos, '+p.tagline;
   if(p.date)t+='\n📅 '+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'');
   t+='\nConfirme sua presença pelo convite: '+inviteLink(g);return t;
 }
@@ -621,6 +629,7 @@ window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
 let cdTimer=null;
 function render(){
   const r=route();clearInterval(cdTimer);
+  document.title=S.party.name+' '+partyAge()+' anos · Cherry';
   const app=document.getElementById('app');
   if(PRIVATE.includes(r)){
     if(!authed){app.innerHTML=viewLogin(r);focusLogin();return}
@@ -649,27 +658,28 @@ function viewInvite(){
   if(p.contactName||p.contactPhone)extras.push(factRow('phone','Contato',esc(p.contactName)+(p.contactName&&p.contactPhone?' · ':'')+'<span class="num">'+esc(fmtPhone(p.contactPhone))+'</span>',p.contactPhone?'<a class="small" href="'+waShare('Oi! Tenho uma dúvida sobre a festa da '+p.name+'.',p.contactPhone)+'" target="_blank" rel="noopener">Chamar no WhatsApp</a>':''));
   const leaf=c=>'<svg class="leaf-deco '+c+'" aria-hidden="true"><use href="#leaf"/></svg>';
   const welcome=(p.welcome||DEFAULT_WELCOME).trim();
+  const age=partyAge();
   return '<main class="invite gutter">'+
    '<section class="hero" aria-labelledby="ttl"><div class="fall" aria-hidden="true">'+falls+'</div>'+leaf('tl')+leaf('br')+
     '<div class="arch">'+photo+'</div>'+
     '<p class="kicker">'+(invitee?esc(invitee.name.split(' ')[0])+', este convite é para você':'Você está convidado(a) para celebrar')+'</p>'+
-    '<h1 id="ttl"><span class="script">'+esc(p.name)+'</span><span class="forty" style="display:block"><b>'+esc(p.age)+'</b> anos</span></h1>'+
+    '<h1 id="ttl" aria-label="'+esc(p.name)+', '+esc(age)+' anos"><span class="script" aria-hidden="true">'+esc(p.name)+'</span><span class="forty" style="display:block" aria-hidden="true"><b>'+esc(age)+'</b> anos</span></h1>'+
     '<p class="tag">'+esc(p.tagline)+'</p>'+
-    (p.date?'<span class="date-chip">'+ic('cal')+esc(fmtDateLong(p.date))+(p.time?' · '+esc(p.time.replace(':','h')):'')+'</span>':'')+
+    (p.date?'<span class="date-chip">'+ic('cal')+esc(fmtDateChip(p.date))+(p.time?' · '+esc(p.time.replace(':','h')):'')+'</span>':'')+
     (p.date?'<div class="countdown" id="cd" aria-label="Contagem regressiva"><div><b id="cd-d">0</b><span>dias</span></div><div><b id="cd-h">0</b><span>horas</span></div><div><b id="cd-m">0</b><span>min</span></div><div><b id="cd-s">0</b><span>seg</span></div></div>':'')+
    '</section>'+
    '<div class="inv-col">'+
-   '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
-   '<section class="sect" aria-labelledby="h-when"><h2 class="sh" id="h-when">'+cherry()+'Quando e onde</h2><div class="facts">'+
+   '<section class="sect when" aria-labelledby="h-when"><h2 class="sh" id="h-when">'+cherry()+'Quando e onde</h2><div class="facts">'+
      factRow('cal','Data',p.date?esc(fmtDateLong(p.date)):tbd)+
      factRow('clock','Horário',p.time?esc(p.time.replace(':','h'))+(p.endTime?' às '+esc(p.endTime.replace(':','h')):''):tbd)+
      factRow('pin','Local',place,maps?'<a class="btn sm" style="margin-top:8px" href="'+maps+'" target="_blank" rel="noopener">'+ic('pin')+'Abrir no mapa</a>':'')+
    '</div></section>'+
-   (extras.length?'<section class="sect" aria-labelledby="h-info"><h2 class="sh" id="h-info">'+cherry()+'Bom saber</h2><div class="facts">'+extras.join('')+'</div></section>':'')+
    '<div class="cta-bar">'+
      (closed?'<div class="notice info">'+ic('info')+'<span>'+esc(closed)+' Fale com a '+esc(p.name)+' se precisar.</span></div>':
       '<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
    '</div><div class="actions"><a class="btn leaf" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Compartilhar no WhatsApp</a>'+(p.date?'<a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a>':'')+'</div>'+
+   '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
+   (extras.length?'<section class="sect" aria-labelledby="h-info"><h2 class="sh" id="h-info">'+cherry()+'Bom saber</h2><div class="facts">'+extras.join('')+'</div></section>':'')+
    '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
    '</div>'+
   '</main>';
@@ -690,9 +700,9 @@ function stepLabel(n){return {1:'Seus dados',2:'Presença',3:rsvp.answer==='no'?
 function stepsFor(){return [1,2,3,5]}
 function viewRsvp(){
   const closed=rsvpClosed();const p=S.party;
-  const head='<div class="rsvp-top"><a class="iconbtn" href="#convite" aria-label="Voltar ao convite">'+ic('back')+'</a><div><div class="label">'+esc(p.name)+' '+esc(p.age)+' anos</div><h1 style="font-size:1.5rem">Confirmar presença</h1></div></div>';
+  const head='<div class="rsvp-top"><a class="iconbtn" href="#convite" aria-label="Voltar ao convite">'+ic('back')+'</a><div><div class="label">'+esc(p.name)+' '+partyAge()+' anos</div><h1 style="font-size:1.5rem">Confirmar presença</h1></div></div>';
   const when=[p.date?fmtDateLong(p.date):'Data a confirmar',p.time?p.time.replace(':','h'):'',p.venue||''].filter(Boolean);
-  const ticket='<div class="ticket">'+cherry()+'<div><b>Aniversário de '+esc(p.age)+' anos da '+esc(p.name)+'</b><div class="meta">'+when.map(w=>'<span>'+esc(w)+'</span>').join('')+'</div></div></div>';
+  const ticket='<div class="ticket">'+cherry()+'<div><b>Aniversário de '+partyAge()+' anos da '+esc(p.name)+'</b><div class="meta">'+when.map(w=>'<span>'+esc(w)+'</span>').join('')+'</div></div></div>';
   if(closed&&rsvp.step!==6)return '<main class="rsvp gutter">'+head+'<div class="card"><div class="notice info">'+ic('info')+'<span>'+esc(closed)+'</span></div><a class="btn block" style="margin-top:16px" href="#convite">Voltar ao convite</a></div></main>';
   if(rsvp.step===6)return '<main class="rsvp gutter">'+viewRsvpDone()+'</main>';
   const seq=stepsFor();const idx=seq.indexOf(rsvp.step);
@@ -775,7 +785,7 @@ function focusLogin(){setTimeout(()=>{const e=document.getElementById('lemail'),
 const NAV=[['painel','home','Início'],['convidados','users','Convidados'],['checklist','list','Tarefas'],['financas','wallet','Finanças'],['festa','gear','Festa']];
 function shell(r,content){
   const links=NAV.map(n=>'<a href="#'+n[0]+'" '+(r===n[0]?'aria-current="page"':'')+'>'+ic(n[1])+'<span>'+n[2]+'</span></a>').join('');
-  return '<header class="topbar"><div class="in gutter"><a class="brand" href="#painel">'+cherry()+'<b>'+esc(S.party.name)+'</b><span>'+esc(S.party.age)+'</span></a><nav class="tabs" aria-label="Seções">'+links+'</nav><span class="spacer"></span>'+(REMOTE?'<span id="sync" class="small muted" aria-live="polite">'+syncLabel()+'</span>':'')+
+  return '<header class="topbar"><div class="in gutter"><a class="brand" href="#painel">'+cherry()+'<b>'+esc(S.party.name)+'</b><span>'+partyAge()+'</span></a><nav class="tabs" aria-label="Seções">'+links+'</nav><span class="spacer"></span>'+(REMOTE?'<span id="sync" class="small muted" aria-live="polite">'+syncLabel()+'</span>':'')+
    '<a class="iconbtn" href="#convite" title="Ver convite" aria-label="Ver convite público">'+ic('eye')+'</a><button class="iconbtn" data-act="logout" title="Sair" aria-label="Sair do painel">'+ic('out')+'</button></div></header>'+
    '<main class="main gutter">'+(storageOk?'':'<div class="notice" style="margin-bottom:14px">'+ic('alert')+'<span>Este navegador não está salvando os dados. As alterações serão perdidas ao fechar a página.</span></div>')+content+'</main>'+
    '<nav class="bottomnav" aria-label="Seções">'+links+'</nav>';
@@ -987,7 +997,7 @@ function expForm(x,isDup){
    '<div class="err" id="ef-err"></div><div class="modal-foot"><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn primary" type="submit">Salvar</button></div></form>');
 }
 function finSummaryText(){
-  const f=fin();const L=['RESUMO FINANCEIRO · '+S.party.name+' '+S.party.age+' anos','Gerado em '+fmtDate(today()),'',
+  const f=fin();const L=['RESUMO FINANCEIRO · '+S.party.name+' '+partyAge()+' anos','Gerado em '+fmtDate(today()),'',
    'Orçamento: '+(f.budget?money(f.budget):'não definido'),'Total previsto: '+money(f.planned),'Total gasto (valores finais): '+money(f.spent),'Custo total considerado: '+money(f.committed),'Já pago: '+money(f.paid),'Falta pagar: '+money(f.pending),(f.budget?'Orçamento − custo: '+money(f.diff):''),'','DESPESAS'];
   S.expenses.forEach(x=>L.push('• '+x.desc+' ['+(CATS[x.category]||x.category)+'] · '+EXP_ST[x.status]+' · custo '+money(cost(x))+' · pago '+money(x.paid)+' · saldo '+money(balance(x))+(x.due?' · vence '+fmtDate(x.due):'')));
   return L.filter((l,i)=>l!==''||i<3||true).join('\n');
@@ -995,7 +1005,7 @@ function finSummaryText(){
 function finCSV(){return toCSV([['descricao','categoria','fornecedor','valor_previsto','valor_final','vencimento','situacao','forma_pagamento','valor_pago','saldo','observacoes','comprovante']].concat(S.expenses.map(x=>[x.desc,CATS[x.category],x.supplier,moneyInput(x.planned),moneyInput(x.final),fmtDate(x.due),EXP_ST[x.status],x.method,moneyInput(x.paid),moneyInput(balance(x)),x.notes,x.receipt])))}
 function finPrint(){
   const f=fin();
-  document.getElementById('printArea').innerHTML='<h1>Resumo financeiro · '+esc(S.party.name)+' '+esc(S.party.age)+' anos</h1><p>Gerado em '+fmtDate(today())+'</p><p>Orçamento: '+(f.budget?money(f.budget):'—')+' · Previsto: '+money(f.planned)+' · Gasto: '+money(f.spent)+' · Pago: '+money(f.paid)+' · Falta pagar: '+money(f.pending)+(f.budget?' · Orçamento − custo: '+money(f.diff):'')+'</p><table><tr><th>Despesa</th><th>Categoria</th><th>Situação</th><th>Vencimento</th><th>Custo</th><th>Pago</th><th>Saldo</th></tr>'+S.expenses.map(x=>'<tr><td>'+esc(x.desc)+'</td><td>'+esc(CATS[x.category])+'</td><td>'+EXP_ST[x.status]+'</td><td>'+fmtDate(x.due)+'</td><td>'+money(cost(x))+'</td><td>'+money(x.paid)+'</td><td>'+money(balance(x))+'</td></tr>').join('')+'</table>';
+  document.getElementById('printArea').innerHTML='<h1>Resumo financeiro · '+esc(S.party.name)+' '+partyAge()+' anos</h1><p>Gerado em '+fmtDate(today())+'</p><p>Orçamento: '+(f.budget?money(f.budget):'—')+' · Previsto: '+money(f.planned)+' · Gasto: '+money(f.spent)+' · Pago: '+money(f.paid)+' · Falta pagar: '+money(f.pending)+(f.budget?' · Orçamento − custo: '+money(f.diff):'')+'</p><table><tr><th>Despesa</th><th>Categoria</th><th>Situação</th><th>Vencimento</th><th>Custo</th><th>Pago</th><th>Saldo</th></tr>'+S.expenses.map(x=>'<tr><td>'+esc(x.desc)+'</td><td>'+esc(CATS[x.category])+'</td><td>'+EXP_ST[x.status]+'</td><td>'+fmtDate(x.due)+'</td><td>'+money(cost(x))+'</td><td>'+money(x.paid)+'</td><td>'+money(balance(x))+'</td></tr>').join('')+'</table>';
   window.print();
 }
 
