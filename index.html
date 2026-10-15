@@ -25,9 +25,14 @@
 <meta name="twitter:description" content="Você está convidado(a)! Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
 <meta name="twitter:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
 <meta name="theme-color" content="#a3123a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Festa Cherry">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Pinyon+Script&family=Figtree:wght@400;500;600;700&display=swap">
@@ -1751,6 +1756,9 @@ async function boot(){
   render();
 }
 boot();
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{}),{once:true});
+}
 })();
 </script>
 </body>

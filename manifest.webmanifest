@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "Festa Cherry · Priscila 40",
+  "short_name": "Festa Cherry",
+  "description": "Convite e informações da festa da Priscila.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff9f4",
+  "theme_color": "#a3123a",
+  "icons": [
+    { "src": "/pwa-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -36,3 +36,11 @@ Se mudar `db/schema.sql`, rode `npm run build:schema` para regerar `lib/schema.j
 
 Abrindo `index.html` direto no navegador, o app funciona sem banco: os dados ficam no `localStorage`
 (nesse modo o painel abre em `#entrar`, com qualquer e-mail e a senha inicial `4040`).
+
+## PWA
+
+O site publicado em HTTPS pode ser instalado pelo navegador em Android e iOS. O manifesto fica em
+`manifest.webmanifest`; `sw.js` mantém o shell da página disponível para abrir offline depois do
+primeiro acesso. Offline, consultas e alterações que dependem da API continuam indisponíveis.
+No iPhone/iPad, use **Compartilhar → Adicionar à Tela de Início** no Safari. Notificações push não
+estão incluídas nesta etapa.
