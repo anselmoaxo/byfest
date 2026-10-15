@@ -543,7 +543,9 @@ function mergeRsvps(list){
   list.forEach(r=>{
     const seen=S.rsvpSeen[r.phone];if(seen&&seen>=r.updated_at)return;
     const g=S.guests.find(x=>normPh(x.phone)===r.phone);
+    if(g&&g.manualAt&&g.manualAt>=String(r.updated_at)){S.rsvpSeen[r.phone]=r.updated_at;return}
     const data={phone:r.phone,status:r.status,companions:r.companions||[],diet:r.diet||'',notes:r.notes||'',respondedAt:String(r.updated_at).slice(0,10)};
+    if(g&&(g.companions||[]).join('|')!==data.companions.join('|'))data.compDiets=[];
     if(g)Object.assign(g,data);else S.guests.push(Object.assign({id:uid(),name:r.name,group:'Pelo convite',allowed:Number(S.party.maxCompanions)||0,demo:false},data));
     S.rsvpSeen[r.phone]=r.updated_at;n++;
   });
@@ -581,6 +583,53 @@ function guestStats(){
   const gs=S.guests;const c={total:gs.length,yes:0,no:0,maybe:0,pending:0,people:0,maybePeople:0};
   gs.forEach(g=>{c[g.status]=(c[g.status]||0)+1;if(g.status==='yes')c.people+=1+(g.companions||[]).length;if(g.status==='maybe')c.maybePeople+=1+(g.companions||[]).length});
   return c;
+}
+/* acompanhantes continuam como lista de nomes (formato do banco); restrições por acompanhante ficam em g.compDiets, na mesma ordem */
+function compDiet(g,i){return ((g.compDiets||[])[i]||'').trim()}
+function compLabel(g){return (g.companions||[]).map((n,i)=>n+(compDiet(g,i)?' ('+compDiet(g,i)+')':'')).join(', ')}
+function parseComps(s){
+  const names=[],diets=[];
+  String(s||'').split(/,(?![^()]*\))/).forEach(p=>{p=p.trim();if(!p)return;const m=p.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+    if(m&&m[1].trim()){names.push(m[1].trim());diets.push(m[2].trim())}else{names.push(p);diets.push('')}});
+  return {names,diets};
+}
+function dietSummary(list){
+  const m={};
+  list.forEach(g=>{
+    if(g.diet)m[g.diet.trim().toLowerCase()]=(m[g.diet.trim().toLowerCase()]||0)+1;
+    (g.companions||[]).forEach((_,i)=>{const d=compDiet(g,i).toLowerCase();if(d)m[d]=(m[d]||0)+1});
+  });
+  return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([k,n])=>k+' ('+n+')');
+}
+function tableStats(){
+  const t={};
+  S.guests.forEach(g=>{if(g.status!=='yes'||!g.table)return;t[g.table]=(t[g.table]||0)+1+(g.companions||[]).length});
+  return t;
+}
+function arrivedStats(){
+  let a=0,tot=0;
+  S.guests.forEach(g=>{if(g.status!=='yes')return;const n=1+(g.companions||[]).length;tot+=n;if(g.arrived)a+=n});
+  return {a,tot};
+}
+const REMIND_DAYS=3;
+function needsReminder(g){
+  if(!g.phone||g.demo||(g.status!=='pending'&&g.status!=='maybe'))return false;
+  const st=inviteState(g);if(!st)return false;
+  const last=(g.invite&&g.invite.remindedAt)||(g.invite&&g.invite.at)||'';if(!last)return true;
+  return -daysUntil(last)>=REMIND_DAYS;
+}
+function reminderText(g){
+  const p=S.party,first=String(g.name||'').trim().split(/\s+/)[0]||'';
+  const L=['Oi'+(first?', '+first:'')+'! 🍒','Passando para lembrar do meu aniversário de '+partyAge()+' anos'+(p.date?' ('+fmtDateLong(p.date)+(p.time?' às '+p.time.replace(':','h'):'')+')':'')+'.'];
+  if(p.rsvpDeadline)L.push('Preciso da sua confirmação até '+fmtDate(p.rsvpDeadline)+'.');
+  else L.push('Você consegue me confirmar se vem?');
+  L.push('','Confirme sua presença por aqui:',inviteLink(g),'','Vai ser muito especial ter você comigo! 💕');
+  return L.join('\n');
+}
+function remind(g){
+  const opened=openWhatsApp(waShare(reminderText(g),g.phone));
+  g.invite=Object.assign({},g.invite,{remindedAt:today(),reminders:((g.invite&&g.invite.reminders)||0)+1});
+  save();render();toast(opened?'Lembrete aberto no WhatsApp':'Não foi possível abrir o WhatsApp; use "Copiar lembrete"');
 }
 function partyDate(){const p=S.party;if(!p.date)return null;return new Date(p.date+'T'+(p.time||'00:00'))}
 function rsvpClosed(){const p=S.party;if(!p.rsvpOpen)return 'As confirmações estão encerradas.';if(p.rsvpDeadline&&daysUntil(p.rsvpDeadline)<0)return 'O prazo para confirmar presença terminou em '+fmtDate(p.rsvpDeadline)+'.';return ''}
@@ -640,7 +689,7 @@ function openWhatsApp(url){
 function sendInvite(g){
   const url=waShare(guestInviteText(g),g.phone);
   const opened=openWhatsApp(url);
-  if(inviteState(g)!=='sent'){g.invite={state:'prepared',at:today()};save()}
+  if(inviteState(g)!=='sent'){g.invite=Object.assign({},g.invite,{state:'prepared',at:today()});save()}
   render();inviteModal(g,opened);
 }
 function inviteModal(g,opened){
@@ -923,6 +972,7 @@ function viewDash(){
   return demoNotice()+
   '<div class="dash">'+
    '<section class="welcome"><div><div class="label">Painel da aniversariante</div><div class="script">Oi, '+esc(p.name)+'!</div><p class="muted" style="margin-top:6px">'+(p.date?esc(fmtDateLong(p.date))+(p.time?' · '+esc(p.time.replace(':','h')):''):'Defina a data da festa para iniciar a contagem.')+'</p>'+
+    (dleft===0&&arrivedStats().tot?'<p class="small" style="margin-top:8px"><b class="num">'+arrivedStats().a+'</b> de <b class="num">'+arrivedStats().tot+'</b> pessoas já chegaram · <a href="#convidados">fazer check-in</a></p>':'')+
     (missing.length?'<a class="btn sm" style="margin-top:12px" href="#festa">'+ic('edit')+'Preencher '+missing.join(', ')+'</a>':'')+'</div>'+
     (dleft!=null?'<div class="big num">'+(dleft>=0?dleft:'✓')+'<small>'+(dleft>0?'dias para a festa':dleft===0?'é hoje!':'festa realizada')+'</small></div>':'')+'</section>'+
    '<div class="kpis">'+
@@ -962,36 +1012,51 @@ function budgetBlock(f){
 }
 
 /* ---------------- convidados ---------------- */
-let gFilter={q:'',status:'',group:''};
+let gFilter={q:'',status:'',group:'',table:'',remind:''};
+function tablesPanel(){
+  const t=tableStats(),names=Object.keys(t).sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true})),cap=Number(S.party.tableCap)||0;
+  const ar=arrivedStats();
+  return '<div class="panel" style="margin-top:14px"><div class="row"><b>Mesas</b><span class="spacer"></span><label class="small muted" style="display:flex;gap:8px;align-items:center">Lugares por mesa<input class="input" id="tb-cap" type="number" min="0" max="99" style="width:84px" data-filter="tb-cap" value="'+(cap||'')+'"></label></div>'+
+   (names.length?'<div class="meta" style="margin-top:8px;gap:8px;flex-wrap:wrap">'+names.map(n=>'<span class="pill '+(cap&&t[n]>cap?'bad':'')+'">'+esc(n)+': <b class="num">'+t[n]+'</b>'+(cap?'/'+cap:'')+(cap&&t[n]>cap?' · lotada':'')+'</span>').join('')+'</div>':'<p class="small muted" style="margin:8px 0 0">Defina a mesa no cadastro de cada confirmado para ver a ocupação aqui.</p>')+
+   (ar.tot?'<p class="small" style="margin:10px 0 0">Chegaram: <b class="num">'+ar.a+'</b> de <b class="num">'+ar.tot+'</b> pessoas confirmadas</p>':'')+'</div>';
+}
 function viewGuests(){
   const gs=guestStats();const p=S.party;
   const invSent=S.guests.filter(g=>inviteState(g)==='sent').length;
   const groups=[...new Set(S.guests.map(g=>g.group).filter(Boolean))].sort();
   const q=gFilter.q.toLowerCase();
-  const list=S.guests.filter(g=>(!gFilter.status||g.status===gFilter.status)&&(!gFilter.group||g.group===gFilter.group)&&(!q||(g.name+' '+g.phone+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
+  const tbls=[...new Set(S.guests.map(g=>g.table).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true}));
+  const nRemind=S.guests.filter(needsReminder).length;
+  const list=S.guests.filter(g=>(!gFilter.status||g.status===gFilter.status)&&(!gFilter.group||g.group===gFilter.group)&&(!gFilter.table||g.table===gFilter.table)&&(!gFilter.remind||needsReminder(g))&&(!q||(g.name+' '+g.phone+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
   return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas'+(invSent?' · '+invSent+' convite'+(invSent>1?'s':'')+' enviado'+(invSent>1?'s':''):'')+'</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
    '<div class="kpis"><div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div></div><div class="kpi"><div class="label">Ainda não sabem</div><div class="v" style="color:var(--warn)">'+gs.maybe+'</div></div><div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div></div><div class="kpi"><div class="label">Sem resposta</div><div class="v">'+gs.pending+'</div></div></div>'+
    '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div></div>'+
-   reportSection()+
+   reportSection()+tablesPanel()+
    '<div class="toolbar"><input class="input" id="g-q" type="search" placeholder="Buscar por nome ou WhatsApp" value="'+esc(gFilter.q)+'" data-filter="g-q" aria-label="Buscar convidados">'+
     '<select class="input" id="g-st" data-filter="g-st" aria-label="Filtrar por status"><option value="">Todos os status</option>'+Object.entries(G_ST).map(([k,v])=>'<option value="'+k+'" '+(gFilter.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
-    '<select class="input" id="g-gr" data-filter="g-gr" aria-label="Filtrar por grupo"><option value="">Todos os grupos</option>'+groups.map(g=>'<option '+(gFilter.group===g?'selected':'')+'>'+esc(g)+'</option>').join('')+'</select></div>'+
+    '<select class="input" id="g-gr" data-filter="g-gr" aria-label="Filtrar por grupo"><option value="">Todos os grupos</option>'+groups.map(g=>'<option '+(gFilter.group===g?'selected':'')+'>'+esc(g)+'</option>').join('')+'</select>'+
+    (tbls.length?'<select class="input" id="g-tb" data-filter="g-tb" aria-label="Filtrar por mesa"><option value="">Todas as mesas</option>'+tbls.map(t=>'<option '+(gFilter.table===t?'selected':'')+'>'+esc(t)+'</option>').join('')+'</select>':'')+
+    '<select class="input" id="g-rm" data-filter="g-rm" aria-label="Filtrar por lembrete"><option value="">Todos os convites</option><option value="1" '+(gFilter.remind?'selected':'')+'>Precisam de lembrete ('+nRemind+')</option></select></div>'+
    '<div id="g-list">'+(list.length?list.map(guestRow).join(''):(S.guests.length?'<div class="empty">Nenhum convidado encontrado com esses filtros.</div>':'<div class="empty">'+cherry()+'<p>Sua lista ainda está vazia.</p><button class="btn primary" style="margin-top:12px" data-act="guest-new">Adicionar o primeiro convidado</button></div>'))+'</div>';
 }
 function guestRow(g){
   const people=g.status==='yes'?1+(g.companions||[]).length:0;
   return '<div class="rec"><div style="min-width:0"><div class="t">'+esc(g.name)+demoBadge(g)+'</div><div class="meta">'+(g.group?'<span>'+esc(g.group)+'</span>':'')+(g.phone?'<span class="num">'+esc(fmtPhone(g.phone))+'</span>':'')+'<span>até '+(Number(g.allowed)||0)+' acomp.</span>'+(g.respondedAt?'<span>respondeu em '+fmtDate(g.respondedAt)+'</span>':'')+'</div>'+
-    ((g.companions||[]).length?'<div class="meta"><span>Com: '+esc(g.companions.join(', '))+'</span></div>':'')+
+    ((g.companions||[]).length?'<div class="meta"><span>Com: '+esc(compLabel(g))+'</span></div>':'')+
+    ((g.table||(g.invite&&g.invite.reminders))?'<div class="meta">'+(g.table?'<span>🪑 Mesa '+esc(g.table)+'</span>':'')+(g.invite&&g.invite.reminders?'<span>lembrado '+g.invite.reminders+'× · último em '+fmtDate(g.invite.remindedAt)+'</span>':'')+'</div>':'')+
     (g.diet?'<div class="meta"><span>🍽 '+esc(g.diet)+'</span></div>':'')+(g.notes?'<div class="meta"><span>'+esc(g.notes)+'</span></div>':'')+'</div>'+
-   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(g.phone&&!g.demo?invitePill(g):'')+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
-   '<div class="acts">'+(g.phone?'<button class="btn sm leaf" data-act="guest-wa" data-id="'+g.id+'">'+ic('wa')+(inviteState(g)?'Abrir WhatsApp de novo':'Enviar convite')+'</button><button class="btn sm" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar convite</button>'+(inviteState(g)==='prepared'?'<button class="btn sm" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>':''):'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
+   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(g.arrived?'<span class="pill ok">✓ Chegou</span>':'')+(g.phone&&!g.demo?invitePill(g):'')+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
+   '<div class="acts">'+(g.phone?'<button class="btn sm leaf" data-act="guest-wa" data-id="'+g.id+'">'+ic('wa')+(inviteState(g)?'Abrir WhatsApp de novo':'Enviar convite')+'</button><button class="btn sm" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar convite</button>'+(inviteState(g)==='prepared'?'<button class="btn sm" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>':''):'')+(needsReminder(g)?'<button class="btn sm leaf" data-act="guest-remind" data-id="'+g.id+'">'+ic('wa')+'Lembrar</button><button class="btn sm" data-act="remind-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar lembrete</button>':'')+(g.status==='yes'?'<button class="btn sm" data-act="guest-arrive" data-id="'+g.id+'">'+(g.arrived?'Desfazer chegada':'✓ Chegou')+'</button>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
 }
 function guestForm(g){
   const maxC=Number(S.party.maxCompanions)||0;
   g=g||{name:'',phone:'',group:'',allowed:maxC,status:'pending',companions:[],diet:'',notes:''};
   const lim=Math.max(maxC,Number(g.allowed)||0);
-  // a confirmação só muda pelo convite público; aqui ela aparece só para consulta
-  const conf=g.id?'<div class="notice info">'+ic('info')+'<span>Confirmação: <b>'+G_ST[g.status]+'</b>'+((g.companions||[]).length?' · com '+esc(g.companions.join(', ')):'')+'. Ela só muda quando o convidado responde pelo convite.</span></div>':'';
+  // presença: normalmente vem do convite público, mas pode ser marcada à mão (ex.: confirmou por telefone)
+  const conf='<div class="grid2"><label class="field"><span>Presença</span><select class="input" id="gf-status" name="status">'+Object.keys(G_ST).map(k=>'<option value="'+k+'"'+(g.status===k?' selected':'')+'>'+G_ST[k]+'</option>').join('')+'</select></label>'+
+   '<label class="field"><span>Acompanhantes (separados por vírgula)</span><input class="input" id="gf-comp" name="comp" maxlength="240" placeholder="Ana (vegetariana), João" value="'+esc(compLabel(g))+'"><small>Restrição do acompanhante entre parênteses.</small></label>'+
+   '<label class="field"><span>Mesa</span><input class="input" id="gf-table" name="table" maxlength="30" list="tablesList" value="'+esc(g.table||'')+'"><datalist id="tablesList">'+[...new Set(S.guests.map(x=>x.table).filter(Boolean))].map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label></div>'+
+   '<small class="muted">Se o convidado responder pelo convite depois, a resposta mais recente vale.</small>';
   openModal(g.id?'Editar convidado':'Novo convidado','<form data-form="guest" data-id="'+(g.id||'')+'" class="stack" novalidate>'+
    '<label class="field"><span>Nome do convidado *</span><input class="input" id="gf-name" name="name" required maxlength="80" autocomplete="off" value="'+esc(g.name)+'"></label>'+
    '<div class="grid2"><label class="field"><span>WhatsApp com DDD *</span><input class="input" id="gf-phone" name="phone" type="tel" inputmode="tel" required maxlength="20" placeholder="(11) 91234-5678" autocomplete="off" value="'+esc(fmtPhone(g.phone))+'"></label>'+
@@ -1000,7 +1065,6 @@ function guestForm(g){
    conf+
    '<label class="field"><span>Restrições alimentares</span><input class="input" id="gf-diet" name="diet" maxlength="160" value="'+esc(g.diet)+'"></label>'+
    '<label class="field"><span>Observações</span><textarea class="input" id="gf-notes" name="notes" maxlength="400">'+esc(g.notes)+'</textarea></label>'+
-   (g.id?'':'<p class="small muted">O convidado entra como <b>Sem resposta</b>. A presença só é confirmada quando ele responder pelo convite.</p>')+
    '<div class="err" id="gf-err" role="alert"></div><div class="modal-foot"><button type="button" class="btn" data-act="close">Cancelar</button><button class="btn" type="submit" name="go" value="save">Salvar convidado</button><button class="btn leaf" type="submit" name="go" value="wa">'+ic('wa')+'Salvar e abrir WhatsApp</button></div></form>');
 }
 function importModal(){
@@ -1015,19 +1079,19 @@ function runImport(){
   const rows=parseCSV(txt);if(rows.length<2){err.textContent='Não encontramos linhas de convidados. Confira se a primeira linha é o cabeçalho.';return}
   const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z_]/g,'');
   const h=rows[0].map(norm);const col=(...names)=>h.findIndex(x=>names.includes(x));
-  const ci={name:col('nome','name'),phone:col('whatsapp','telefone','celular','phone'),group:col('grupo','familia','grupoufamilia','group'),allowed:col('acompanhantes_permitidos','acompanhantespermitidos','acompanhantes_perm','permitidos'),status:col('status'),comp:col('acompanhantes','acompanhantes_confirmados'),diet:col('restricoes','restricoes_alimentares','restricoesalimentares'),notes:col('observacoes','obs'),date:col('data_resposta','dataresposta')};
+  const ci={name:col('nome','name'),phone:col('whatsapp','telefone','celular','phone'),group:col('grupo','familia','grupoufamilia','group'),allowed:col('acompanhantes_permitidos','acompanhantespermitidos','acompanhantes_perm','permitidos'),status:col('status'),comp:col('acompanhantes','acompanhantes_confirmados'),diet:col('restricoes','restricoes_alimentares','restricoesalimentares'),notes:col('observacoes','obs'),date:col('data_resposta','dataresposta'),table:col('mesa','table')};
   if(ci.name<0){err.textContent='A coluna "nome" não foi encontrada no cabeçalho.';return}
   const stMap={'vai':'yes','sim':'yes','yes':'yes','nao vai':'no','nao':'no','no':'no','ainda nao sabe':'maybe','talvez':'maybe','maybe':'maybe'};
   let added=0,updated=0;
   rows.slice(1).forEach(r=>{const v=i=>i>=0?(r[i]||'').trim():'';const name=v(ci.name);if(!name)return;
     const st=stMap[v(ci.status).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')]||'pending';
-    const data={name,phone:digits(v(ci.phone)),group:v(ci.group),allowed:parseInt(v(ci.allowed))||Number(S.party.maxCompanions)||0,status:st,companions:v(ci.comp)?v(ci.comp).split(',').map(s=>s.trim()).filter(Boolean):[],diet:v(ci.diet),notes:v(ci.notes),respondedAt:st!=='pending'?(v(ci.date).match(/^(\d{2})\/(\d{2})\/(\d{4})$/)?v(ci.date).replace(/^(\d{2})\/(\d{2})\/(\d{4})$/,'$3-$2-$1'):today()):''};
+    const data={name,phone:digits(v(ci.phone)),group:v(ci.group),allowed:parseInt(v(ci.allowed))||Number(S.party.maxCompanions)||0,status:st,companions:parseComps(v(ci.comp)).names,compDiets:parseComps(v(ci.comp)).diets,table:v(ci.table),diet:v(ci.diet),notes:v(ci.notes),respondedAt:st!=='pending'?(v(ci.date).match(/^(\d{2})\/(\d{2})\/(\d{4})$/)?v(ci.date).replace(/^(\d{2})\/(\d{2})\/(\d{4})$/,'$3-$2-$1'):today()):''};
     const ex=data.phone&&S.guests.find(g=>digits(g.phone)===data.phone);
     if(ex){Object.assign(ex,data);ex.demo=false;updated++}else{S.guests.push(Object.assign({id:uid(),demo:false},data));added++}});
   save();closeModal();render();toast(added+' adicionado(s), '+updated+' atualizado(s)');
 }
 function guestsCSV(){
-  return toCSV([['nome','whatsapp','grupo','acompanhantes_permitidos','status','pessoas_confirmadas','acompanhantes','restricoes','observacoes','data_resposta']].concat(S.guests.map(g=>[g.name,fmtPhone(g.phone),g.group,g.allowed,G_ST[g.status],g.status==='yes'?1+(g.companions||[]).length:0,(g.companions||[]).join(', '),g.diet,g.notes,fmtDate(g.respondedAt)])));
+  return toCSV([['nome','whatsapp','grupo','acompanhantes_permitidos','status','pessoas_confirmadas','acompanhantes','restricoes','observacoes','data_resposta','mesa']].concat(S.guests.map(g=>[g.name,fmtPhone(g.phone),g.group,g.allowed,G_ST[g.status],g.status==='yes'?1+(g.companions||[]).length:0,compLabel(g),g.diet,g.notes,fmtDate(g.respondedAt),g.table||''])));
 }
 
 /* ---------------- relatório em PDF dos confirmados ---------------- */
@@ -1050,7 +1114,9 @@ function reportSection(){
     (groups.length?'<select class="input" id="r-gr" data-filter="r-gr" aria-label="Filtrar o relatório por grupo"><option value="">Todos os grupos</option>'+groups.map(g=>'<option '+(rFilter.group===g?'selected':'')+'>'+esc(g)+'</option>').join('')+'</select>':'')+
     '<label class="switch"><input type="checkbox" id="r-notes" data-filter="r-notes" '+(rFilter.notes?'checked':'')+'>Incluir observações</label></div>'+
    (repMsg?'<div class="notice '+(repMsg.bad?'':'info')+'" role="alert" style="margin-top:12px">'+ic(repMsg.bad?'alert':'info')+'<span>'+esc(repMsg.text)+'</span></div>':'')+
+   (dietSummary(list).length?'<p class="small" style="margin:12px 0 0"><b>Restrições alimentares (para o buffet):</b> '+esc(dietSummary(list).join(' · '))+'</p>':'')+
    '<div class="row" style="margin-top:12px">'+
+    '<button class="btn" data-act="attend-pdf"'+(list.length?'':' disabled')+'>'+ic('download')+'Lista de presença (portaria)</button>'+
     '<button class="btn primary" data-act="report-pdf"'+(list.length?'':' disabled')+(repBusy?' aria-busy="true"':'')+'>'+(repBusy?'Gerando PDF…':ic('download')+'Baixar relatório em PDF')+'</button>'+
     (REMOTE?'<button class="btn" data-act="refresh">Atualizar respostas</button>':'')+
     (filtered?'<button class="btn" data-act="report-clear">Limpar filtros</button>':'')+'</div>'+
@@ -1174,7 +1240,7 @@ function buildReportPdf(J,list){
   const notes=rFilter.notes;
   const head=['#','Convidado','Acompanhantes','Pessoas'].concat(notes?['Observações']:[]);
   const body=list.map((g,i)=>{
-    const comp=(g.companions||[]).filter(Boolean);
+    const comp=(g.companions||[]).filter(Boolean).map((n,i)=>n+(compDiet(g,i)?' ('+compDiet(g,i)+')':''));
     const obs=[g.diet?'Restrição: '+g.diet:'',g.notes||''].filter(Boolean).join('\n');
     return [String(i+1),g.name,comp.length?comp.join(', '):'—',String(1+comp.length)].concat(notes?[obs||'—']:[]);
   });
@@ -1182,6 +1248,26 @@ function buildReportPdf(J,list){
     columnStyles:notes?{0:{cellWidth:9,halign:'right',textColor:C.muted},1:{cellWidth:44,fontStyle:'bold'},2:{cellWidth:50},3:{cellWidth:21,halign:'center'},4:{cellWidth:'auto'}}
                       :{0:{cellWidth:9,halign:'right',textColor:C.muted},1:{cellWidth:62,fontStyle:'bold'},2:{cellWidth:'auto'},3:{cellWidth:21,halign:'center'}}});
   return K.frame();
+}
+// lista de portaria: confirmados ordenados por mesa e nome, com caixa de marcação
+async function downloadAttendance(){
+  try{
+    if(REMOTE&&authed)await refreshRemote(true);
+    const list=reportList().slice().sort((a,b)=>(a.table||'￿').localeCompare(b.table||'￿','pt-BR',{numeric:true})||a.name.localeCompare(b.name,'pt-BR'));
+    if(!list.length){toast('Ainda não há convidados confirmados.');return}
+    const J=await loadPdfLib();
+    const K=pdfKit(J,'Lista de presença'),people=reportPeople(list);
+    let y=K.intro(['Marque a chegada na portaria. Ordenada por mesa e nome.']);
+    y=K.cards(y,[[list.length,'convites confirmados'],[people,'pessoas esperadas']]);
+    const body=list.map(g=>{
+      const comp=(g.companions||[]).filter(Boolean).map((n,i)=>n+(compDiet(g,i)?' ('+compDiet(g,i)+')':''));
+      return ['[   ]',g.name+(comp.length?'\n+ '+comp.join(', '):''),g.table||'—',String(1+comp.length),g.diet||'—'];
+    });
+    K.table({head:[['','Convidado','Mesa','Pessoas','Restrição']],body,foot:[['','Total','',String(people),'']],startY:y,
+      columnStyles:{0:{cellWidth:10,halign:'center'},1:{cellWidth:'auto',fontStyle:'bold'},2:{cellWidth:24},3:{cellWidth:20,halign:'center'},4:{cellWidth:44}}});
+    const name='lista-presenca-'+(slug(S.party.name)||'festa')+'.pdf';
+    K.frame().save(name);toast('PDF gerado: '+name);
+  }catch(e){console.error(e);toast('Não foi possível gerar a lista agora. Verifique a conexão e tente de novo.')}
 }
 // ---- resumo financeiro (só no painel; nada é pago pelo app)
 function pdfMoney(v){return money(v).replace(/−/g,'-')}
@@ -1431,9 +1517,13 @@ document.addEventListener('click',e=>{
    case 'guest-wa':{const g=byId(S.guests,id);if(g)sendInvite(g);break}
    case 'inv-copy':{const g=byId(S.guests,id);if(g)copyText(guestInviteText(g),'Convite copiado');break}
    case 'inv-reopen':{const g=byId(S.guests,id);if(g&&inviteState(g)!=='sent'){g.invite={state:'prepared',at:today()};save();render()}break}
-   case 'inv-sent':{const g=byId(S.guests,id);if(g){g.invite={state:'sent',at:today()};save();closeModal();render();toast('Convite de '+g.name.split(' ')[0]+' marcado como enviado')}break}
+   case 'guest-remind':{const g=byId(S.guests,id);if(g)remind(g);break}
+   case 'remind-copy':{const g=byId(S.guests,id);if(g)copyText(reminderText(g),'Lembrete copiado');break}
+   case 'guest-arrive':{const g=byId(S.guests,id);if(g){g.arrived=g.arrived?'':new Date().toISOString();save();render()}break}
+   case 'attend-pdf':downloadAttendance();break;
+   case 'inv-sent':{const g=byId(S.guests,id);if(g){g.invite=Object.assign({},g.invite,{state:'sent',at:today()});save();closeModal();render();toast('Convite de '+g.name.split(' ')[0]+' marcado como enviado')}break}
    case 'guest-del':{const g=byId(S.guests,id);confirmDialog('Remover convidado','Remover <b>'+esc(g.name)+'</b> da lista? A resposta dessa pessoa também será apagada.','Remover',()=>{S.guests=S.guests.filter(x=>x.id!==id);save();render();toast('Convidado removido')});break}
-   case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],respondedAt:''});save();render();toast('Resposta cancelada')});break}
+   case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],compDiets:[],arrived:'',respondedAt:''});save();render();toast('Resposta cancelada')});break}
    case 'guest-import':importModal();break;
    case 'imp-run':runImport();break;
    case 'report-pdf':downloadReport();break;
@@ -1487,7 +1577,7 @@ document.addEventListener('input',e=>{
   if(el.hasAttribute('data-calc'))updSaldo();
 });
 function applyFilter(el,keepFocus){
-  const m={'g-q':v=>gFilter.q=v,'g-st':v=>gFilter.status=v,'g-gr':v=>gFilter.group=v,'f-q':v=>fFilter.q=v,'f-cat':v=>fFilter.cat=v,'f-st':v=>fFilter.st=v,'f-from':v=>fFilter.from=v,'f-to':v=>fFilter.to=v,'r-q':v=>rFilter.q=v,'r-gr':v=>rFilter.group=v,'r-notes':()=>rFilter.notes=el.checked};
+  const m={'g-q':v=>gFilter.q=v,'g-st':v=>gFilter.status=v,'g-gr':v=>gFilter.group=v,'g-tb':v=>gFilter.table=v,'g-rm':v=>gFilter.remind=v,'tb-cap':v=>{S.party.tableCap=Math.max(0,parseInt(v)||0);save()},'f-q':v=>fFilter.q=v,'f-cat':v=>fFilter.cat=v,'f-st':v=>fFilter.st=v,'f-from':v=>fFilter.from=v,'f-to':v=>fFilter.to=v,'r-q':v=>rFilter.q=v,'r-gr':v=>rFilter.group=v,'r-notes':()=>rFilter.notes=el.checked};
   if(el.dataset.filter.startsWith('r-'))repMsg=null;
   m[el.dataset.filter](el.value);const pos=el.selectionStart;render();
   if(keepFocus){const n=document.getElementById(el.id);if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}}
@@ -1583,12 +1673,18 @@ document.addEventListener('submit',e=>{
     const lim=Math.max(maxC,old?Number(old.allowed)||0:0);
     const allowed=Math.max(0,parseInt(v('allowed'))||0);
     if(allowed>lim)return fail('O limite da festa é de '+lim+' acompanhante(s) por convite.','gf-allowed');
-    if(old&&(old.companions||[]).length>allowed)return fail(old.name+' já confirmou '+old.companions.length+' acompanhante(s). O limite não pode ser menor que isso.','gf-allowed');
+    const st=G_ST[v('status')]?v('status'):'pending';
+    const pc=st==='yes'||st==='maybe'?parseComps(v('comp')):{names:[],diets:[]};
+    const comps=pc.names;
+    if(comps.length>allowed)return fail('Há '+comps.length+' acompanhante(s) para um limite de '+allowed+'. Ajuste o limite ou a lista.','gf-comp');
     const dupe=S.guests.find(g=>normPh(g.phone)===ph&&g.id!==id);
     if(dupe)return fail('Esse WhatsApp já está cadastrado para '+dupe.name+'. Edite o cadastro existente.','gf-phone');
-    // cadastrar ou editar nunca muda a confirmação
-    const data={name,phone:ph,group:v('group'),allowed,diet:v('diet'),notes:v('notes')};
-    let g;if(old){Object.assign(old,data,{demo:false});g=old}else{g=Object.assign({id:uid(),demo:false,status:'pending',companions:[],respondedAt:''},data);S.guests.push(g)}
+    const data={name,phone:ph,group:v('group'),allowed,diet:v('diet'),notes:v('notes'),table:v('table'),compDiets:pc.diets};
+    // só mexe na resposta quando a presença ou os acompanhantes mudaram (marca como manual)
+    const changed=!old||old.status!==st||(old.companions||[]).join('|')!==comps.join('|');
+    if(changed)Object.assign(data,{status:st,companions:comps,respondedAt:st==='pending'?'':today(),manualAt:new Date().toISOString()});
+    if(st!=='yes')data.arrived='';
+    let g;if(old){Object.assign(old,data,{demo:false});g=old}else{g=Object.assign({id:uid(),demo:false},data);S.guests.push(g)}
     const sub=e.submitter;const wa=sub&&sub.value==='wa';
     save();closeModal();
     if(wa){sendInvite(g);return}
