@@ -291,6 +291,13 @@ details.sec .body{padding-bottom:20px}
   #printArea table{width:100%;border-collapse:collapse;font-size:12px}
   #printArea td,#printArea th{border-bottom:1px solid #ccc;padding:4px;text-align:left}
 }
+#ytWrap{position:fixed;left:-400px;bottom:0;width:200px;height:200px;opacity:0;pointer-events:none;overflow:hidden}
+.intro{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;text-align:center;background:radial-gradient(70vmax 60vmax at 50% 0%,var(--blush),var(--cream) 70%)}
+.intro .in{max-width:380px;display:grid;gap:14px;justify-items:center}
+.intro svg.ch{width:72px;height:86px}
+.intro .script{font-family:'Pinyon Script',cursive;font-size:3rem;color:var(--cherry);line-height:1}
+.intro p{margin:0}
+.music-fab{position:fixed;right:16px;bottom:16px;z-index:150;min-height:48px;min-width:48px;border-radius:999px;border:1px solid var(--cherry);background:var(--cream);color:var(--cherry);font:inherit;font-weight:600;display:flex;align-items:center;gap:8px;padding:0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}.hero .fall{display:none}}
 /* ===== refinamento visual Cherry ===== */
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
@@ -371,6 +378,9 @@ details.more .in{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 </svg>
 
 <div id="app" aria-live="polite"></div>
+<div id="introRoot"></div>
+<div id="musicRoot"></div>
+<div id="ytWrap" aria-hidden="true"><div id="ytHolder"></div></div>
 <div id="modalRoot"></div>
 <div id="toastRoot" role="status" aria-live="polite"></div>
 <div id="printArea"></div>
@@ -697,8 +707,29 @@ function go(r){if(location.hash==='#'+r)render();else location.hash=r}
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
 
 let cdTimer=null;
+/* ---------------- música do convite (YouTube, player oculto fora de #app) ---------------- */
+const MUSIC_ID='tQ0yjYUFKAE'; /* Justin Bieber – Peaches */
+let yt=null,ytReady=false,musicWant=false,musicPlaying=false,introSeen=false;
+function initMusic(){
+  if(yt||!/^https?:$/.test(location.protocol))return;
+  const mk=()=>{try{yt=new YT.Player('ytHolder',{width:'200',height:'200',videoId:MUSIC_ID,playerVars:{playsinline:1,controls:0,loop:1,playlist:MUSIC_ID,rel:0,disablekb:1},events:{
+    onReady:()=>{ytReady=true;yt.setVolume(60);if(musicWant)yt.playVideo()},
+    onStateChange:e=>{musicPlaying=e.data===1;syncMusic()},
+    onError:()=>{musicPlaying=false;ytReady=false;syncMusic()}}})}catch(_){}};
+  if(window.YT&&YT.Player){mk();return}
+  window.onYouTubeIframeAPIReady=mk;
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.async=true;document.head.appendChild(s);
+}
+function syncMusic(){
+  const r=route(),pub=!ALBUM_PATH&&!LOGIN_PATH&&(r==='convite'||r==='confirmar');
+  const intro=document.getElementById('introRoot'),fab=document.getElementById('musicRoot');
+  if(!intro||!fab)return;
+  if(!pub){if(yt&&ytReady&&musicPlaying)yt.pauseVideo();musicWant=false;intro.innerHTML='';fab.innerHTML='';return}
+  intro.innerHTML=(!introSeen&&r==='convite')?'<div class="intro" role="dialog" aria-modal="true" aria-label="Abrir convite"><div class="in"><svg class="ch" aria-hidden="true"><use href="#cherry"/></svg><p class="script">'+esc(S.party.name)+' '+esc(partyAge())+'</p><p class="muted">Você recebeu um convite especial. 🍒</p><button class="btn primary big" data-act="open-invite" autofocus>Abrir convite</button></div></div>':'';
+  fab.innerHTML=introSeen&&ytReady?'<button class="music-fab" data-act="music-toggle" aria-label="'+(musicPlaying?'Pausar música':'Tocar música')+'">'+(musicPlaying?'⏸ Música':'▶ Música')+'</button>':'';
+}
 function render(){
-  const r=route();clearInterval(cdTimer);
+  const r=route();clearInterval(cdTimer);syncMusic();
   document.title=S.party.name+' '+partyAge()+' anos · Cherry';
   const app=document.getElementById('app');
   if(ALBUM_PATH){app.innerHTML=viewGuestAlbum();loadGuestGallery();return}
@@ -1368,6 +1399,8 @@ document.addEventListener('click',e=>{
   if(el.tagName==='INPUT'&&(el.type==='checkbox'||el.type==='file'))return;
   if(el.tagName==='A'&&el.getAttribute('href')==='#')e.preventDefault();
   switch(a){
+   case 'open-invite':introSeen=true;musicWant=true;if(yt&&ytReady)yt.playVideo();else initMusic();syncMusic();break;
+   case 'music-toggle':if(yt&&ytReady){if(musicPlaying){musicWant=false;yt.pauseVideo()}else{musicWant=true;yt.playVideo()}}break;
    case 'album-refresh':loadAdminAlbum();break;
    case 'album-more':appendAdminPhotoBatch();break;
    case 'album-copy':copyText(document.getElementById('album-url')?.value||'','Link do álbum copiado');break;
@@ -1618,6 +1651,7 @@ async function boot(){
   rsvp=newRsvp();rsvpRestore();
   invitee=readGuestParam();
   if(invitee&&!rsvp.name&&rsvp.step===1){rsvp.name=invitee.name;rsvp.phone=invitee.phone?fmtPhone(invitee.phone):''}
+  if(!ALBUM_PATH&&!LOGIN_PATH&&!PRIVATE.includes(route()))initMusic();
   render();
 }
 boot();
