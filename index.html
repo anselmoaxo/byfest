@@ -712,9 +712,15 @@ function shareText(g){
 // No computador vamos direto ao WhatsApp Web; no celular o api.whatsapp.com abre o app sem estragar a mensagem.
 const WA_MOBILE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'');
 const waShare=(txt,num)=>(WA_MOBILE?'https://api.whatsapp.com/send?':'https://web.whatsapp.com/send?')+(num?'phone='+waNumber(num)+'&':'')+'text='+encodeURIComponent(txt);
+// quem recebe a mensagem: o campo "Como chamar" se estiver preenchido; senão, nomes com "e", "&" ou "+" viram o casal (primeiro nome de cada um)
+function greetName(g){
+  const custom=String(g.greet||'').replace(/\s+/g,' ').trim();if(custom)return custom;
+  const parts=String(g.name||'').trim().split(/\s+(?:e|&|\+)\s+/i).map(x=>x.trim().split(/\s+/)[0]).filter(Boolean);
+  return parts.length===2?parts[0]+' e '+parts[1]:parts[0]||'';
+}
 // convite individual: só usa data, horário e local se estiverem cadastrados
 function guestInviteText(g){
-  const p=S.party,first=String(g.name||'').trim().split(/\s+/)[0]||'';
+  const p=S.party,first=greetName(g);
   const clean=x=>String(x||'').replace(/\s+/g,' ').trim();
   const L=['Oi'+(first?', '+first:'')+'! 🍒','Quero convidar você para comemorar meus '+partyAge()+' anos!'];
   const info=[];
@@ -1120,6 +1126,7 @@ function guestForm(g){
    '<small class="muted">Se o convidado responder pelo convite depois, a resposta mais recente vale.</small>';
   openModal(g.id?'Editar convidado':'Novo convidado','<form data-form="guest" data-id="'+(g.id||'')+'" class="stack" novalidate>'+
    '<label class="field"><span>Nome do convidado *</span><input class="input" id="gf-name" name="name" required maxlength="80" autocomplete="off" value="'+esc(g.name)+'"></label>'+
+   '<label class="field"><span>Como chamar na mensagem</span><input class="input" id="gf-greet" name="greet" maxlength="60" autocomplete="off" placeholder="Ex.: Ana e Pedro" value="'+esc(g.greet||'')+'"><small>Opcional. Se o nome tiver "e" (Ana e Pedro Silva), a mensagem já cumprimenta o casal.</small></label>'+
    '<div class="grid2"><label class="field"><span>WhatsApp com DDD *</span><input class="input" id="gf-phone" name="phone" type="tel" inputmode="tel" required maxlength="20" placeholder="(11) 91234-5678" autocomplete="off" value="'+esc(fmtPhone(g.phone))+'"></label>'+
    '<label class="field"><span>Grupo ou família</span><input class="input" id="gf-group" name="group" maxlength="60" list="groupsList" value="'+esc(g.group)+'"><datalist id="groupsList">'+[...new Set(S.guests.map(x=>x.group).filter(Boolean))].map(x=>'<option value="'+esc(x)+'">').join('')+'</datalist></label>'+
    '<label class="field"><span>Limite de acompanhantes</span><input class="input" id="gf-allowed" name="allowed" type="number" min="0" max="'+lim+'" value="'+Math.min(lim,Number(g.allowed)||0)+'"><small>A festa permite até '+maxC+' por convite (ajuste em Festa).</small></label></div>'+
@@ -1744,7 +1751,7 @@ document.addEventListener('submit',e=>{
     if(comps.length>allowed)return fail('Há '+comps.length+' acompanhante(s) para um limite de '+allowed+'. Ajuste o limite ou a lista.','gf-comp');
     const dupe=S.guests.find(g=>normPh(g.phone)===ph&&g.id!==id);
     if(dupe)return fail('Esse WhatsApp já está cadastrado para '+dupe.name+'. Edite o cadastro existente.','gf-phone');
-    const data={name,phone:ph,group:v('group'),allowed,diet:v('diet'),notes:v('notes'),table:v('table'),compDiets:pc.diets};
+    const data={name,greet:v('greet'),phone:ph,group:v('group'),allowed,diet:v('diet'),notes:v('notes'),table:v('table'),compDiets:pc.diets};
     // só mexe na resposta quando a presença ou os acompanhantes mudaram (marca como manual)
     const changed=!old||old.status!==st||(old.companions||[]).join('|')!==comps.join('|');
     if(changed)Object.assign(data,{status:st,companions:comps,respondedAt:st==='pending'?'':today(),manualAt:new Date().toISOString()});
