@@ -250,9 +250,9 @@ end $$;
 -- Convite por código: cada convidado da lista tem um código aleatório (guest.code) e só esse link mostra o convite e aceita resposta.
 alter table rsvps add column if not exists guest_code text;
 -- @@
--- Dados públicos sem código: só o nome e a idade (para a tela de login e o álbum). Data, local e foto ficam no convite com código.
+-- Dados públicos sem código: só o nome, a idade e o tema visual (para a tela de login e o álbum). Data, local e foto ficam no convite com código.
 create or replace function get_public() returns jsonb language sql stable as $$
-  select coalesce((select jsonb_build_object('name', data -> 'party' -> 'name', 'age', data -> 'party' -> 'age')
+  select coalesce((select jsonb_build_object('name', data -> 'party' -> 'name', 'age', data -> 'party' -> 'age', 'theme', data -> 'party' -> 'theme')
                      from app_state where id = 1 and data ? 'party'), '{}'::jsonb)
 $$;
 -- @@

@@ -43,7 +43,7 @@
   --cherry:#a3123a; --cherry-deep:#6e0c27; --cherry-soft:#c8375b;
   --blush:#f8e1e6; --blush-2:#fbeef1; --cream:#fff9f4; --paper:#ffffff;
   --leaf:#3d7a4c; --leaf-soft:#e3f0e5;
-  --ink:#3b1a23; --ink-2:#6b4a53; --line:#ecd3da; --shadow:0 10px 30px -18px rgba(110,12,39,.45);
+  --ink:#3b1a23; --ink-2:#6b4a53; --line:#ecd3da; --shadow:0 10px 30px -18px color-mix(in srgb,var(--cherry-deep) 45%,transparent);
   --ok:#2f7a45; --ok-bg:#e2f2e6; --warn:#9a5b00; --warn-bg:#fdf0d8; --bad:#b0232f; --bad-bg:#fbe3e5; --muted-bg:#f3e9ec;
   --f-display:"Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
   --f-script:"Pinyon Script", "Snell Roundhand", "Segoe Script", cursive;
@@ -124,8 +124,8 @@ textarea.input{min-height:90px;resize:vertical}
 .arch .ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--cherry);padding:14px;text-align:center}
 .arch .ph svg{width:64px;height:76px}
 .hero .script{font-family:var(--f-script);font-size:clamp(3.4rem,15vw,4.6rem);line-height:1;color:var(--cherry);position:relative}
-.hero .forty{font-family:var(--f-display);font-size:clamp(1.3rem,5vw,1.6rem);letter-spacing:.32em;text-transform:uppercase;color:var(--ink);margin-top:6px}
-.hero .forty b{font-weight:600;font-size:1.6em;letter-spacing:.04em;color:var(--cherry-deep);font-style:italic;margin-right:.12em}
+.hero .forty{font-family:var(--f-script);font-weight:400;font-size:clamp(2.3rem,10vw,3.1rem);line-height:1.05;color:var(--cherry-deep);margin-top:2px}
+.hero .forty b{font-weight:400;color:inherit;margin-right:.1em}
 .hero .tag{font-family:var(--f-display);font-style:italic;font-size:1.12rem;color:var(--ink-2);max-width:34ch;margin:14px auto 0}
 .theme-badge{display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:6px 14px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--leaf)}
 .theme-badge svg{width:16px;height:16px}
@@ -301,13 +301,19 @@ details.sec .body{padding-bottom:20px}
 .intro{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;text-align:center;background:radial-gradient(70vmax 60vmax at 50% 0%,var(--blush),var(--cream) 70%)}
 .intro .in{max-width:380px;display:grid;gap:14px;justify-items:center}
 .intro svg.ch{width:72px;height:86px}
-.intro .script{font-family:'Pinyon Script',cursive;font-size:3rem;color:var(--cherry);line-height:1}
+.intro .script{font-family:var(--f-script);font-size:3rem;color:var(--cherry);line-height:1}
 .intro p{margin:0}
 .music-fab{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:150;min-height:44px;min-width:48px;border-radius:999px;border:1px solid var(--cherry);background:color-mix(in srgb,var(--cream) 92%,transparent);backdrop-filter:blur(6px);color:var(--cherry);font:inherit;font-weight:600;display:flex;align-items:center;gap:8px;padding:0 16px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.15);white-space:nowrap}
 .music-fab .eq{display:inline-flex;gap:2px;align-items:flex-end;height:14px}.music-fab .eq i{width:3px;background:currentColor;border-radius:2px;animation:eq 1s ease-in-out infinite}.music-fab .eq i:nth-child(2){animation-delay:-.3s}.music-fab .eq i:nth-child(3){animation-delay:-.6s}
 @keyframes eq{0%,100%{height:4px}50%{height:14px}}
 body.has-music .invite{padding-top:52px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}.hero .fall{display:none}}
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.theme-opt{display:grid;gap:6px;text-align:left;padding:12px;border-radius:var(--r);border:2px solid var(--line);background:var(--t-cream);color:var(--t-ink);cursor:pointer;font:inherit}
+.theme-opt[aria-pressed="true"]{border-color:var(--cherry);box-shadow:var(--shadow)}
+.theme-opt .sw{display:flex;gap:4px}.theme-opt .sw i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,.08)}
+.theme-opt .nm{font-size:1.7rem;line-height:1.1;color:var(--t-main)}
+.theme-opt .lb{font-weight:600;font-size:.9rem}
 /* ===== refinamento visual Cherry ===== */
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
   radial-gradient(55vmax 45vmax at 105% -8%, color-mix(in srgb,var(--blush) 80%,transparent), transparent 62%),
@@ -675,6 +681,27 @@ function gcalLink(){
   const loc=[p.venue,p.address].filter(Boolean).join(', ');
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Aniversário de 40 anos da '+p.name+' 🍒')+'&dates='+dates+'&details='+encodeURIComponent('Convite: '+inviteLink())+(loc?'&location='+encodeURIComponent(loc):'')+'&ctz=America/Sao_Paulo';
 }
+// Temas prontos: cores e fontes que a anfitriã escolhe em Festa › Tema (salvo em party.theme)
+const THEMES={
+ cherry:{label:'Cherry',desc:'Cereja e verde, o original',c:['#a3123a','#6e0c27','#c8375b','#f8e1e6','#fbeef1','#fff9f4','#3d7a4c','#e3f0e5','#3b1a23','#6b4a53','#ecd3da'],display:'"Bodoni Moda", "Didot", Georgia, serif',script:'"Pinyon Script", cursive',fonts:'Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Pinyon+Script'},
+ rosa:{label:'Rosa e dourado',desc:'Rosa chá com toque dourado',c:['#b03a62','#7a2343','#d0648a','#fbe4ec','#fdf1f5','#fffaf7','#a8822f','#f4ead6','#3d2230','#6e5060','#f0d6e0'],display:'"Playfair Display", Georgia, serif',script:'"Great Vibes", cursive',fonts:'Playfair+Display:ital,wght@0,400..700;1,400..600&family=Great+Vibes'},
+ lavanda:{label:'Lavanda',desc:'Lilás suave e verde-sálvia',c:['#6b4fa0','#45307a','#8d73c2','#ece6f7','#f5f1fb','#fbf9fe','#5b8a72','#e3efe8','#2e2540','#5f5672','#e0d8ee'],display:'"Cormorant Garamond", Georgia, serif',script:'"Parisienne", cursive',fonts:'Cormorant+Garamond:ital,wght@0,400..700;1,400..600&family=Parisienne'},
+ jardim:{label:'Jardim',desc:'Verde folha e terracota',c:['#2f6f4f','#1f4a35','#4f9070','#e4f1e8','#f1f8f3','#fbfcf8','#b8682e','#f6eadb','#1f2e26','#4c5d53','#d4e5da'],display:'"Lora", Georgia, serif',script:'"Dancing Script", cursive',fonts:'Lora:ital,wght@0,400..700;1,400..600&family=Dancing+Script:wght@400..700'},
+ azul:{label:'Azul sereno',desc:'Azul e dourado',c:['#2a5d8f','#1b3d5f','#4f81b3','#e3edf7','#f1f6fb','#fafcfe','#b38a2e','#f5edd9','#1d2a38','#4d5b6b','#d6e2ee'],display:'"Bodoni Moda", "Didot", Georgia, serif',script:'"Allura", cursive',fonts:'Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=Allura'}
+};
+const THEME_VARS=['cherry','cherry-deep','cherry-soft','blush','blush-2','cream','leaf','leaf-soft','ink','ink-2','line'];
+function themeKey(){const k=S&&S.party&&S.party.theme;return THEMES[k]?k:'cherry'}
+let themeOn='';
+function applyTheme(k){
+  k=THEMES[k]?k:themeKey();if(k===themeOn)return;themeOn=k;const t=THEMES[k],st=document.documentElement.style;
+  THEME_VARS.forEach((v,i)=>st.setProperty('--'+v,t.c[i]));
+  st.setProperty('--f-display',t.display);st.setProperty('--f-script',t.script);
+  let l=document.getElementById('themeFonts');
+  if(k==='cherry'){if(l)l.remove()}else{if(!l){l=document.createElement('link');l.id='themeFonts';l.rel='stylesheet';document.head.appendChild(l)}l.href='https://fonts.googleapis.com/css2?family='+t.fonts+'&display=swap'}
+  const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t.c[0];
+  try{localStorage.setItem(KEY+':theme',k)}catch(_){}
+}
+function themePicker(){const cur=themeKey();if(!document.getElementById('themePreviewFonts')){const l=document.createElement('link');l.id='themePreviewFonts';l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Great+Vibes&family=Parisienne&family=Dancing+Script:wght@400..700&family=Allura&display=swap';document.head.appendChild(l)}return '<div class="themes" role="group" aria-label="Tema da festa">'+Object.keys(THEMES).map(k=>{const t=THEMES[k],c=t.c;return '<button type="button" class="theme-opt" data-act="set-theme" data-theme="'+k+'" aria-pressed="'+(k===cur)+'" style="--t-main:'+c[0]+';--t-cream:'+c[5]+';--t-ink:'+c[8]+'"><span class="sw">'+[0,3,6,8].map(i=>'<i style="background:'+c[i]+'"></i>').join('')+'</span><span class="nm" style="font-family:'+esc(t.script)+'">'+esc(S.party.name||'Festa')+'</span><span class="lb">'+esc(t.label)+'</span><span class="small muted">'+esc(t.desc)+'</span></button>'}).join('')+'</div>'}
 function partyAge(){const n=parseInt(S.party.age,10);return n>0&&n<130?n:40}
 function shareText(g){
   const p=S.party;let t='🍒 Você é especial para mim e está convidado(a)! '+p.name+' '+partyAge()+' anos, '+p.tagline;
@@ -804,7 +831,7 @@ function syncMusic(){
 }
 function render(){
   const r=route();clearInterval(cdTimer);syncMusic();
-  document.title=S.party.name+' '+partyAge()+' anos · Cherry';
+  applyTheme();document.title=S.party.name+' '+partyAge()+' anos · '+THEMES[themeKey()].label;
   const app=document.getElementById('app');
   if(ALBUM_PATH){app.innerHTML=viewGuestAlbum();loadGuestGallery();return}
   if(PRIVATE.includes(r)){
@@ -1192,11 +1219,11 @@ function pdfKit(J,sub){
   const C={cherry:[163,18,58],deep:[110,12,39],blush:[248,225,230],blush2:[251,238,241],cream:[255,249,244],ink:[59,26,35],muted:[107,74,83],line:[234,205,212],leaf:[61,122,76]};
   const doc=new J({unit:'mm',format:'a4',orientation:'portrait'});
   const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight(),M=16;
-  const title=(p.name||'Aniversário')+' '+age+' anos — Festa Cherry';
+  const title=(p.name||'Aniversário')+' '+age+' anos — Festa '+THEMES[themeKey()].label;
   const now=new Date(),two=n=>String(n).padStart(2,'0');
   const gen='Relatório gerado em '+two(now.getDate())+'/'+two(now.getMonth()+1)+'/'+now.getFullYear()+' às '+two(now.getHours())+'h'+two(now.getMinutes());
   const when=p.date?fmtDateLong(p.date).replace(/^./,c=>c.toUpperCase())+(p.time?' às '+p.time.replace(':','h'):''):'';
-  doc.setProperties({title:title+' · '+sub,subject:sub,creator:'Festa Cherry'});
+  doc.setProperties({title:title+' · '+sub,subject:sub,creator:'Festa '+THEMES[themeKey()].label});
   const cherryAt=(x,y,s)=>{ // par de cerejas pequeno; (x,y) = canto superior esquerdo
     doc.setDrawColor(...C.leaf);doc.setLineWidth(.35*s);
     doc.line(x+3.4*s,y,x+1.6*s,y+4.6*s);doc.line(x+3.4*s,y,x+5.2*s,y+4.9*s);
@@ -1497,6 +1524,7 @@ function viewParty(){
    '<label class="field"><span>Observações para os convidados</span><textarea class="input" id="pf-notes" name="notes" maxlength="500">'+esc(p.notes)+'</textarea></label>'+
    '<div class="grid2">'+f('contactName','Contato para dúvidas',p.contactName,'maxlength="60"')+f('contactPhone','WhatsApp do contato',fmtPhone(p.contactPhone),'inputmode="tel" maxlength="20"')+'</div>'+
   '</div></details>'+
+  '<details class="sec" open><summary>Tema</summary><div class="body stack"><p class="small muted">Muda as cores e as fontes do convite e do painel. Os convidados veem o tema novo assim que você escolher.</p>'+themePicker()+'</div></details>'+
   '<details class="sec" open><summary>Confirmações de presença</summary><div class="body stack">'+
    '<label class="switch"><input type="checkbox" id="pf-rsvpOpen" name="rsvpOpen" '+(p.rsvpOpen?'checked':'')+'>Receber confirmações</label>'+
    '<div class="grid2">'+f('rsvpDeadline','Data limite para confirmar',p.rsvpDeadline,'type="date"')+f('maxCompanions','Acompanhantes por convidado',p.maxCompanions,'type="number" min="0" max="10"','Vale para quem confirma pelo link sem estar na lista. Na lista, ajuste por convidado.')+'</div>'+
@@ -1591,6 +1619,7 @@ document.addEventListener('click',e=>{
    case 'reload':location.reload();break;
    case 'draft-discard':{const f=el.closest('form');if(f){draftClear(f);f.reset();el.closest('.draft-note').remove();if(document.getElementById('ef-saldo'))updSaldo()}break}
    case 'toggle-pw':{const i=document.getElementById('lpw');if(i){const show=i.type==='password';i.type=show?'text':'password';el.textContent=show?'Ocultar':'Mostrar';el.setAttribute('aria-pressed',String(show));el.setAttribute('aria-label',show?'Ocultar senha':'Mostrar senha')}break}
+   case 'set-theme':{const k=el.dataset.theme;if(!THEMES[k])break;S.party.theme=k;save();render();toast('Tema '+THEMES[k].label+' aplicado');break}
    case 'photo-del':S.party.photo='';save();render();toast('Foto removida');break;
   }
 });
@@ -1768,6 +1797,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelec
 /* ---------------- início ---------------- */
 async function boot(){
   load();rsvp=newRsvp();
+  try{const tk=localStorage.getItem(KEY+':theme');if(tk&&!S.party.theme)applyTheme(tk)}catch(_){}
   if(/^https?:$/.test(location.protocol)&&!inFrame){
     const app=document.getElementById('app');
     app.innerHTML='<main class="login gutter"><div class="card" style="text-align:center"><div style="width:56px;margin:0 auto 10px">'+cherry()+'</div><p class="muted">Carregando o convite…</p></div></main>';
