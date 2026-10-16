@@ -5,10 +5,11 @@ const SCHEMA = require('../lib/schema');
 
 const CALLS = {
   get_public: { sql: 'select get_public() as v', args: () => [] },
-  rsvp_limit: { sql: 'select rsvp_limit($1) as v', args: a => [str(a.phone, 30)] },
-  submit_rsvp: {
-    sql: 'select submit_rsvp($1, $2, $3, $4::text[], $5, $6) as v',
-    args: a => [str(a.name, 200), str(a.phone, 30), str(a.status, 10),
+  // Convite e resposta só com o código do convidado (o link pessoal). Sem código, a resposta pública não existe mais.
+  get_invite: { sql: 'select get_invite($1) as v', args: a => [str(a.code, 400)] },
+  submit_rsvp_code: {
+    sql: 'select submit_rsvp_code($1, $2, $3, $4, $5::text[], $6, $7) as v',
+    args: a => [str(a.code, 400), str(a.name, 200), str(a.phone, 30), str(a.status, 10),
       (Array.isArray(a.companions) ? a.companions : []).slice(0, 20).map(c => str(c, 200)),
       str(a.diet, 500), str(a.notes, 1000)],
   },
@@ -23,7 +24,7 @@ const CALLS = {
   },
 };
 // Erros levantados pelas funções do banco que podem ser mostrados ao navegador.
-const PUBLIC_ERRORS = new Set(['not_configured', 'locked', 'closed', 'invalid_name', 'invalid_phone',
+const PUBLIC_ERRORS = new Set(['not_configured', 'invalid_code', 'locked', 'closed', 'invalid_name', 'invalid_phone',
   'invalid_status', 'too_many_companions', 'invalid_companion', 'too_long', 'full']);
 
 function str(v, max) { return String(v == null ? '' : v).slice(0, max); }

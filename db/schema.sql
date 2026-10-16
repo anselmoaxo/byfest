@@ -246,3 +246,70 @@ begin
    where id = 1;
   return jsonb_build_object('ok', true);
 end $$;
+-- @@
+-- Convite por código: cada convidado da lista tem um código aleatório (guest.code) e só esse link mostra o convite e aceita resposta.
+alter table rsvps add column if not exists guest_code text;
+-- @@
+-- Dados públicos sem código: só o nome e a idade (para a tela de login e o álbum). Data, local e foto ficam no convite com código.
+create or replace function get_public() returns jsonb language sql stable as $$
+  select coalesce((select jsonb_build_object('name', data -> 'party' -> 'name', 'age', data -> 'party' -> 'age')
+                     from app_state where id = 1 and data ? 'party'), '{}'::jsonb)
+$$;
+-- @@
+-- Acha o convidado pelo código. Links antigos (?c= com nome|telefone em base64) só valem enquanto a anfitriã
+-- deixar ligada a opção party.legacyLinks, e só para quem já está na lista com aquele telefone.
+create or replace function invite_guest(p_code text) returns jsonb language plpgsql stable as $$
+declare
+  d jsonb; g jsonb; c text := trim(coalesce(p_code, '')); raw text; ph text;
+begin
+  select data into d from app_state where id = 1;
+  if d is null then raise exception 'not_configured'; end if;
+  if c ~ '^[a-z0-9]{10,40}$' then
+    select x into g from jsonb_array_elements(coalesce(d -> 'guests', '[]')) x where x ->> 'code' = c limit 1;
+    if g is not null then return g; end if;
+  end if;
+  if coalesce((d -> 'party' ->> 'legacyLinks')::boolean, true) and c ~ '^[A-Za-z0-9_-]+$' and length(c) between 4 and 400 then
+    begin
+      raw := translate(c, '-_', '+/');
+      raw := raw || repeat('=', (4 - length(raw) % 4) % 4);
+      raw := convert_from(decode(raw, 'base64'), 'UTF8');
+      ph := norm_phone(split_part(raw, '|', 2));
+    exception when others then ph := '';
+    end;
+    if length(ph) between 10 and 11 then
+      select x into g from jsonb_array_elements(coalesce(d -> 'guests', '[]')) x
+       where norm_phone(x ->> 'phone') = ph limit 1;
+      if g is not null then return g; end if;
+    end if;
+  end if;
+  raise exception 'invalid_code';
+end $$;
+-- @@
+create or replace function get_invite(p_code text) returns jsonb language plpgsql stable as $$
+declare g jsonb; party jsonb; r rsvps;
+begin
+  g := invite_guest(p_code);
+  select (data -> 'party') - 'budget' into party from app_state where id = 1;
+  select * into r from rsvps where (g ->> 'code' is not null and guest_code = g ->> 'code') or phone = norm_phone(g ->> 'phone')
+   order by updated_at desc limit 1;
+  return jsonb_build_object('party', party, 'guest', jsonb_build_object(
+    'code', g ->> 'code', 'name', g ->> 'name', 'phone', coalesce(g ->> 'phone', ''),
+    'allowed', coalesce((g ->> 'allowed')::int, (party ->> 'maxCompanions')::int, 0),
+    'status', coalesce(r.status, ''), 'companions', to_jsonb(coalesce(r.companions, '{}'::text[])),
+    'diet', coalesce(r.diet, ''), 'notes', coalesce(r.notes, '')));
+end $$;
+-- @@
+-- Resposta pelo convite com código. Usa o WhatsApp cadastrado pela anfitriã quando existe, para a resposta cair no convidado certo.
+create or replace function submit_rsvp_code(p_code text, p_name text, p_phone text, p_status text, p_companions text[], p_diet text, p_notes text)
+returns jsonb language plpgsql as $$
+declare g jsonb; ph text; lim int; res jsonb;
+begin
+  g := invite_guest(p_code);
+  ph := norm_phone(g ->> 'phone');
+  if length(ph) not between 10 and 11 then ph := norm_phone(p_phone); end if;
+  lim := coalesce((g ->> 'allowed')::int, (select (data -> 'party' ->> 'maxCompanions')::int from app_state where id = 1), 0);
+  if p_status <> 'no' and coalesce(array_length(p_companions, 1), 0) > lim then raise exception 'too_many_companions'; end if;
+  res := submit_rsvp(p_name, ph, p_status, p_companions, p_diet, p_notes);
+  update rsvps set guest_code = g ->> 'code' where phone = ph;
+  return res;
+end $$;
