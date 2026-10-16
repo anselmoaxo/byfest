@@ -29,9 +29,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Festa Cherry">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -118,9 +118,10 @@ textarea.input{min-height:90px;resize:vertical}
 .hero .fall{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .hero .fall svg{position:absolute;top:-40px;width:22px;height:28px;opacity:.55;animation:fall linear infinite}
 @keyframes fall{from{transform:translateY(-40px) rotate(-10deg)}to{transform:translateY(760px) rotate(25deg)}}
-.arch{width:min(200px,52vw);aspect-ratio:3/4;max-width:100%;margin:6px auto 18px;border-radius:999px 999px 26px 26px;overflow:hidden;background:var(--blush);border:6px solid var(--paper);box-shadow:var(--shadow);display:grid;place-items:center;position:relative}
-.arch img{width:100%;height:100%;object-fit:cover}
-.arch .ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--cherry);padding:16px;text-align:center}
+.arch{width:min(190px,50vw);aspect-ratio:1;max-width:100%;margin:6px auto 18px;border-radius:50%;padding:5px;background:linear-gradient(45deg,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%);box-shadow:var(--shadow);display:grid;place-items:center;position:relative}
+.arch>img,.arch>.ph{width:100%;height:100%;border-radius:50%;border:5px solid var(--paper);overflow:hidden;background:var(--blush)}
+.arch img{object-fit:cover}
+.arch .ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--cherry);padding:14px;text-align:center}
 .arch .ph svg{width:64px;height:76px}
 .hero .script{font-family:var(--f-script);font-size:clamp(3.4rem,15vw,4.6rem);line-height:1;color:var(--cherry);position:relative}
 .hero .forty{font-family:var(--f-display);font-size:clamp(1.3rem,5vw,1.6rem);letter-spacing:.32em;text-transform:uppercase;color:var(--ink);margin-top:6px}
@@ -287,7 +288,7 @@ details.sec .body{padding-bottom:20px}
 .login{max-width:420px;margin:0 auto;padding-block:48px}
 .pwwrap{position:relative;display:block}.pwwrap .input{padding-right:84px}.pwtoggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--ink-2);font:inherit;font-size:.85rem;padding:8px 10px;cursor:pointer;border-radius:8px}.pwtoggle:hover{color:var(--cherry,#b0182b)}
 .photo-edit{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-.photo-edit .arch{width:120px;margin:0;border-width:4px}
+.photo-edit .arch{width:120px;margin:0;padding:4px}.photo-edit .arch>img,.photo-edit .arch>.ph{border-width:3px}
 #printArea{display:none}
 @media print{
   body *{visibility:hidden}
@@ -302,7 +303,10 @@ details.sec .body{padding-bottom:20px}
 .intro svg.ch{width:72px;height:86px}
 .intro .script{font-family:'Pinyon Script',cursive;font-size:3rem;color:var(--cherry);line-height:1}
 .intro p{margin:0}
-.music-fab{position:fixed;right:16px;bottom:16px;z-index:150;min-height:48px;min-width:48px;border-radius:999px;border:1px solid var(--cherry);background:var(--cream);color:var(--cherry);font:inherit;font-weight:600;display:flex;align-items:center;gap:8px;padding:0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.music-fab{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:150;min-height:44px;min-width:48px;border-radius:999px;border:1px solid var(--cherry);background:color-mix(in srgb,var(--cream) 92%,transparent);backdrop-filter:blur(6px);color:var(--cherry);font:inherit;font-weight:600;display:flex;align-items:center;gap:8px;padding:0 16px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.15);white-space:nowrap}
+.music-fab .eq{display:inline-flex;gap:2px;align-items:flex-end;height:14px}.music-fab .eq i{width:3px;background:currentColor;border-radius:2px;animation:eq 1s ease-in-out infinite}.music-fab .eq i:nth-child(2){animation-delay:-.3s}.music-fab .eq i:nth-child(3){animation-delay:-.6s}
+@keyframes eq{0%,100%{height:4px}50%{height:14px}}
+body.has-music .invite{padding-top:52px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;transition:none !important}.hero .fall{display:none}}
 /* ===== refinamento visual Cherry ===== */
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
@@ -520,7 +524,7 @@ function defaults(){
 let S;let storageOk=true;
 function freshRemote(){const d=defaults();d.guests=[];d.expenses=[];d.tasks.forEach(t=>t.expenseId='');d.pinDefault=false;delete d.pinHash;d.rsvpSeen={};return d}
 function load(){try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);const def=defaults();S=Object.assign({},def,o);S.party=Object.assign({},def.party,o.party||{});return}}catch(e){storageOk=false}S=defaults()}
-function save(){if(curSubmit&&draftable(curSubmit))draftClear(curSubmit);if(REMOTE){if(authed)queuePush();return}try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false;toast('Não foi possível salvar neste navegador. Libere espaço ou remova a foto.')}}
+function save(){if(curSubmit&&draftable(curSubmit))draftClear(curSubmit);if(REMOTE){if(authed){ensureCodes();queuePush()}return}try{localStorage.setItem(KEY,JSON.stringify(S));storageOk=true}catch(e){storageOk=false;toast('Não foi possível salvar neste navegador. Libere espaço ou remova a foto.')}}
 let authed=false;
 
 /* ---------------- sincronização com o banco (modo online) ---------------- */
@@ -547,7 +551,7 @@ function mergeRsvps(list){
   S.rsvpSeen=S.rsvpSeen||{};let n=0;
   list.forEach(r=>{
     const seen=S.rsvpSeen[r.phone];if(seen&&seen>=r.updated_at)return;
-    const g=S.guests.find(x=>normPh(x.phone)===r.phone);
+    const g=(r.guest_code&&S.guests.find(x=>x.code===r.guest_code))||S.guests.find(x=>normPh(x.phone)===r.phone);
     if(g&&g.manualAt&&g.manualAt>=String(r.updated_at)){S.rsvpSeen[r.phone]=r.updated_at;return}
     const data={phone:r.phone,status:r.status,companions:r.companions||[],diet:r.diet||'',notes:r.notes||'',respondedAt:String(r.updated_at).slice(0,10)};
     if(g&&(g.companions||[]).join('|')!==data.companions.join('|'))data.compDiets=[];
@@ -563,8 +567,8 @@ async function adminLogin(email,password){
   if(r.data){S=Object.assign(base,r.data);S.party=Object.assign(base.party,r.data.party||{});S.rsvpSeen=r.data.rsvpSeen||{};delete S.pinHash;S.pinDefault=false}
   else{const party=S.party;S=base;Object.assign(S.party,party)}
   authed=true;try{sessionStorage.setItem(KEY+':cred',JSON.stringify(cred))}catch(_){}
-  const n=mergeRsvps(r.rsvps||[]);
-  if(!r.data||n)queuePush(0);
+  const n=mergeRsvps(r.rsvps||[]),codes=ensureCodes();
+  if(!r.data||n||codes)queuePush(0);
   r.newRsvps=n;return r;
 }
 function logoutRemote(){try{sessionStorage.removeItem(KEY+':cred')}catch(_){}location.replace('/login')}
@@ -639,9 +643,19 @@ function remind(g){
 function partyDate(){const p=S.party;if(!p.date)return null;return new Date(p.date+'T'+(p.time||'00:00'))}
 function rsvpClosed(){const p=S.party;if(!p.rsvpOpen)return 'As confirmações estão encerradas.';if(p.rsvpDeadline&&daysUntil(p.rsvpDeadline)<0)return 'O prazo para confirmar presença terminou em '+fmtDate(p.rsvpDeadline)+'.';return ''}
 const PUBLIC_URL='https://myfest.blogdapriscila.com.br/';
+function siteBase(){let b=(S.party.inviteUrl||PUBLIC_URL).split('#')[0].split('?')[0].replace(/\/convite\/.*$/,'/');return b.endsWith('/')?b:b+'/'}
+// Código do convite: 12 letras/números aleatórios (60 bits). Só quem tem o link pessoal vê o convite e responde.
+function newCode(){const a='abcdefghijkmnpqrstuvwxyz23456789',b=crypto.getRandomValues(new Uint8Array(12));return Array.from(b,x=>a[x%32]).join('')}
+function ensureCodes(){let n=0;(S.guests||[]).forEach(g=>{if(!g.demo&&!g.code){g.code=newCode();n++}});return n}
 function inviteLink(g){
+  if(!g&&invitee)return invitee.code?siteBase()+'convite/'+invitee.code:location.href.split('#')[0];
   const base=S.party.inviteUrl||(REMOTE?PUBLIC_URL:location.href.split('#')[0].split('?')[0]);
-  if(!g||!g.name)return REMOTE||S.party.inviteUrl?base:base+'#convite';
+  if(REMOTE){
+    if(!g||!g.name||g.demo)return siteBase();
+    if(!g.code){g.code=newCode();setTimeout(save,0)}
+    return siteBase()+'convite/'+g.code;
+  }
+  if(!g||!g.name)return S.party.inviteUrl?base:base+'#convite';
   // link pessoal, como um link de agendamento: já abre com o nome e o WhatsApp do convidado
   let c='';try{c=btoa(unescape(encodeURIComponent(g.name+'|'+(g.phone||'')))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}catch(_){}
   return base+(base.includes('?')?'&':'?')+'c='+c;
@@ -755,8 +769,12 @@ function parseCSV(text){
 /* ---------------- roteamento ---------------- */
 const PRIVATE=['painel','convidados','checklist','financas','festa','fotos'];
 const LOGIN_PATH=/^\/login\/?$/.test(location.pathname);
+const CODE_PATH=location.pathname.match(/^\/convite\/([a-z0-9]{10,40})\/?$/);
+// código do convite: /convite/<código>; links antigos ?c=… ainda chegam aqui enquanto a anfitriã permitir
+const inviteParam=CODE_PATH?CODE_PATH[1]:(new URLSearchParams(location.search).get('c')||'');
+let inviteBad=false;
 const ALBUM_PATH=/^\/fotos\/?$/.test(location.pathname);
-function route(){return (location.hash||'').replace('#','')||(LOGIN_PATH?'entrar':'convite')}
+function route(){return (location.hash||'').replace('#','')||(LOGIN_PATH||(REMOTE&&!invitee&&!inviteBad)?'entrar':'convite')}
 function go(r){if(location.hash==='#'+r)render();else location.hash=r}
 window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
 
@@ -775,12 +793,14 @@ function initMusic(){
   const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.async=true;document.head.appendChild(s);
 }
 function syncMusic(){
-  const r=route(),pub=!ALBUM_PATH&&!LOGIN_PATH&&(r==='convite'||r==='confirmar');
+  const r=route(),pub=!ALBUM_PATH&&!LOGIN_PATH&&(r==='convite'||r==='confirmar')&&(!REMOTE||!!invitee||authed);
   const intro=document.getElementById('introRoot'),fab=document.getElementById('musicRoot');
   if(!intro||!fab)return;
-  if(!pub){if(yt&&ytReady&&musicPlaying)yt.pauseVideo();musicWant=false;intro.innerHTML='';fab.innerHTML='';return}
+  if(!pub){if(yt&&ytReady&&musicPlaying)yt.pauseVideo();musicWant=false;intro.innerHTML='';fab.innerHTML='';document.body.classList.remove('has-music');return}
   intro.innerHTML=(!introSeen&&r==='convite')?'<div class="intro" role="dialog" aria-modal="true" aria-label="Abrir convite"><div class="in"><svg class="ch" aria-hidden="true"><use href="#cherry"/></svg><p class="script">'+esc(S.party.name)+' '+esc(partyAge())+'</p><p class="muted">Você recebeu um convite especial. 🍒</p><button class="btn primary big" data-act="open-invite" autofocus>Abrir convite</button></div></div>':'';
-  fab.innerHTML=introSeen&&ytReady?'<button class="music-fab" data-act="music-toggle" aria-label="'+(musicPlaying?'Pausar música':'Tocar música')+'">'+(musicPlaying?'⏸ Música':'▶ Música')+'</button>':'';
+  // fica no topo: chama atenção para aumentar o volume logo ao abrir o convite
+  fab.innerHTML=introSeen&&ytReady?'<button class="music-fab" data-act="music-toggle" aria-label="'+(musicPlaying?'Música tocando. Toque para pausar':'Tocar música')+'">'+(musicPlaying?'<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>🔊 Aumente o som':'▶ Tocar música')+'</button>':'';
+  document.body.classList.toggle('has-music',!!fab.innerHTML);
 }
 function render(){
   const r=route();clearInterval(cdTimer);syncMusic();
@@ -792,8 +812,10 @@ function render(){
     app.innerHTML=shell(r,({painel:viewDash,convidados:viewGuests,checklist:viewTasks,financas:viewFinance,festa:viewParty,fotos:viewPhotosAdmin})[r]());if(r==='fotos'&&REMOTE)loadAdminAlbum();
     return;
   }
-  if(r==='confirmar'){rsvpPersist();app.innerHTML=viewRsvp();focusFirst();return}
   if(r==='entrar'){if(authed){go('painel');return}app.innerHTML=viewLogin('painel');focusLogin();return}
+  // sem o link pessoal o convite não aparece (a anfitriã logada vê a prévia)
+  if(REMOTE&&!invitee&&!authed){app.innerHTML=viewNoInvite();return}
+  if(r==='confirmar'){rsvpPersist();app.innerHTML=viewRsvp();focusFirst();return}
   app.innerHTML=viewInvite();startCountdown();
 }
 function focusFirst(){setTimeout(()=>{const f=document.querySelector('#app .card input,#app .card button');if(f&&rsvp.step>1)f.focus()},30)}
@@ -922,13 +944,14 @@ function viewRsvpDone(){
    '<button class="btn block" data-act="rsvp-edit">'+ic('edit')+'Alterar minha resposta</button>'+
    '<a class="btn ghost block" href="#convite">Voltar ao convite</a></div>';
 }
-const RSVP_ERR={closed:'As confirmações estão encerradas. Fale com a aniversariante se precisar.',too_many_companions:'O número de acompanhantes passou do permitido. Volte e ajuste.',invalid_phone:'O WhatsApp parece incompleto. Corrija seus dados.',invalid_name:'Confira seu nome em “Corrigir meus dados”.',invalid_companion:'Confira os nomes dos acompanhantes.',not_configured:'O convite ainda está sendo preparado. Tente de novo mais tarde.',full:'Não foi possível registrar mais respostas. Fale com a aniversariante.'};
+const RSVP_ERR={invalid_code:'Este link de convite não é mais válido. Peça um novo link a quem te convidou.',closed:'As confirmações estão encerradas. Fale com a aniversariante se precisar.',too_many_companions:'O número de acompanhantes passou do permitido. Volte e ajuste.',invalid_phone:'O WhatsApp parece incompleto. Corrija seus dados.',invalid_name:'Confira seu nome em “Corrigir meus dados”.',invalid_companion:'Confira os nomes dos acompanhantes.',not_configured:'O convite ainda está sendo preparado. Tente de novo mais tarde.',full:'Não foi possível registrar mais respostas. Fale com a aniversariante.'};
 function rsvpSubmit(){
   const p=S.party;const now=new Date().toISOString().slice(0,10);
   const data={name:rsvp.name.trim(),phone:digits(rsvp.phone),status:rsvp.answer,companions:rsvp.answer==='no'?[]:rsvp.companions.slice(0,rsvp.count).map(s=>s.trim()),diet:rsvp.answer==='no'?'':rsvp.diet.trim(),notes:rsvp.notes.trim(),respondedAt:now};
   if(REMOTE){
     const b=document.querySelector('[data-act=rsvp-submit]');if(b){b.setAttribute('aria-busy','true');b.textContent='Enviando sua resposta…'}
-    rpc('submit_rsvp',{name:data.name,phone:normPh(data.phone),status:data.status,companions:data.companions,diet:data.diet,notes:data.notes})
+    if(!invitee){rsvp.errors={submit:'Esta é uma prévia do convite. As respostas chegam pelo link pessoal de cada convidado.'};render();return}
+    rpc('submit_rsvp_code',{code:invitee.key,name:data.name,phone:normPh(data.phone),status:data.status,companions:data.companions,diet:data.diet,notes:data.notes})
       .then(()=>{rsvp.step=6;rsvp.errors={};render();window.scrollTo(0,0)})
       .catch(e=>{rsvp.errors={submit:RSVP_ERR[e.code]||'Não foi possível enviar agora. Verifique a conexão e tente de novo.'};render()});
     return;
@@ -940,6 +963,12 @@ function rsvpSubmit(){
 
 /* ================= LOGIN ================= */
 let pinFails=0,pinLockUntil=0,loginErr='',loginEmail='';
+function viewNoInvite(){
+  return '<main class="login gutter"><div class="card stack" style="text-align:center"><div style="width:56px;margin:0 auto">'+cherry()+'</div>'+
+   '<h1 style="font-size:1.5rem">'+(inviteBad?'Link de convite inválido':'Convite exclusivo')+'</h1>'+
+   '<p class="muted">'+(inviteBad?'Este link não está mais valendo. Peça um novo link a quem te convidou.':'O convite abre pelo link pessoal que você recebeu no WhatsApp.')+'</p>'+
+   '<a class="btn ghost" href="/#entrar">Sou da organização: entrar</a></div></main>';
+}
 function viewLogin(target){
   return '<main class="login gutter"><div class="card stack"><div style="text-align:center"><div style="width:56px;margin:0 auto 6px">'+cherry()+'</div><h1 style="font-size:1.7rem">Entrar</h1><p class="muted">Área privada da festa de '+esc(S.party.name)+'.</p></div>'+
    '<form data-form="login" data-target="'+esc(target)+'" class="stack" novalidate>'+
@@ -948,7 +977,7 @@ function viewLogin(target){
    (loginErr?'<span class="err" role="alert">'+esc(loginErr)+'</span>':'')+
    '<button class="btn primary big block" type="submit">'+ic('lock')+'Entrar</button></form>'+
    (S.pinDefault?'<div class="notice info small">'+ic('info')+'<span>Nesta versão de demonstração use qualquer e-mail e a senha <b>4040</b>. Troque em Festa › Acesso.</span></div>':'')+
-   '<a class="btn ghost" href="'+(REMOTE?'/':'#convite')+'">Ver o convite</a></div></main>';
+   (REMOTE?'<p class="small muted" style="text-align:center;margin:0">Convidados entram pelo link pessoal que receberam.</p>':'<a class="btn ghost" href="#convite">Ver o convite</a>')+'</div></main>';
 }
 function focusLogin(){setTimeout(()=>{const e=document.getElementById('lemail'),p=document.getElementById('lpw');const f=e&&e.value?p:e;if(f)f.focus()},30)}
 
@@ -994,10 +1023,9 @@ function viewDash(){
     '<button class="shortcut" data-act="guest-new">'+ic('plus')+'Adicionar convidado</button>'+
     '<button class="shortcut" data-act="exp-new">'+ic('wallet')+'Lançar despesa</button>'+
     '<button class="shortcut" data-act="task-new">'+ic('list')+'Nova tarefa</button>'+
-    '<button class="shortcut" data-act="copy-invite">'+ic('link')+'Copiar link do convite</button>'+
-    '<a class="shortcut" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>'+
+    (REMOTE?'<a class="shortcut" href="#convidados">'+ic('wa')+'Enviar convites</a>':'<button class="shortcut" data-act="copy-invite">'+ic('link')+'Copiar link do convite</button><a class="shortcut" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>')+
     '<button class="shortcut" data-act="report-open">'+ic('download')+'Relatório de confirmados</button>'+
-    '<a class="shortcut" href="#convite">'+ic('eye')+'Ver convite</a></div></section>'+
+    '<a class="shortcut" href="#convite">'+ic('eye')+(REMOTE?'Prévia do convite':'Ver convite')+'</a></div></section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Dinheiro da festa</h3><span class="spacer"></span><a class="small" href="#financas">Ver finanças</a></div>'+budgetBlock(f)+'</section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Próximas tarefas</h3><span class="spacer"></span><span class="small muted">'+doneT+' de '+S.tasks.length+' concluídas</span></div>'+
     (tasks.length?'<div class="list">'+tasks.map(t=>'<div class="li"><button class="iconbtn" data-act="task-toggle" data-id="'+t.id+'" aria-label="Marcar '+esc(t.name)+' como concluída">'+ic('check')+'</button><div class="main-t"><b>'+esc(t.name)+'</b><div class="meta">'+catChip(t.category)+''+(t.due?'<span>até '+fmtDate(t.due)+'</span>':'')+'</div></div><span class="pill '+T_ST_CLS[t.status]+'">'+T_ST[t.status]+'</span></div>').join('')+'</div>':'<p class="muted">Tudo em dia por aqui.</p>')+
@@ -1035,7 +1063,8 @@ function viewGuests(){
   const list=S.guests.filter(g=>(!gFilter.status||g.status===gFilter.status)&&(!gFilter.group||g.group===gFilter.group)&&(!gFilter.table||g.table===gFilter.table)&&(!gFilter.remind||needsReminder(g))&&(!q||(g.name+' '+g.phone+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
   return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas'+(invSent?' · '+invSent+' convite'+(invSent>1?'s':'')+' enviado'+(invSent>1?'s':''):'')+'</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
    '<div class="kpis"><div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div></div><div class="kpi"><div class="label">Ainda não sabem</div><div class="v" style="color:var(--warn)">'+gs.maybe+'</div></div><div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div></div><div class="kpi"><div class="label">Sem resposta</div><div class="v">'+gs.pending+'</div></div></div>'+
-   '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div></div>'+
+   '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div>'+
+    (REMOTE?'<div class="row" style="margin-top:10px"><label class="switch"><input type="checkbox" data-act="toggle-legacy" '+(p.legacyLinks!==false?'checked':'')+'>Aceitar links enviados antes do convite com código</label><span class="small muted">Desligue quando todos já tiverem o link novo. Esses links antigos só abrem para quem está na lista.</span></div>':'')+'</div>'+
    reportSection()+tablesPanel()+
    '<div class="toolbar"><input class="input" id="g-q" type="search" placeholder="Buscar por nome ou WhatsApp" value="'+esc(gFilter.q)+'" data-filter="g-q" aria-label="Buscar convidados">'+
     '<select class="input" id="g-st" data-filter="g-st" aria-label="Filtrar por status"><option value="">Todos os status</option>'+Object.entries(G_ST).map(([k,v])=>'<option value="'+k+'" '+(gFilter.status===k?'selected':'')+'>'+v+'</option>').join('')+'</select>'+
@@ -1128,7 +1157,7 @@ function reportSection(){
    '<p class="small muted" style="margin-top:10px">'+(list.length?'':(filtered?'Nenhum confirmado com esses filtros. ':'Ainda não há convidados confirmados. ')+'')+
     'O PDF traz nome, acompanhantes e total de pessoas'+(rFilter.notes?', com restrições alimentares e observações':'')+'. Telefones e valores da festa não entram.'+(demo?' Convidados de exemplo também ficam de fora.':'')+'</p></section>';
 }
-const PDF_LIBS=['vendor/jspdf.umd.min.js','vendor/jspdf.plugin.autotable.min.js'];
+const PDF_LIBS=['vendor/jspdf.umd.min.js','vendor/jspdf.plugin.autotable.min.js'].map(f=>(/^https?:$/.test(location.protocol)?'/':'')+f);
 let pdfLibP=null;
 function loadScript(src){return new Promise((ok,fail)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>fail(new Error('load '+src));document.head.appendChild(s)})}
 function loadPdfLib(){
@@ -1507,7 +1536,7 @@ document.addEventListener('click',e=>{
    case 'photo-remove':{const removed=photoFiles.splice(Number(el.dataset.index),1)[0];if(removed)URL.revokeObjectURL(removed.url);photoPreview();break}
    case 'close':closeModal();break;
    case 'confirm-yes':{const f=pendingConfirm;pendingConfirm=null;closeModal();f&&f();break}
-   case 'logout':if(REMOTE){logoutRemote();break}authed=false;try{sessionStorage.removeItem(KEY+':auth')}catch(_){}go('convite');break;
+   case 'logout':if(REMOTE){logoutRemote();break}authed=false;try{sessionStorage.removeItem(KEY+':auth')}catch(_){}go('entrar');break;
    /* rsvp */
    case 'rsvp-answer':rsvp.answer=el.dataset.v;rsvp.errors={};if(rsvp.answer==='no'){rsvp.count=0}render();break;
    case 'rsvp-next2':if(!rsvp.answer){rsvp.errors={answer:'Escolha uma das opções para continuar.'};render();break}rsvpNav(1);break;
@@ -1569,6 +1598,7 @@ document.addEventListener('change',e=>{
   const el=e.target;
   if(el.id==='photo-input'){const files=Array.from(el.files||[]);if(files.length>10){toast('Selecione até 10 fotos por envio.');el.value='';return}if(files.some(f=>!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>10*1024*1024)){toast('Use fotos JPEG, PNG ou WebP com até 10 MB cada.');el.value='';return}photoFiles.forEach(x=>URL.revokeObjectURL(x.url));photoFiles=files.map(file=>({file,url:URL.createObjectURL(file)}));photoPreview();return}
   if(el.dataset.act==='album-setting'){photoCall({action:'settings',publishImmediately:el.checked}).then(()=>toast(el.checked?'Novas fotos serão exibidas imediatamente':'Novas fotos aguardarão sua aprovação')).catch(()=>{el.checked=!el.checked;toast('Não foi possível salvar essa opção.')});return}
+  if(el.dataset.act==='toggle-legacy'){S.party.legacyLinks=el.checked;save();render();toast(el.checked?'Links antigos aceitos':'Só os links novos abrem o convite');return}
   if(el.dataset.act==='toggle-rsvp'){S.party.rsvpOpen=el.checked;save();render();toast(el.checked?'Confirmações abertas':'Confirmações fechadas');return}
   if(el.dataset.act==='photo'&&el.files[0]){resizeImage(el.files[0],url=>{const old=S.party.photo;S.party.photo=url;save();if(!storageOk){S.party.photo=old}render();if(storageOk)toast('Foto atualizada')});return}
   if(el.dataset.act==='imp-file'&&el.files[0]){const r=new FileReader();r.onload=()=>{document.getElementById('imp-text').value=r.result};r.readAsText(el.files[0]);return}
@@ -1592,8 +1622,9 @@ function updSaldo(){
   const c=fv>0?fv:pv;el.querySelector('span').innerHTML='Saldo restante: <b class="num">'+money(Math.max(0,c-pd))+'</b>'+(pd>c&&c>0?' · <span style="color:var(--bad)">valor pago maior que o custo</span>':'');
 }
 /* ---------------- rascunhos: nada se perde ao sair da tela ---------------- */
-function rsvpPersist(){try{const o=Object.assign({},rsvp);delete o.errors;localStorage.setItem(KEY+':rsvp',JSON.stringify(o))}catch(_){}}
-function rsvpRestore(){try{const o=JSON.parse(localStorage.getItem(KEY+':rsvp')||'null');if(o&&typeof o==='object'){Object.assign(rsvp,o,{errors:{}});if(rsvp.step===4)rsvp.step=3}}catch(_){}}
+function rsvpKey(){return KEY+':rsvp'+(invitee&&invitee.key?':'+invitee.key:'')}
+function rsvpPersist(){try{const o=Object.assign({},rsvp);delete o.errors;localStorage.setItem(rsvpKey(),JSON.stringify(o))}catch(_){}}
+function rsvpRestore(){try{const o=JSON.parse(localStorage.getItem(rsvpKey())||'null');if(o&&typeof o==='object'){Object.assign(rsvp,o,{errors:{}});if(rsvp.step===4)rsvp.step=3}}catch(_){}}
 const NO_DRAFT=['login','access'];
 function draftable(f){const k=f&&f.dataset&&f.dataset.form;return !!k&&!NO_DRAFT.includes(k)&&!k.startsWith('rsvp')}
 function draftKey(f){return KEY+':draft:'+f.dataset.form+':'+(f.dataset.id||'novo')}
@@ -1640,8 +1671,8 @@ document.addEventListener('submit',e=>{
     const nd=d.length>11&&d.startsWith('55')?d.slice(2):d;
     if(REMOTE){
       const b=form.querySelector('button[type=submit]');if(b){b.setAttribute('aria-busy','true');b.textContent='Um momento…'}
-      rpc('rsvp_limit',{phone:nd}).then(lim=>{rsvp.limit=Number(lim)||0;rsvp.existingId='';rsvp.count=Math.min(rsvp.count,rsvp.limit);rsvpNav(1)})
-        .catch(()=>{rsvp.errors={phone:'Não foi possível continuar agora. Verifique a conexão e tente de novo.'};render()});
+      if(!invitee){rsvp.errors={phone:'Esta é uma prévia do convite. As respostas chegam pelo link pessoal de cada convidado.'};render();return}
+      rsvp.limit=Number(invitee.allowed)||0;rsvp.existingId='';rsvp.count=Math.min(rsvp.count,rsvp.limit);rsvpNav(1);
       return;
     }
     const g=S.guests.find(x=>{let p=digits(x.phone);if(p.length>11&&p.startsWith('55'))p=p.slice(2);return p&&p===nd});
@@ -1741,7 +1772,13 @@ async function boot(){
     const app=document.getElementById('app');
     app.innerHTML='<main class="login gutter"><div class="card" style="text-align:center"><div style="width:56px;margin:0 auto 10px">'+cherry()+'</div><p class="muted">Carregando o convite…</p></div></main>';
     try{
-      const pub=await rpc('get_public');REMOTE=true;S=freshRemote();Object.assign(S.party,pub||{});
+      let pub=null;
+      if(inviteParam&&!ALBUM_PATH){
+        try{const inv=await rpc('get_invite',{code:inviteParam});pub=inv.party||{};const g=inv.guest||{};invitee={key:inviteParam,code:g.code||'',name:g.name||'',phone:g.phone||'',allowed:Number(g.allowed)||0,prev:g}}
+        catch(e){if(e.code!=='invalid_code')throw e;inviteBad=true}
+      }
+      if(!pub)pub=await rpc('get_public');
+      REMOTE=true;S=freshRemote();Object.assign(S.party,pub||{});
       let c=null;try{c=JSON.parse(sessionStorage.getItem(KEY+':cred')||'null');sessionStorage.removeItem(KEY+':pin')}catch(_){}
       if(c&&c.email&&c.password){try{const r=await adminLogin(c.email,c.password);if(!r.ok)sessionStorage.removeItem(KEY+':cred')}catch(_){}}
     }catch(e){
@@ -1750,9 +1787,11 @@ async function boot(){
   }
   if(!REMOTE){try{authed=sessionStorage.getItem(KEY+':auth')===S.pinHash}catch(e){authed=false}}
   rsvp=newRsvp();rsvpRestore();
-  invitee=readGuestParam();
+  if(!REMOTE)invitee=readGuestParam();
   if(invitee&&!rsvp.name&&rsvp.step===1){rsvp.name=invitee.name;rsvp.phone=invitee.phone?fmtPhone(invitee.phone):''}
-  if(!ALBUM_PATH&&!LOGIN_PATH&&!PRIVATE.includes(route()))initMusic();
+  // quem já respondeu volta a ver a própria resposta para poder mudar
+  const pv=invitee&&invitee.prev;if(pv&&pv.status&&!rsvp.answer){rsvp.answer=pv.status;rsvp.companions=(pv.companions||[]).slice();rsvp.count=Math.min(rsvp.companions.length,invitee.allowed);rsvp.diet=pv.diet||'';rsvp.notes=pv.notes||''}
+  if(!ALBUM_PATH&&!LOGIN_PATH&&!PRIVATE.includes(route())&&(!REMOTE||invitee))initMusic();
   render();
 }
 boot();

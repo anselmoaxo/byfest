@@ -44,3 +44,10 @@ O site publicado em HTTPS pode ser instalado pelo navegador em Android e iOS. O 
 primeiro acesso. Offline, consultas e alterações que dependem da API continuam indisponíveis.
 No iPhone/iPad, use **Compartilhar → Adicionar à Tela de Início** no Safari. Notificações push não
 estão incluídas nesta etapa.
+
+## Entrada e convite com código
+
+- O endereço principal (`/`) abre o login. O convite só aparece pelo link pessoal `/convite/<código>`.
+- Cada convidado da lista recebe um código aleatório de 12 caracteres (`guest.code`), criado no painel ao salvar. Só esse link mostra data, local e foto e aceita resposta (`get_invite` e `submit_rsvp_code`). As chamadas públicas antigas `submit_rsvp` e `rsvp_limit` saíram da API, e `get_public` devolve só nome e idade.
+- Links antigos `?c=` (nome|telefone em base64) continuam abrindo enquanto a opção "Aceitar links enviados antes do convite com código" estiver ligada em Convidados, e só para quem está na lista com aquele telefone.
+

@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/login", "destination": "/index.html" },
-    { "source": "/fotos", "destination": "/index.html" }
+    { "source": "/fotos", "destination": "/index.html" },
+    { "source": "/convite/:code", "destination": "/index.html" }
   ]
 }
