@@ -56,5 +56,5 @@ estão incluídas nesta etapa.
 
 - A anfitriã monta o cardápio em **Festa › Cardápio** (ou pelo atalho “Cardápio da festa” no início do painel): categorias (começa com Entradas, Pratos principais, Sobremesas e Bebidas), itens com descrição opcional, ordem das categorias, título e um recado no fim. Há uma chave para mostrar ou esconder o cardápio no convite.
 - Fica em `party.menu` e chega ao convidado junto com o convite (`get_invite`), então só quem tem o link pessoal vê. Não houve mudança no banco.
-- No convite aparece o cartão “Cardápio” com o botão **Ver cardápio**, que abre `/convite/<código>#cardapio`. A página segue o tema escolhido em Festa › Tema. Categorias sem itens não aparecem.
+- No convite aparece sempre o cartão “Comes e bebes” com o botão **Bora ver os comes e bebes?** (some só se a chave estiver desligada; sem itens, a página avisa que está sendo preparado), que abre `/convite/<código>#cardapio`. A página segue o tema escolhido em Festa › Tema. Categorias sem itens não aparecem.
 - O cardápio é só para consulta: o convidado não escolhe prato.
