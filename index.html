@@ -337,6 +337,28 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .note-card .from{font-family:var(--f-script);font-size:2.2rem;color:var(--cherry);line-height:1;margin-top:8px;text-align:right;position:relative}
 .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
 .inv-col{min-width:0}
+/* cardápio: página do convidado (segue o tema) e editor no painel */
+.menu-page{max-width:620px;margin:0 auto;padding-block:20px 48px}
+.menu-card{position:relative;overflow:hidden;text-align:center;background:radial-gradient(120% 55% at 50% 0%,var(--blush) 0%,var(--paper) 60%);border:1px solid var(--line);border-radius:var(--r-lg);outline:1px solid var(--line);outline-offset:-10px;padding:40px 24px 34px}
+.menu-card>*:not(.leaf-deco){position:relative}
+.menu-card header{margin-bottom:26px}
+.menu-card .kicker{margin:0}
+.menu-card h1.script{font-family:var(--f-script);font-weight:400;font-size:clamp(3.2rem,14vw,4.4rem);line-height:1.05;color:var(--cherry)}
+.menu-card .when{font-family:var(--f-display);font-style:italic;color:var(--ink-2);margin-top:4px}
+.menu-sec h2{font-family:var(--f-display);font-size:.92rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--cherry-deep);margin-bottom:14px}
+.menu-sec ul{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.menu-sec .dish{display:block;font-family:var(--f-display);font-size:1.18rem;font-style:italic;color:var(--ink);line-height:1.3}
+.menu-sec .desc{display:block;font-size:.9rem;color:var(--ink-2);margin:3px auto 0;max-width:42ch}
+.menu-div{width:20px;height:24px;margin:24px auto}
+.menu-div svg{width:100%;height:100%}
+.menu-note{font-family:var(--f-display);font-style:italic;color:var(--ink-2);margin-top:28px;padding-top:18px;border-top:1px solid var(--line);white-space:pre-line}
+.menu-teaser .cats{font-family:var(--f-display);font-style:italic;color:var(--ink-2);margin:0 0 14px}
+.menu-ed{border:1px solid var(--line);border-radius:var(--r);padding:12px;margin:0;display:grid;gap:8px;min-width:0}
+.menu-ed .row{flex-wrap:nowrap;gap:4px}
+.menu-ed .menu-cat{font-family:var(--f-display);font-size:1.05rem;flex:1 1 0;width:auto;min-width:0}
+.menu-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) auto;gap:8px;align-items:center}
+.menu-ed>.btn{justify-self:start;align-self:flex-start}
+@media (max-width:560px){.menu-item{grid-template-columns:minmax(0,1fr) auto;padding-bottom:8px;border-bottom:1px dashed var(--line)}.menu-item .iconbtn{grid-column:2;grid-row:1}.menu-item [data-m="desc"]{grid-column:1;grid-row:2}}
 @media (min-width:960px){
   .invite{max-width:1080px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start;padding-block:40px 64px}
   .invite .hero{position:sticky;top:24px;padding:40px 28px}
@@ -465,6 +487,9 @@ const I={
  printer:'<path d="M7 9V3h10v6M7 17H4v-7h16v7h-3"/><rect x="7" y="14" width="10" height="7"/>',
  dup:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4h12"/>',
  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ menu:'<path d="M7 3v6a2 2 0 0 0 4 0V3M9 11v10"/><path d="M17 21V3c-2 1.5-3 4.5-3 8h3"/>',
+ up:'<path d="M6 15l6-6 6 6"/>',
+ down:'<path d="M6 9l6 6 6-6"/>',
  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
  link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'
 };
@@ -826,7 +851,7 @@ function initMusic(){
   const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.async=true;document.head.appendChild(s);
 }
 function syncMusic(){
-  const r=route(),pub=!ALBUM_PATH&&!LOGIN_PATH&&(r==='convite'||r==='confirmar')&&(!REMOTE||!!invitee||authed);
+  const r=route(),pub=!ALBUM_PATH&&!LOGIN_PATH&&(r==='convite'||r==='confirmar'||r==='cardapio')&&(!REMOTE||!!invitee||authed);
   const intro=document.getElementById('introRoot'),fab=document.getElementById('musicRoot');
   if(!intro||!fab)return;
   if(!pub){if(yt&&ytReady&&musicPlaying)yt.pauseVideo();musicWant=false;intro.innerHTML='';fab.innerHTML='';document.body.classList.remove('has-music');return}
@@ -849,6 +874,7 @@ function render(){
   // sem o link pessoal o convite não aparece (a anfitriã logada vê a prévia)
   if(REMOTE&&!invitee&&!authed){app.innerHTML=viewNoInvite();return}
   if(r==='confirmar'){rsvpPersist();app.innerHTML=viewRsvp();focusFirst();return}
+  if(r==='cardapio'){app.innerHTML=viewMenu();return}
   app.innerHTML=viewInvite();startCountdown();
 }
 function focusFirst(){setTimeout(()=>{const f=document.querySelector('#app .card input,#app .card button');if(f&&rsvp.step>1)f.focus()},30)}
@@ -938,10 +964,83 @@ function viewInvite(){
       '<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
    '</div>'+(p.date?'<div class="actions"><a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a></div>':'')+
    '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
+   menuTeaser()+
    (extras.length?'<section class="sect" aria-labelledby="h-info"><h2 class="sh" id="h-info">'+cherry()+'Bom saber</h2><div class="facts">'+extras.join('')+'</div></section>':'')+
    '<p class="privacy">'+ic('lock').replace('<svg','<svg style="width:14px;height:14px;vertical-align:-2px"')+' Seus dados são usados apenas para a organização da comemoração.</p>'+
    '</div>'+
   '</main>';
+}
+/* ================= CARDÁPIO ================= */
+// party.menu = {show, title, note, sections:[{name, items:[{name, desc}]}]}. A anfitriã edita em Festa › Cardápio;
+// o convidado vê em #cardapio, só pelo link pessoal (vem junto com o convite em get_invite).
+const MENU_DEFAULT=['Entradas','Pratos principais','Sobremesas','Bebidas'];
+const MENU_LIM={sections:10,items:40,name:80,desc:200,title:60,note:300};
+function menuBlank(){return {show:true,title:'Cardápio',note:'',sections:MENU_DEFAULT.map(n=>({name:n,items:[]}))}}
+function menuClean(m){
+  m=m&&typeof m==='object'?m:{};const t=(x,n)=>String(x==null?'':x).replace(/\s+/g,' ').trim().slice(0,n);
+  return {show:m.show!==false,title:t(m.title,MENU_LIM.title),note:String(m.note||'').trim().slice(0,MENU_LIM.note),
+   sections:(Array.isArray(m.sections)?m.sections:[]).slice(0,MENU_LIM.sections).map(c=>({name:t(c&&c.name,MENU_LIM.name),
+    items:(Array.isArray(c&&c.items)?c.items:[]).slice(0,MENU_LIM.items).map(i=>({name:t(i&&i.name,MENU_LIM.name),desc:t(i&&i.desc,MENU_LIM.desc)})).filter(i=>i.name)}))
+    .filter(c=>c.name||c.items.length)};
+}
+function menuSaved(){const m=S.party.menu;return menuClean(m&&Array.isArray(m.sections)?m:menuBlank())}
+// o convidado só vê categorias com itens
+function menuPublic(){const m=menuSaved();m.sections=m.sections.filter(c=>c.items.length);return m}
+function menuReady(){const m=menuPublic();return m.show&&m.sections.length>0}
+function menuTeaser(){
+  if(!menuReady())return '';const m=menuPublic();
+  return '<section class="sect menu-teaser" aria-labelledby="h-menu"><h2 class="sh" id="h-menu">'+cherry()+esc(m.title||'Cardápio')+'</h2><p class="cats">'+m.sections.map(c=>esc(c.name||'Cardápio')).join(' · ')+'</p><a class="btn block" href="#cardapio">'+ic('menu')+'Ver cardápio</a></section>';
+}
+function viewMenu(){
+  const p=S.party,m=menuPublic(),show=m.sections.length&&(m.show||authed);
+  const leaf=c=>'<svg class="leaf-deco '+c+'" aria-hidden="true"><use href="#leaf"/></svg>';
+  const body=show?m.sections.map((c,i)=>'<section class="menu-sec" aria-labelledby="mh-'+i+'"><h2 id="mh-'+i+'">'+esc(c.name||'Cardápio')+'</h2><ul>'+c.items.map(it=>'<li><span class="dish">'+esc(it.name)+'</span>'+(it.desc?'<span class="desc">'+esc(it.desc)+'</span>':'')+'</li>').join('')+'</ul></section>').join('<div class="menu-div">'+cherry()+'</div>')
+   :'<p class="muted">O cardápio ainda está sendo preparado. Volte mais perto da festa! 🍒</p>';
+  return '<main class="menu-page gutter"><div class="rsvp-top"><a class="btn sm" href="#convite">'+ic('back')+'Voltar ao convite</a><span class="spacer"></span>'+(authed&&!m.show?'<span class="pill warn">Oculto para os convidados</span>':'')+'</div>'+
+   '<article class="menu-card" aria-labelledby="menu-ttl">'+leaf('tl')+leaf('br')+
+    '<header><p class="kicker">'+esc(p.name)+' · '+esc(partyAge())+' anos</p><h1 class="script" id="menu-ttl">'+esc(m.title||'Cardápio')+'</h1>'+(p.date?'<p class="when">'+esc(fmtDateLong(p.date))+'</p>':'')+'</header>'+
+    body+(show&&m.note?'<p class="menu-note">'+esc(m.note)+'</p>':'')+
+   '</article>'+
+   (rsvpClosed()?'':'<div class="actions"><a class="btn primary" href="#confirmar">'+ic('heart')+'Confirmar presença</a></div>')+
+  '</main>';
+}
+/* editor do painel: rascunho em memória (e no navegador) até clicar em Salvar cardápio */
+let menuEdit=null;
+function menuDraftKey(){return KEY+':menuDraft'}
+function menuEditGet(){
+  if(!menuEdit){try{menuEdit=JSON.parse(localStorage.getItem(menuDraftKey())||'null')}catch(_){}
+    if(!menuEdit||!Array.isArray(menuEdit.sections))menuEdit=menuSaved();
+    menuEdit.sections.forEach(c=>{if(!Array.isArray(c.items))c.items=[];if(!c.items.length)c.items.push({name:'',desc:''})})}
+  return menuEdit;
+}
+function menuDirty(){return !!menuEdit&&JSON.stringify(menuClean(menuEdit))!==JSON.stringify(menuSaved())}
+function menuEditKeep(){try{if(menuDirty())localStorage.setItem(menuDraftKey(),JSON.stringify(menuEdit));else localStorage.removeItem(menuDraftKey())}catch(_){}}
+function menuDirtyHtml(){menuEditGet();return menuDirty()?'<div class="notice info small">'+ic('info')+'<span>Há mudanças no cardápio que ainda não foram salvas.</span><button type="button" class="btn sm ghost" data-act="menu-discard">Descartar</button></div>':''}
+function menuEditorHtml(){
+  const m=menuEditGet(),n=m.sections.length,a=(i,j)=>' data-s="'+i+'"'+(j==null?'':' data-i="'+j+'"');
+  return '<label class="switch"><input type="checkbox" data-m="show" '+(m.show!==false?'checked':'')+'>Mostrar o cardápio no convite</label>'+
+  '<label class="field"><span>Título</span><input class="input" data-m="title" value="'+esc(m.title||'')+'" maxlength="'+MENU_LIM.title+'" placeholder="Cardápio"></label>'+
+  m.sections.map((c,i)=>'<fieldset class="menu-ed"><legend class="sr">Categoria '+(i+1)+'</legend><div class="row"><input class="input menu-cat" data-m="sec"'+a(i)+' value="'+esc(c.name)+'" maxlength="'+MENU_LIM.name+'" placeholder="Nome da categoria" aria-label="Nome da categoria '+(i+1)+'">'+
+    '<button type="button" class="iconbtn" data-act="menu-move" data-d="-1"'+a(i)+' aria-label="Subir categoria"'+(i?'':' disabled')+'>'+ic('up')+'</button>'+
+    '<button type="button" class="iconbtn" data-act="menu-move" data-d="1"'+a(i)+' aria-label="Descer categoria"'+(i<n-1?'':' disabled')+'>'+ic('down')+'</button>'+
+    '<button type="button" class="iconbtn" data-act="menu-del-sec"'+a(i)+' aria-label="Remover categoria">'+ic('trash')+'</button></div>'+
+    c.items.map((it,j)=>'<div class="menu-item"><input class="input" data-m="name"'+a(i,j)+' value="'+esc(it.name)+'" maxlength="'+MENU_LIM.name+'" placeholder="Prato ou bebida" aria-label="Item '+(j+1)+' de '+esc(c.name||'categoria '+(i+1))+'">'+
+      '<input class="input" data-m="desc"'+a(i,j)+' value="'+esc(it.desc)+'" maxlength="'+MENU_LIM.desc+'" placeholder="Descrição (opcional)" aria-label="Descrição do item '+(j+1)+'">'+
+      '<button type="button" class="iconbtn" data-act="menu-del-item"'+a(i,j)+' aria-label="Remover item">'+ic('x')+'</button></div>').join('')+
+    (c.items.length<MENU_LIM.items?'<button type="button" class="btn sm" data-act="menu-add-item"'+a(i)+'>'+ic('plus')+'Adicionar item</button>':'')+'</fieldset>').join('')+
+  (n<MENU_LIM.sections?'<button type="button" class="btn sm" data-act="menu-add-sec" style="justify-self:start;align-self:flex-start">'+ic('plus')+'Adicionar categoria</button>':'')+
+  '<label class="field"><span>Recado no fim do cardápio (opcional)</span><textarea class="input" data-m="note" maxlength="'+MENU_LIM.note+'" placeholder="Ex.: Avise se tiver alguma restrição alimentar.">'+esc(m.note||'')+'</textarea></label>';
+}
+function menuRefresh(focusSel){
+  menuEditKeep();const ed=document.getElementById('menu-editor'),d=document.getElementById('menu-dirty');
+  if(ed)ed.innerHTML=menuEditorHtml();if(d)d.innerHTML=menuDirtyHtml();
+  if(focusSel){const f=document.querySelector('#menu-editor '+focusSel);if(f&&!f.disabled)f.focus()}
+}
+function menuInput(el){
+  const m=menuEditGet(),k=el.dataset.m,s=+el.dataset.s,i=+el.dataset.i,c=m.sections[s];
+  if(k==='show')m.show=el.checked;else if(k==='title')m.title=el.value;else if(k==='note')m.note=el.value;
+  else if(k==='sec'&&c)c.name=el.value;else if((k==='name'||k==='desc')&&c&&c.items[i])c.items[i][k]=el.value;else return;
+  menuEditKeep();const d=document.getElementById('menu-dirty');if(d)d.innerHTML=menuDirtyHtml();
 }
 function startCountdown(){
   const t=partyDate();if(!t||!document.getElementById('cd'))return;
@@ -1090,6 +1189,7 @@ function viewDash(){
     '<button class="shortcut" data-act="task-new">'+ic('list')+'Nova tarefa</button>'+
     (REMOTE?'<a class="shortcut" href="#convidados">'+ic('wa')+'Enviar convites</a>':'<button class="shortcut" data-act="copy-invite">'+ic('link')+'Copiar link do convite</button><a class="shortcut" href="'+waShare(shareText())+'" target="_blank" rel="noopener">'+ic('wa')+'Enviar convite</a>')+
     '<button class="shortcut" data-act="report-open">'+ic('download')+'Relatório de confirmados</button>'+
+    '<button class="shortcut" data-act="menu-open">'+ic('menu')+'Cardápio da festa</button>'+
     '<a class="shortcut" href="#convite">'+ic('eye')+(REMOTE?'Prévia do convite':'Ver convite')+'</a></div></section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Dinheiro da festa</h3><span class="spacer"></span><a class="small" href="#financas">Ver finanças</a></div>'+budgetBlock(f)+'</section>'+
    '<section class="panel c6"><div class="row"><h3 style="margin:0">Próximas tarefas</h3><span class="spacer"></span><span class="small muted">'+doneT+' de '+S.tasks.length+' concluídas</span></div>'+
@@ -1571,6 +1671,7 @@ function viewParty(){
   '</div></details>'+
   '<details class="sec" open><summary>Orçamento</summary><div class="body stack">'+f('budget','Orçamento total da festa (R$)',moneyInput(p.budget),'inputmode="decimal" placeholder="0,00" class="input num"')+'</div></details>'+
   '<div class="err" id="pf-err" style="margin-top:10px"></div><div class="row" style="margin:16px 0 24px"><button class="btn primary big" type="submit">'+ic('check')+'Salvar dados da festa</button></div></form>'+
+  '<details class="sec" open id="sec-menu"><summary>Cardápio</summary><div class="body"><form data-form="menu" class="stack" novalidate><p class="small muted">Os pratos e as bebidas da festa. O convidado abre pelo botão “Ver cardápio” no convite pessoal. Categorias sem itens não aparecem para ele.</p><div id="menu-dirty">'+menuDirtyHtml()+'</div><div id="menu-editor" class="stack">'+menuEditorHtml()+'</div><div class="err" id="mf-err"></div><div class="row"><button class="btn primary" type="submit">'+ic('check')+'Salvar cardápio</button><a class="btn" href="#cardapio">'+ic('eye')+'Ver como o convidado</a></div></form></div></details>'+
   '<details class="sec"><summary>Acesso</summary><div class="body"><form data-form="access" class="stack" novalidate><p class="small muted">O e-mail e a senha protegem o painel, a lista de convidados e as finanças. Entre pelo endereço '+esc(REMOTE?location.origin+'/login':'#entrar')+'.</p>'+(REMOTE&&cred.emails&&cred.emails.length?'<div class="notice info small">'+ic('users')+'<span>Podem entrar no painel: <b>'+cred.emails.map(esc).join('</b> e <b>')+'</b>. A senha é a mesma para todos; trocando aqui, muda para todos.</span></div><input type="hidden" name="email" value="'+esc(cred.email)+'">':'<label class="field"><span>E-mail de acesso</span><input class="input" id="ac-email" name="email" type="email" autocomplete="username" value="'+esc(REMOTE?cred.email:(S.adminEmail||''))+'"></label>')+'<div class="grid2"><label class="field"><span>Nova senha (mínimo 6 caracteres)</span><input class="input" id="np1" name="p1" type="password" autocomplete="new-password"></label><label class="field"><span>Repita a nova senha</span><input class="input" id="np2" name="p2" type="password" autocomplete="new-password"></label></div><p class="small muted">Deixe a senha em branco para manter a atual.</p><div class="err" id="pin-err"></div><button class="btn" type="submit">'+ic('lock')+'Salvar acesso</button></form></div></details>'+
   '<details class="sec"><summary>Dados do app</summary><div class="body stack">'+(hasDemo()?'<div class="row"><button class="btn" data-act="clear-demo">Remover dados de exemplo</button><span class="small muted">Apaga só os itens marcados como Exemplo.</span></div>':'<p class="small muted">Não há dados de exemplo.</p>')+'<div class="row"><button class="btn danger" data-act="reset-all">'+ic('trash')+'Apagar tudo e recomeçar</button></div></div></details>';
 }
@@ -1658,6 +1759,14 @@ document.addEventListener('click',e=>{
    case 'reload':location.reload();break;
    case 'draft-discard':{const f=el.closest('form');if(f){draftClear(f);f.reset();el.closest('.draft-note').remove();if(document.getElementById('ef-saldo'))updSaldo()}break}
    case 'toggle-pw':{const i=document.getElementById('lpw');if(i){const show=i.type==='password';i.type=show?'text':'password';el.textContent=show?'Ocultar':'Mostrar';el.setAttribute('aria-pressed',String(show));el.setAttribute('aria-label',show?'Ocultar senha':'Mostrar senha')}break}
+   case 'menu-open':go('festa');setTimeout(()=>{const x=document.getElementById('sec-menu');if(x){x.open=true;x.scrollIntoView({behavior:'smooth',block:'start'})}},60);break;
+   case 'menu-add-sec':{const m=menuEditGet();if(m.sections.length>=MENU_LIM.sections)break;m.sections.push({name:'',items:[{name:'',desc:''}]});menuRefresh('[data-m="sec"][data-s="'+(m.sections.length-1)+'"]');break}
+   case 'menu-del-sec':{const m=menuEditGet(),i=+el.dataset.s,c=m.sections[i];if(!c)break;const del=()=>{m.sections.splice(i,1);menuRefresh()};
+     if(c.items.some(x=>x.name.trim()))confirmDialog('Remover categoria','A categoria <b>'+esc(c.name||'sem nome')+'</b> e os itens dela saem do cardápio quando você salvar.','Remover',del);else del();break}
+   case 'menu-move':{const m=menuEditGet(),i=+el.dataset.s,d=+el.dataset.d,j=i+d;if(!m.sections[i]||j<0||j>=m.sections.length)break;[m.sections[i],m.sections[j]]=[m.sections[j],m.sections[i]];menuRefresh('[data-act="menu-move"][data-s="'+j+'"][data-d="'+d+'"]');break}
+   case 'menu-add-item':{const m=menuEditGet(),s=+el.dataset.s,c=m.sections[s];if(!c||c.items.length>=MENU_LIM.items)break;c.items.push({name:'',desc:''});menuRefresh('[data-m="name"][data-s="'+s+'"][data-i="'+(c.items.length-1)+'"]');break}
+   case 'menu-del-item':{const m=menuEditGet(),c=m.sections[+el.dataset.s];if(!c)break;c.items.splice(+el.dataset.i,1);if(!c.items.length)c.items.push({name:'',desc:''});menuRefresh();break}
+   case 'menu-discard':menuEdit=null;try{localStorage.removeItem(menuDraftKey())}catch(_){}menuRefresh();toast('Mudanças do cardápio descartadas');break;
    case 'set-theme':{const k=el.dataset.theme;if(!THEMES[k])break;S.party.theme=k;save();render();toast('Tema '+THEMES[k].label+' aplicado');break}
    case 'photo-del':S.party.photo='';save();render();toast('Foto removida');break;
   }
@@ -1693,7 +1802,7 @@ function updSaldo(){
 function rsvpKey(){return KEY+':rsvp'+(invitee&&invitee.key?':'+invitee.key:'')}
 function rsvpPersist(){try{const o=Object.assign({},rsvp);delete o.errors;localStorage.setItem(rsvpKey(),JSON.stringify(o))}catch(_){}}
 function rsvpRestore(){try{const o=JSON.parse(localStorage.getItem(rsvpKey())||'null');if(o&&typeof o==='object'){Object.assign(rsvp,o,{errors:{}});if(rsvp.step===4)rsvp.step=3}}catch(_){}}
-const NO_DRAFT=['login','access'];
+const NO_DRAFT=['login','access','menu'];
 function draftable(f){const k=f&&f.dataset&&f.dataset.form;return !!k&&!NO_DRAFT.includes(k)&&!k.startsWith('rsvp')}
 function draftKey(f){return KEY+':draft:'+f.dataset.form+':'+(f.dataset.id||'novo')}
 function draftSave(f){
@@ -1719,6 +1828,7 @@ function onFormEdit(e){
   const f=e.target.closest&&e.target.closest('form[data-form]');if(!f)return;
   if(draftable(f)){draftSave(f);return}
   const k=f.dataset.form,el=e.target;
+  if(k==='menu'){if(el.dataset&&el.dataset.m)menuInput(el);return}
   if(k==='rsvp1'){if(el.name==='name')rsvp.name=el.value;if(el.name==='phone')rsvp.phone=el.value;if(el.name==='consent')rsvp.consent=el.checked}
   else if(k==='rsvp3'){saveCompanionInputs();if(el.name==='diet')rsvp.diet=el.value;if(el.name==='notes')rsvp.notes=el.value}
   else return;
@@ -1821,6 +1931,14 @@ document.addEventListener('submit',e=>{
     const url=v('inviteUrl');if(url&&!/^https?:\/\//i.test(url)){err.textContent='O link do convite precisa começar com https://';return}
     Object.assign(p,{name:v('name'),age:parseInt(v('age'))||40,tagline:v('tagline')||p.tagline,welcome:v('welcome'),date:v('date'),time:v('time'),endTime:v('endTime'),venue:v('venue'),address:v('address'),dress:v('dress'),parking:v('parking'),notes:v('notes'),contactName:v('contactName'),contactPhone:cp,rsvpOpen:!!fd.get('rsvpOpen'),rsvpDeadline:v('rsvpDeadline'),maxCompanions:Math.max(0,parseInt(v('maxCompanions'))||0),budget:budget||0,inviteUrl:url});
     save();render();toast('Dados da festa salvos');return;
+  }
+  if(kind==='menu'){
+    const err=document.getElementById('mf-err'),raw=menuEditGet(),m=menuClean(raw);
+    const bad=raw.sections.findIndex(c=>!String(c.name||'').trim()&&c.items.some(x=>String(x.name||'').trim()));
+    if(bad>=0){err.textContent='Dê um nome para a categoria '+(bad+1)+', que já tem itens.';const f=document.querySelector('#menu-editor [data-m="sec"][data-s="'+bad+'"]');if(f)f.focus();return}
+    err.textContent='';
+    S.party.menu=m;menuEdit=null;try{localStorage.removeItem(menuDraftKey())}catch(_){}
+    save();render();toast(m.sections.some(c=>c.items.length)?(m.show?'Cardápio salvo e visível no convite':'Cardápio salvo (oculto no convite)'):'Cardápio salvo');return;
   }
   if(kind==='access'){
     const err=document.getElementById('pin-err');const email=v('email').toLowerCase(),a=fd.get('p1')||'',b=fd.get('p2')||'';
