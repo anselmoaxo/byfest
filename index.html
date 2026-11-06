@@ -4,31 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>Priscila 40 · Cherry</title>
+<title>Priscila 40 anos</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Priscila 40 anos: uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
 <!-- card de prévia (WhatsApp, redes): genérico de propósito, sem dados de convidados -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Festa Cherry">
+<meta property="og:site_name" content="Priscila 40 anos">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://myfest.blogdapriscila.com.br/">
-<meta property="og:title" content="Priscila 40 anos · Festa Cherry">
+<meta property="og:title" content="Priscila 40 anos">
 <meta property="og:description" content="Você está convidado(a)! Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
-<meta property="og:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
-<meta property="og:image:secure_url" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
+<meta property="og:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg?v=2">
+<meta property="og:image:secure_url" content="https://myfest.blogdapriscila.com.br/og-convite.jpg?v=2">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Convite: Priscila 40 anos, Festa Cherry. Confirme sua presença.">
+<meta property="og:image:alt" content="Convite: Priscila 40 anos. Confirme sua presença.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Priscila 40 anos · Festa Cherry">
+<meta name="twitter:title" content="Priscila 40 anos">
 <meta name="twitter:description" content="Você está convidado(a)! Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
-<meta name="twitter:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
+<meta name="twitter:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg?v=2">
 <meta name="theme-color" content="#a3123a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Festa Cherry">
+<meta name="apple-mobile-web-app-title" content="Priscila 40 anos">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -551,7 +551,7 @@ function demoData(){
 }
 function defaults(){
   const d=demoData();
-  return {v:1,party:{name:'Priscila',age:40,tagline:'uma celebração doce, cheia de amor e boas histórias.',welcome:'',date:'',time:'',endTime:'',venue:'',address:'',dress:'',parking:'',notes:'',contactName:'',contactPhone:'',photo:'',rsvpDeadline:'',maxCompanions:2,rsvpOpen:true,budget:0,inviteUrl:''},
+  return {v:1,party:{name:'Priscila',age:40,nick:'Pri',tagline:'uma celebração doce, cheia de amor e boas histórias.',welcome:'',date:'',time:'',endTime:'',venue:'',address:'',dress:'',parking:'',notes:'',contactName:'',contactPhone:'',photo:'',rsvpDeadline:'',maxCompanions:2,rsvpOpen:true,budget:0,inviteUrl:''},
     guests:d.guests,expenses:d.expenses,tasks:d.tasks,pinHash:pinHash(DEFAULT_PIN),pinDefault:true};
 }
 let S;let storageOk=true;
@@ -729,6 +729,8 @@ function applyTheme(k){
   try{localStorage.setItem(KEY+':theme',k)}catch(_){}
 }
 function themePicker(){const cur=themeKey();if(!document.getElementById('themePreviewFonts')){const l=document.createElement('link');l.id='themePreviewFonts';l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Great+Vibes&family=Parisienne&family=Dancing+Script:wght@400..700&family=Allura&display=swap';document.head.appendChild(l)}return '<div class="themes" role="group" aria-label="Tema da festa">'+Object.keys(THEMES).map(k=>{const t=THEMES[k],c=t.c;return '<button type="button" class="theme-opt" data-act="set-theme" data-theme="'+k+'" aria-pressed="'+(k===cur)+'" style="--t-main:'+c[0]+';--t-cream:'+c[5]+';--t-ink:'+c[8]+'"><span class="sw">'+[0,3,6,8].map(i=>'<i style="background:'+c[i]+'"></i>').join('')+'</span><span class="nm" style="font-family:'+esc(t.script)+'">'+esc(S.party.name||'Festa')+'</span><span class="lb">'+esc(t.label)+'</span><span class="small muted">'+esc(t.desc)+'</span></button>'}).join('')+'</div>'}
+// Apelido usado no convite ("os 40 anos da Pri"); vazio usa o primeiro nome.
+function partyNick(){const n=S.party.nick,first=String(S.party.name||'').trim().split(/\s+/)[0];if(n!=null)return String(n).trim()||first;return /^priscila$/i.test(first)?'Pri':first}
 function partyAge(){const n=parseInt(S.party.age,10);return n>0&&n<130?n:40}
 function shareText(g){
   const p=S.party;let t='🍒 Você é especial para mim e está convidado(a)! '+p.name+' '+partyAge()+' anos, '+p.tagline;
@@ -857,14 +859,14 @@ function syncMusic(){
   const intro=document.getElementById('introRoot'),fab=document.getElementById('musicRoot');
   if(!intro||!fab)return;
   if(!pub){if(yt&&ytReady&&musicPlaying)yt.pauseVideo();musicWant=false;intro.innerHTML='';fab.innerHTML='';document.body.classList.remove('has-music');return}
-  intro.innerHTML=(!introSeen&&r==='convite')?'<div class="intro" role="dialog" aria-modal="true" aria-label="Abrir convite"><div class="in"><svg class="ch" aria-hidden="true"><use href="#cherry"/></svg><p class="script">'+esc(S.party.name)+' '+esc(partyAge())+'</p><p class="muted">Você recebeu um convite especial. 🍒</p><button class="btn primary big" data-act="open-invite" autofocus>Abrir convite</button></div></div>':'';
+  intro.innerHTML=(!introSeen&&r==='convite')?'<div class="intro" role="dialog" aria-modal="true" aria-label="Abrir convite"><div class="in"><svg class="ch" aria-hidden="true"><use href="#cherry"/></svg><p class="script">'+esc(S.party.name)+' '+esc(partyAge())+' anos</p><p class="muted">Você recebeu um convite especial. 🍒</p><button class="btn primary big" data-act="open-invite" autofocus>Abrir convite</button></div></div>':'';
   // fica no topo: chama atenção para aumentar o volume logo ao abrir o convite
   fab.innerHTML=introSeen&&ytReady?'<button class="music-fab" data-act="music-toggle" aria-label="'+(musicPlaying?'Música tocando. Toque para pausar':'Tocar música')+'">'+(musicPlaying?'<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>🔊 Aumente o som':'▶ Tocar música')+'</button>':'';
   document.body.classList.toggle('has-music',!!fab.innerHTML);
 }
 function render(){
   const r=route();clearInterval(cdTimer);syncMusic();
-  applyTheme();document.title=S.party.name+' '+partyAge()+' anos · '+THEMES[themeKey()].label;
+  applyTheme();document.title=S.party.name+' '+partyAge()+' anos';
   const app=document.getElementById('app');
   if(ALBUM_PATH){app.innerHTML=viewGuestAlbum();loadGuestGallery();return}
   if(PRIVATE.includes(r)){
@@ -949,7 +951,7 @@ function viewInvite(){
   return '<main class="invite gutter">'+
    '<section class="hero" aria-labelledby="ttl"><div class="fall" aria-hidden="true">'+falls+'</div>'+leaf('tl')+leaf('br')+
     '<div class="arch">'+photo+'</div>'+
-    '<p class="kicker">'+(invitee?esc(invitee.name.split(' ')[0])+', este convite é para você':'Você está convidado(a) para celebrar')+'</p>'+
+    '<p class="kicker">'+(invitee?esc(greetName(invitee))+', você está convidado(a)':'Você está convidado(a)')+' para celebrar os '+esc(age)+' anos da '+esc(partyNick())+'</p>'+
     '<h1 id="ttl" aria-label="'+esc(p.name)+', '+esc(age)+' anos"><span class="script" aria-hidden="true">'+esc(p.name)+'</span><span class="forty" style="display:block" aria-hidden="true"><b>'+esc(age)+'</b> anos</span></h1>'+
     '<p class="tag">'+esc(p.tagline)+'</p>'+
     (p.date?'<span class="date-chip">'+ic('cal')+esc(fmtDateChip(p.date))+(p.time?' · '+esc(p.time.replace(':','h')):'')+'</span>':'')+
@@ -1657,6 +1659,7 @@ function viewParty(){
   '<details class="sec" open><summary>Convite</summary><div class="body stack">'+
    '<div class="photo-edit"><div class="arch">'+(p.photo?'<img src="'+p.photo+'" alt="Foto atual">':'<div class="ph">'+cherry()+'</div>')+'</div><div class="stack" style="gap:8px"><b>Foto de capa</b><label class="btn sm" for="pf-photo" style="cursor:pointer">'+ic('upload')+(p.photo?'Trocar foto':'Adicionar foto')+'</label><input id="pf-photo" type="file" accept="image/*" class="sr" data-act="photo">'+(p.photo?'<button type="button" class="btn sm danger" data-act="photo-del">Remover foto</button>':'')+'<small class="muted">A foto é reduzida automaticamente para carregar rápido.</small></div></div>'+
    '<div class="grid2">'+f('name','Nome da aniversariante',p.name,'maxlength="40" required')+f('age','Idade',p.age,'type="number" min="1" max="120"')+'</div>'+
+   f('nick','Apelido no convite',p.nick==null?'Pri':p.nick,'maxlength="30"','Aparece em “Você está convidado(a) para celebrar os '+esc(partyAge())+' anos da …”. Vazio usa o primeiro nome.')+
    f('tagline','Frase de destaque',p.tagline,'maxlength="120"')+
    '<label class="field"><span>Recado para os convidados</span><textarea class="input" id="pf-welcome" name="welcome" maxlength="400" placeholder="'+esc(DEFAULT_WELCOME)+'">'+esc(p.welcome||'')+'</textarea><small>Aparece no convite assinado com o seu nome. Em branco, usamos o texto de exemplo.</small></label>'+
    '<div class="grid2">'+f('date','Data da festa',p.date,'type="date"')+f('time','Horário de início',p.time,'type="time"')+f('endTime','Horário de término (opcional)',p.endTime,'type="time"')+'</div>'+
@@ -1932,7 +1935,7 @@ document.addEventListener('submit',e=>{
     const budget=parseMoney(v('budget'));if(isNaN(budget)||budget<0){err.textContent='Orçamento inválido. Use números, por exemplo 15.000,00.';document.getElementById('pf-budget').focus();return}
     const cp=digits(v('contactPhone'));if(cp&&(cp.length<10||cp.length>13)){err.textContent='WhatsApp do contato inválido. Use DDD + número.';return}
     const url=v('inviteUrl');if(url&&!/^https?:\/\//i.test(url)){err.textContent='O link do convite precisa começar com https://';return}
-    Object.assign(p,{name:v('name'),age:parseInt(v('age'))||40,tagline:v('tagline')||p.tagline,welcome:v('welcome'),date:v('date'),time:v('time'),endTime:v('endTime'),venue:v('venue'),address:v('address'),dress:v('dress'),parking:v('parking'),notes:v('notes'),contactName:v('contactName'),contactPhone:cp,rsvpOpen:!!fd.get('rsvpOpen'),rsvpDeadline:v('rsvpDeadline'),maxCompanions:Math.max(0,parseInt(v('maxCompanions'))||0),budget:budget||0,inviteUrl:url});
+    Object.assign(p,{name:v('name'),nick:v('nick'),age:parseInt(v('age'))||40,tagline:v('tagline')||p.tagline,welcome:v('welcome'),date:v('date'),time:v('time'),endTime:v('endTime'),venue:v('venue'),address:v('address'),dress:v('dress'),parking:v('parking'),notes:v('notes'),contactName:v('contactName'),contactPhone:cp,rsvpOpen:!!fd.get('rsvpOpen'),rsvpDeadline:v('rsvpDeadline'),maxCompanions:Math.max(0,parseInt(v('maxCompanions'))||0),budget:budget||0,inviteUrl:url});
     save();render();toast('Dados da festa salvos');return;
   }
   if(kind==='menu'){

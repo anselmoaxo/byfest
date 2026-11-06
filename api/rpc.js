@@ -60,7 +60,10 @@ module.exports = async (req, res) => {
   try {
     const sql = neon(url);
     await ensureSchema(sql);
-    const rows = await sql.query(call.sql, call.args(body.args || {}));
+    const args = body.args || {};
+    const before = body.fn === 'submit_rsvp_code' && hookUrl() ? await rsvpEvent(sql, args.code) : null;
+    const rows = await sql.query(call.sql, call.args(args));
+    if (body.fn === 'submit_rsvp_code') await notifyRsvp(sql, args.code, before);
     return res.status(200).json(rows[0] ? rows[0].v : null);
   } catch (e) {
     if (PUBLIC_ERRORS.has(e.message)) return res.status(400).json({ error: e.message });
@@ -68,5 +71,40 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'server_error' });
   }
 };
+
+// Aviso de confirmação para o n8n (que manda o WhatsApp). Só roda se N8N_RSVP_WEBHOOK_URL estiver definida na Vercel.
+// O segredo vai no cabeçalho X-Byfest-Secret (N8N_RSVP_SECRET). Se o n8n falhar ou demorar, a resposta do convidado já foi gravada.
+const SITE_URL = 'https://myfest.blogdapriscila.com.br/';
+function hookUrl() { return /^https:\/\//.test(process.env.N8N_RSVP_WEBHOOK_URL || '') ? process.env.N8N_RSVP_WEBHOOK_URL : ''; }
+async function rsvpEvent(sql, code) {
+  try { const r = await sql.query('select rsvp_event($1) as v', [str(code, 400)]); return r[0] ? r[0].v : null; }
+  catch (e) { return null; }
+}
+async function notifyRsvp(sql, code, before) {
+  const url = hookUrl();
+  if (!url) return;
+  try {
+    const ev = await rsvpEvent(sql, code);
+    if (!ev || !ev.guest || !ev.guest.code) return;
+    let base = String(ev.party.inviteUrl || SITE_URL).split('#')[0].split('?')[0].replace(/\/convite\/.*$/, '/');
+    if (!base.endsWith('/')) base += '/';
+    const g = ev.guest;
+    const payload = {
+      event: 'rsvp', at: new Date().toISOString(),
+      previousStatus: before && before.guest ? before.guest.status : '',
+      people: g.status === 'no' ? 0 : 1 + (g.companions || []).length,
+      inviteLink: base + 'convite/' + g.code, menuLink: base + 'convite/' + g.code + '#cardapio',
+      guest: g, party: ev.party,
+    };
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    try {
+      const r = await fetch(url, { method: 'POST', signal: ctrl.signal,
+        headers: { 'Content-Type': 'application/json', 'X-Byfest-Secret': process.env.N8N_RSVP_SECRET || '' },
+        body: JSON.stringify(payload) });
+      if (!r.ok) console.error('n8n rsvp', r.status);
+    } finally { clearTimeout(t); }
+  } catch (e) { console.error('n8n rsvp', e && e.name === 'AbortError' ? 'timeout' : e); }
+}
 
 function safeJson(s) { try { return JSON.parse(s); } catch { return {}; } }
