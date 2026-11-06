@@ -29,6 +29,7 @@ Variáveis de ambiente na Vercel:
 | `DATABASE_URL` | Conexão do Neon (a integração Neon da Vercel cria sozinha) |
 | `ADMIN_PIN` | Senha inicial do painel, de 4 a 8 números. Depois pode ser trocada em Festa › Acesso |
 | `ADMIN_EMAILS` | Opcional. E-mails que podem entrar no painel, separados por vírgula, todos com a mesma senha |
+| `RSVP_WEBHOOK_URL` | Opcional. URL do webhook do n8n que avisa a Priscila no WhatsApp a cada resposta de convidado |
 
 Se mudar `db/schema.sql`, rode `npm run build:schema` para regerar `lib/schema.js`.
 

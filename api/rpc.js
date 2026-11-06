@@ -61,6 +61,7 @@ module.exports = async (req, res) => {
     const sql = neon(url);
     await ensureSchema(sql);
     const rows = await sql.query(call.sql, call.args(body.args || {}));
+    if (body.fn === 'submit_rsvp_code') await notifyRsvp(body.args || {});
     return res.status(200).json(rows[0] ? rows[0].v : null);
   } catch (e) {
     if (PUBLIC_ERRORS.has(e.message)) return res.status(400).json({ error: e.message });
@@ -68,5 +69,22 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'server_error' });
   }
 };
+
+// Avisa a anfitriã no WhatsApp (rotina no n8n) quando um convidado responde pelo link pessoal.
+// RSVP_WEBHOOK_URL fica nas variáveis da Vercel; sem ela, nada é enviado. Falha no aviso nunca atrapalha a resposta.
+async function notifyRsvp(a) {
+  const url = process.env.RSVP_WEBHOOK_URL;
+  if (!url) return;
+  const companions = (Array.isArray(a.companions) ? a.companions : []).map(c => str(c, 200).trim()).filter(Boolean).slice(0, 20);
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: str(a.name, 200).trim(), status: str(a.status, 10), companions: a.status === 'no' ? [] : companions,
+        diet: str(a.diet, 500).trim(), notes: str(a.notes, 1000).trim() }),
+      signal: AbortSignal.timeout(4000),
+    });
+  } catch (e) { console.error('rsvp webhook', e.message); }
+}
 
 function safeJson(s) { try { return JSON.parse(s); } catch { return {}; } }

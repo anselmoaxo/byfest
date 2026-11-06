@@ -4,31 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<title>Priscila 40 · Cherry</title>
+<title>Priscila 40 anos</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Priscila 40 anos: uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
 <!-- card de prévia (WhatsApp, redes): genérico de propósito, sem dados de convidados -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Festa Cherry">
+<meta property="og:site_name" content="Priscila 40 anos">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:url" content="https://myfest.blogdapriscila.com.br/">
-<meta property="og:title" content="Priscila 40 anos · Festa Cherry">
+<meta property="og:title" content="Priscila 40 anos">
 <meta property="og:description" content="Você está convidado(a)! Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
-<meta property="og:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
-<meta property="og:image:secure_url" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
+<meta property="og:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg?v=2">
+<meta property="og:image:secure_url" content="https://myfest.blogdapriscila.com.br/og-convite.jpg?v=2">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Convite: Priscila 40 anos, Festa Cherry. Confirme sua presença.">
+<meta property="og:image:alt" content="Convite: Priscila 40 anos. Confirme sua presença.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Priscila 40 anos · Festa Cherry">
+<meta name="twitter:title" content="Priscila 40 anos">
 <meta name="twitter:description" content="Você está convidado(a)! Uma celebração doce, cheia de amor e boas histórias. Confirme sua presença.">
-<meta name="twitter:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg">
+<meta name="twitter:image" content="https://myfest.blogdapriscila.com.br/og-convite.jpg?v=2">
 <meta name="theme-color" content="#a3123a">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Festa Cherry">
+<meta name="apple-mobile-web-app-title" content="Priscila 40 anos">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -328,6 +328,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .leaf-deco.br{bottom:-30px;right:-26px;transform:rotate(156deg)}
 .hero>*:not(.fall):not(.leaf-deco){position:relative;z-index:1}
 .kicker{font-family:var(--f-display);font-style:italic;color:var(--leaf);font-size:1.05rem;margin-bottom:2px;position:relative}
+.kick-up{display:block;font-style:normal;font-weight:600;font-size:.86rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cherry-deep);margin-top:2px}
 .date-chip{white-space:nowrap;display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:8px 16px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-weight:600;font-size:.92rem;color:var(--cherry-deep);position:relative}
 .date-chip svg{width:18px;height:18px;color:var(--cherry)}
 .sh{font-size:1.3rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}
@@ -588,6 +589,8 @@ function mergeRsvps(list){
     if(g&&g.manualAt&&g.manualAt>=String(r.updated_at)){S.rsvpSeen[r.phone]=r.updated_at;return}
     const data={phone:r.phone,status:r.status,companions:r.companions||[],diet:r.diet||'',notes:r.notes||'',respondedAt:String(r.updated_at).slice(0,10)};
     if(g&&(g.companions||[]).join('|')!==data.companions.join('|'))data.compDiets=[];
+    // quem respondeu pelo link recebeu o convite: marca como enviado sem precisar clicar
+    if(!g||inviteState(g)!=='sent')data.invite=Object.assign({},g&&g.invite,{state:'sent',at:(g&&g.invite&&g.invite.at)||data.respondedAt});
     if(g)Object.assign(g,data);else S.guests.push(Object.assign({id:uid(),name:r.name,group:'Pelo convite',allowed:Number(S.party.maxCompanions)||0,demo:false},data));
     S.rsvpSeen[r.phone]=r.updated_at;n++;
   });
@@ -864,7 +867,7 @@ function syncMusic(){
 }
 function render(){
   const r=route();clearInterval(cdTimer);syncMusic();
-  applyTheme();document.title=S.party.name+' '+partyAge()+' anos · '+THEMES[themeKey()].label;
+  applyTheme();document.title=S.party.name+' '+partyAge()+' anos';
   const app=document.getElementById('app');
   if(ALBUM_PATH){app.innerHTML=viewGuestAlbum();loadGuestGallery();return}
   if(PRIVATE.includes(r)){
@@ -949,7 +952,7 @@ function viewInvite(){
   return '<main class="invite gutter">'+
    '<section class="hero" aria-labelledby="ttl"><div class="fall" aria-hidden="true">'+falls+'</div>'+leaf('tl')+leaf('br')+
     '<div class="arch">'+photo+'</div>'+
-    '<p class="kicker">'+(invitee?esc(invitee.name.split(' ')[0])+', este convite é para você':'Você está convidado(a) para celebrar')+'</p>'+
+    '<p class="kicker">'+(invitee?esc(invitee.name.split(' ')[0])+', você':'Você')+' está convidado(a) para celebrar <span class="kick-up">os '+esc(age)+' anos da Pri</span></p>'+
     '<h1 id="ttl" aria-label="'+esc(p.name)+', '+esc(age)+' anos"><span class="script" aria-hidden="true">'+esc(p.name)+'</span><span class="forty" style="display:block" aria-hidden="true"><b>'+esc(age)+'</b> anos</span></h1>'+
     '<p class="tag">'+esc(p.tagline)+'</p>'+
     (p.date?'<span class="date-chip">'+ic('cal')+esc(fmtDateChip(p.date))+(p.time?' · '+esc(p.time.replace(':','h')):'')+'</span>':'')+
@@ -1247,8 +1250,8 @@ function guestRow(g){
     ((g.companions||[]).length?'<div class="meta"><span>Com: '+esc(compLabel(g))+'</span></div>':'')+
     ((g.table||(g.invite&&g.invite.reminders))?'<div class="meta">'+(g.table?'<span>🪑 Mesa '+esc(g.table)+'</span>':'')+(g.invite&&g.invite.reminders?'<span>lembrado '+g.invite.reminders+'× · último em '+fmtDate(g.invite.remindedAt)+'</span>':'')+'</div>':'')+
     (g.diet?'<div class="meta"><span>🍽 '+esc(g.diet)+'</span></div>':'')+(g.notes?'<div class="meta"><span>'+esc(g.notes)+'</span></div>':'')+'</div>'+
-   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(g.arrived?'<span class="pill ok">✓ Chegou</span>':'')+(g.phone&&!g.demo?invitePill(g):'')+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
-   '<div class="acts">'+(g.phone?'<button class="btn sm leaf" data-act="guest-wa" data-id="'+g.id+'">'+ic('wa')+(inviteState(g)?'Abrir WhatsApp de novo':'Enviar convite')+'</button><button class="btn sm" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar convite</button>'+(inviteState(g)==='prepared'?'<button class="btn sm" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>':''):'')+(needsReminder(g)?'<button class="btn sm leaf" data-act="guest-remind" data-id="'+g.id+'">'+ic('wa')+'Lembrar</button><button class="btn sm" data-act="remind-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar lembrete</button>':'')+(g.status==='yes'?'<button class="btn sm" data-act="guest-arrive" data-id="'+g.id+'">'+(g.arrived?'Desfazer chegada':'✓ Chegou')+'</button>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
+   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(g.arrived?'<span class="pill ok">✓ Chegou na festa</span>':'')+(g.phone&&!g.demo?invitePill(g):'')+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
+   '<div class="acts">'+(g.phone?'<button class="btn sm leaf" data-act="guest-wa" data-id="'+g.id+'">'+ic('wa')+(inviteState(g)?'Abrir WhatsApp de novo':'Enviar convite')+'</button><button class="btn sm" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar convite</button>'+(inviteState(g)==='prepared'?'<button class="btn sm" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>':''):'')+(needsReminder(g)?'<button class="btn sm leaf" data-act="guest-remind" data-id="'+g.id+'">'+ic('wa')+'Lembrar</button><button class="btn sm" data-act="remind-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar lembrete</button>':'')+(g.status==='yes'?'<button class="btn sm" data-act="guest-arrive" data-id="'+g.id+'">'+(g.arrived?'Desfazer chegada':'✓ Chegou na festa')+'</button>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
 }
 function guestForm(g){
   const maxC=Number(S.party.maxCompanions)||0;
