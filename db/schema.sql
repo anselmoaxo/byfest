@@ -313,3 +313,21 @@ begin
   update rsvps set guest_code = g ->> 'code' where phone = ph;
   return res;
 end $$;
+-- @@
+-- Dados de uma resposta para o aviso automático (n8n → WhatsApp). Só a API chama, depois de gravar a resposta.
+create or replace function rsvp_event(p_code text) returns jsonb language plpgsql stable as $$
+declare g jsonb; party jsonb; r rsvps;
+begin
+  g := invite_guest(p_code);
+  select data -> 'party' into party from app_state where id = 1;
+  select * into r from rsvps where (g ->> 'code' is not null and guest_code = g ->> 'code') or phone = norm_phone(g ->> 'phone')
+   order by updated_at desc limit 1;
+  return jsonb_build_object(
+    'guest', jsonb_build_object('code', g ->> 'code', 'name', coalesce(r.name, g ->> 'name'), 'listName', g ->> 'name',
+      'greet', coalesce(g ->> 'greet', ''), 'phone', coalesce(r.phone, norm_phone(g ->> 'phone')),
+      'status', coalesce(r.status, ''), 'companions', to_jsonb(coalesce(r.companions, '{}'::text[])),
+      'diet', coalesce(r.diet, ''), 'notes', coalesce(r.notes, ''), 'answeredAt', r.updated_at),
+    'party', jsonb_build_object('name', party ->> 'name', 'nick', party ->> 'nick', 'age', party ->> 'age',
+      'date', party ->> 'date', 'time', party ->> 'time', 'venue', party ->> 'venue', 'address', party ->> 'address',
+      'inviteUrl', party ->> 'inviteUrl'));
+end $$;

@@ -30,6 +30,9 @@ Variáveis de ambiente na Vercel:
 | `ADMIN_PIN` | Senha inicial do painel, de 4 a 8 números. Depois pode ser trocada em Festa › Acesso |
 | `ADMIN_EMAILS` | Opcional. E-mails que podem entrar no painel, separados por vírgula, todos com a mesma senha |
 
+| `N8N_RSVP_WEBHOOK_URL` | Opcional. Webhook do n8n chamado a cada resposta no convite (aviso no WhatsApp da Priscila). Sem ela, nada é enviado |
+| `N8N_RSVP_SECRET` | Segredo enviado no cabeçalho `X-Byfest-Secret`; o n8n só aceita o aviso se for igual ao configurado lá |
+
 Se mudar `db/schema.sql`, rode `npm run build:schema` para regerar `lib/schema.js`.
 
 ## Rodar localmente
@@ -58,3 +61,9 @@ estão incluídas nesta etapa.
 - Fica em `party.menu` e chega ao convidado junto com o convite (`get_invite`), então só quem tem o link pessoal vê. Não houve mudança no banco.
 - No convite aparece sempre o cartão “Comes e bebes” com o botão **Bora ver os comes e bebes?** (some só se a chave estiver desligada; sem itens, a página avisa que está sendo preparado), que abre `/convite/<código>#cardapio`. A página segue o tema escolhido em Festa › Tema. Categorias sem itens não aparecem.
 - O cardápio é só para consulta: o convidado não escolhe prato.
+
+## Aviso de confirmação (n8n)
+
+- Quando um convidado responde pelo link pessoal, `api/rpc.js` grava a resposta e depois manda um POST para `N8N_RSVP_WEBHOOK_URL` com `event: "rsvp"`, a resposta anterior (`previousStatus`), o total de pessoas, o link do convite e os dados do convidado e da festa (`rsvp_event` no banco). Espera no máximo 5 segundos; se o n8n falhar, a resposta já está salva e o convidado não vê erro.
+- No n8n, o fluxo “Festa Priscila 40: aviso de confirmação no WhatsApp” confere o segredo, avisa a Priscila pela Evolution API e, se a resposta for “vai”, pode agradecer o convidado com data, local e link (esse passo começa desligado).
+- O texto do convite usa o apelido de **Festa › Dados da festa › Apelido no convite** (“os 40 anos da Pri”).

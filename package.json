@@ -2,7 +2,7 @@
   "name": "byfest",
   "private": true,
   "version": "1.0.0",
-  "description": "Convite, confirmação de presença e painel da festa Priscila 40 (tema Cherry)",
+  "description": "Convite, confirmação de presença e painel da festa Priscila 40 anos",
   "scripts": {
     "build:schema": "node scripts/build-schema.js"
   },
