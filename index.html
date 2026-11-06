@@ -588,7 +588,9 @@ function mergeRsvps(list){
     if(g&&g.manualAt&&g.manualAt>=String(r.updated_at)){S.rsvpSeen[r.phone]=r.updated_at;return}
     const data={phone:r.phone,status:r.status,companions:r.companions||[],diet:r.diet||'',notes:r.notes||'',respondedAt:String(r.updated_at).slice(0,10)};
     if(g&&(g.companions||[]).join('|')!==data.companions.join('|'))data.compDiets=[];
-    if(g)Object.assign(g,data);else S.guests.push(Object.assign({id:uid(),name:r.name,group:'Pelo convite',allowed:Number(S.party.maxCompanions)||0,demo:false},data));
+    // quem respondeu recebeu o convite: marca como enviado sem precisar clicar
+    if(g&&inviteState(g)!=='sent')data.invite=Object.assign({},g.invite,{state:'sent',at:(g.invite&&g.invite.at)||data.respondedAt});
+    if(g)Object.assign(g,data);else S.guests.push(Object.assign({id:uid(),name:r.name,group:'Pelo convite',allowed:Number(S.party.maxCompanions)||0,demo:false,invite:{state:'sent',at:data.respondedAt}},data));
     S.rsvpSeen[r.phone]=r.updated_at;n++;
   });
   return n;
@@ -600,8 +602,8 @@ async function adminLogin(email,password){
   if(r.data){S=Object.assign(base,r.data);S.party=Object.assign(base.party,r.data.party||{});S.rsvpSeen=r.data.rsvpSeen||{};delete S.pinHash;S.pinDefault=false}
   else{const party=S.party;S=base;Object.assign(S.party,party)}
   authed=true;try{sessionStorage.setItem(KEY+':cred',JSON.stringify(cred))}catch(_){}
-  const n=mergeRsvps(r.rsvps||[]),codes=ensureCodes();
-  if(!r.data||n||codes)queuePush(0);
+  const n=mergeRsvps(r.rsvps||[]),codes=ensureCodes(),early=clearEarlyArrivals();
+  if(!r.data||n||codes||early)queuePush(0);
   r.newRsvps=n;return r;
 }
 function logoutRemote(){try{sessionStorage.removeItem(KEY+':cred')}catch(_){}location.replace('/login')}
@@ -648,6 +650,10 @@ function tableStats(){
   S.guests.forEach(g=>{if(g.status!=='yes'||!g.table)return;t[g.table]=(t[g.table]||0)+1+(g.companions||[]).length});
   return t;
 }
+// "Chegou" é o check-in na porta da festa: só aparece a partir do dia da festa (ou sem data cadastrada).
+function checkinOpen(){const d=S.party.date;return !d||d<=today()}
+// Marcações de chegada feitas antes do dia da festa eram engano (confundiam com "a resposta chegou"): são apagadas.
+function clearEarlyArrivals(){const d=S.party.date;let n=0;if(!d)return 0;(S.guests||[]).forEach(g=>{if(g.arrived&&String(g.arrived).slice(0,10)<d){g.arrived='';n++}});return n}
 function arrivedStats(){
   let a=0,tot=0;
   S.guests.forEach(g=>{if(g.status!=='yes')return;const n=1+(g.companions||[]).length;tot+=n;if(g.arrived)a+=n});
@@ -1221,7 +1227,7 @@ function tablesPanel(){
   const ar=arrivedStats();
   return '<div class="panel" style="margin-top:14px"><div class="row"><b>Mesas</b><span class="spacer"></span><label class="small muted" style="display:flex;gap:8px;align-items:center">Lugares por mesa<input class="input" id="tb-cap" type="number" min="0" max="99" style="width:84px" data-filter="tb-cap" value="'+(cap||'')+'"></label></div>'+
    (names.length?'<div class="meta" style="margin-top:8px;gap:8px;flex-wrap:wrap">'+names.map(n=>'<span class="pill '+(cap&&t[n]>cap?'bad':'')+'">'+esc(n)+': <b class="num">'+t[n]+'</b>'+(cap?'/'+cap:'')+(cap&&t[n]>cap?' · lotada':'')+'</span>').join('')+'</div>':'<p class="small muted" style="margin:8px 0 0">Defina a mesa no cadastro de cada confirmado para ver a ocupação aqui.</p>')+
-   (ar.tot?'<p class="small" style="margin:10px 0 0">Chegaram: <b class="num">'+ar.a+'</b> de <b class="num">'+ar.tot+'</b> pessoas confirmadas</p>':'')+'</div>';
+   (ar.tot&&checkinOpen()?'<p class="small" style="margin:10px 0 0">Chegaram na festa: <b class="num">'+ar.a+'</b> de <b class="num">'+ar.tot+'</b> pessoas confirmadas</p>':'')+'</div>';
 }
 function viewGuests(){
   const gs=guestStats();const p=S.party;
@@ -1249,8 +1255,8 @@ function guestRow(g){
     ((g.companions||[]).length?'<div class="meta"><span>Com: '+esc(compLabel(g))+'</span></div>':'')+
     ((g.table||(g.invite&&g.invite.reminders))?'<div class="meta">'+(g.table?'<span>🪑 Mesa '+esc(g.table)+'</span>':'')+(g.invite&&g.invite.reminders?'<span>lembrado '+g.invite.reminders+'× · último em '+fmtDate(g.invite.remindedAt)+'</span>':'')+'</div>':'')+
     (g.diet?'<div class="meta"><span>🍽 '+esc(g.diet)+'</span></div>':'')+(g.notes?'<div class="meta"><span>'+esc(g.notes)+'</span></div>':'')+'</div>'+
-   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(g.arrived?'<span class="pill ok">✓ Chegou</span>':'')+(g.phone&&!g.demo?invitePill(g):'')+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
-   '<div class="acts">'+(g.phone?'<button class="btn sm leaf" data-act="guest-wa" data-id="'+g.id+'">'+ic('wa')+(inviteState(g)?'Abrir WhatsApp de novo':'Enviar convite')+'</button><button class="btn sm" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar convite</button>'+(inviteState(g)==='prepared'?'<button class="btn sm" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>':''):'')+(needsReminder(g)?'<button class="btn sm leaf" data-act="guest-remind" data-id="'+g.id+'">'+ic('wa')+'Lembrar</button><button class="btn sm" data-act="remind-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar lembrete</button>':'')+(g.status==='yes'?'<button class="btn sm" data-act="guest-arrive" data-id="'+g.id+'">'+(g.arrived?'Desfazer chegada':'✓ Chegou')+'</button>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
+   '<div class="side"><span class="pill '+G_ST_CLS[g.status]+'"><i class="dot"></i>'+G_ST[g.status]+'</span>'+(g.status!=='pending'&&g.respondedAt?'<span class="pill">Respondeu em '+fmtDate(g.respondedAt)+'</span>':'')+(g.arrived?'<span class="pill ok">✓ Chegou na festa</span>':'')+(g.phone&&!g.demo?invitePill(g):'')+(people?'<span class="small num"><b>'+people+'</b> pessoa'+(people>1?'s':'')+'</span>':'')+'</div>'+
+   '<div class="acts">'+(g.phone?'<button class="btn sm leaf" data-act="guest-wa" data-id="'+g.id+'">'+ic('wa')+(inviteState(g)?'Abrir WhatsApp de novo':'Enviar convite')+'</button><button class="btn sm" data-act="inv-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar convite</button>'+(inviteState(g)==='prepared'?'<button class="btn sm" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>':''):'')+(needsReminder(g)?'<button class="btn sm leaf" data-act="guest-remind" data-id="'+g.id+'">'+ic('wa')+'Lembrar</button><button class="btn sm" data-act="remind-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar lembrete</button>':'')+(g.status==='yes'&&(checkinOpen()||g.arrived)?'<button class="btn sm" data-act="guest-arrive" data-id="'+g.id+'">'+(g.arrived?'Desfazer chegada':'✓ Chegou na festa')+'</button>':'')+'<button class="btn sm" data-act="guest-edit" data-id="'+g.id+'">'+ic('edit')+'Editar</button>'+(g.status!=='pending'?'<button class="btn sm" data-act="guest-reset" data-id="'+g.id+'">Cancelar resposta</button>':'')+'<button class="btn sm danger" data-act="guest-del" data-id="'+g.id+'">'+ic('trash')+'Remover</button></div></div>';
 }
 function guestForm(g){
   const maxC=Number(S.party.maxCompanions)||0;
