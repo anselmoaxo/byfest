@@ -290,7 +290,8 @@ declare g jsonb; party jsonb; r rsvps;
 begin
   g := invite_guest(p_code);
   select (data -> 'party') - 'budget' into party from app_state where id = 1;
-  select * into r from rsvps where (g ->> 'code' is not null and guest_code = g ->> 'code') or phone = norm_phone(g ->> 'phone')
+  select * into r from rsvps where (g ->> 'code' is not null and guest_code = g ->> 'code')
+      or (guest_code is null and phone = norm_phone(g ->> 'phone'))
    order by updated_at desc limit 1;
   return jsonb_build_object('party', party, 'guest', jsonb_build_object(
     'code', g ->> 'code', 'name', g ->> 'name', 'phone', coalesce(g ->> 'phone', ''),
@@ -320,7 +321,8 @@ declare g jsonb; party jsonb; r rsvps;
 begin
   g := invite_guest(p_code);
   select data -> 'party' into party from app_state where id = 1;
-  select * into r from rsvps where (g ->> 'code' is not null and guest_code = g ->> 'code') or phone = norm_phone(g ->> 'phone')
+  select * into r from rsvps where (g ->> 'code' is not null and guest_code = g ->> 'code')
+      or (guest_code is null and phone = norm_phone(g ->> 'phone'))
    order by updated_at desc limit 1;
   return jsonb_build_object(
     'guest', jsonb_build_object('code', g ->> 'code', 'name', coalesce(r.name, g ->> 'name'), 'listName', g ->> 'name',
