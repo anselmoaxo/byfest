@@ -605,8 +605,8 @@ async function adminLogin(email,password){
   if(r.data){S=Object.assign(base,r.data);S.party=Object.assign(base.party,r.data.party||{});S.rsvpSeen=r.data.rsvpSeen||{};delete S.pinHash;S.pinDefault=false}
   else{const party=S.party;S=base;Object.assign(S.party,party)}
   authed=true;try{sessionStorage.setItem(KEY+':cred',JSON.stringify(cred))}catch(_){}
-  const n=mergeRsvps(r.rsvps||[]),codes=ensureCodes(),early=clearEarlyArrivals();
-  if(!r.data||n||codes||early)queuePush(0);
+  const n=mergeRsvps(r.rsvps||[]),codes=ensureCodes(),early=clearEarlyArrivals(),synced=syncRespondedInvites();
+  if(!r.data||n||codes||early||synced)queuePush(0);
   r.newRsvps=n;return r;
 }
 function logoutRemote(){try{sessionStorage.removeItem(KEY+':cred')}catch(_){}location.replace('/login')}
@@ -656,6 +656,8 @@ function tableStats(){
 // "Chegou" é o check-in na porta da festa: só aparece a partir do dia da festa (ou sem data cadastrada).
 function checkinOpen(){const d=S.party.date;return !d||d<=today()}
 // Marcações de chegada feitas antes do dia da festa eram engano (confundiam com "a resposta chegou"): são apagadas.
+// Quem já respondeu recebeu o convite. Vale também para respostas que chegaram antes desta regra existir.
+function syncRespondedInvites(){let n=0;(S.guests||[]).forEach(g=>{if(g.demo||!g.status||g.status==='pending'||!g.respondedAt||inviteState(g)==='sent')return;g.invite=Object.assign({},g.invite,{state:'sent',at:(g.invite&&g.invite.at)||g.respondedAt});n++});return n}
 function clearEarlyArrivals(){const d=S.party.date;let n=0;if(!d)return 0;(S.guests||[]).forEach(g=>{if(g.arrived&&String(g.arrived).slice(0,10)<d){g.arrived='';n++}});return n}
 function arrivedStats(){
   let a=0,tot=0;
