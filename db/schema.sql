@@ -184,6 +184,13 @@ begin
   update app_state set data = p_data, version = version + 1, updated_at = now()
    where id = 1 and version = p_version returning version into v;
   if v is null then return jsonb_build_object('ok', false, 'error', 'conflict'); end if;
+  -- Convidado removido da lista: a resposta dele sai junto (senão o mesmo WhatsApp, cadastrado de novo, herdava a resposta).
+  delete from rsvps r where r.guest_code is not null and not exists (
+    select 1 from jsonb_array_elements(coalesce(p_data -> 'guests', '[]')) x where x ->> 'code' = r.guest_code);
+  -- "Cancelar resposta" no painel: apaga a resposta enviada antes do cancelamento (uma resposta mais nova continua valendo).
+  delete from rsvps r using jsonb_array_elements(coalesce(p_data -> 'guests', '[]')) x
+   where r.guest_code = x ->> 'code' and x ->> 'status' = 'pending' and coalesce(x ->> 'manualAt', '') <> ''
+     and r.updated_at <= (x ->> 'manualAt')::timestamptz;
   return jsonb_build_object('ok', true, 'version', v);
 end $$;
 -- @@

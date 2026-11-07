@@ -587,7 +587,9 @@ function mergeRsvps(list){
   S.rsvpSeen=S.rsvpSeen||{};let n=0;
   list.forEach(r=>{
     const seen=S.rsvpSeen[r.phone];if(seen&&seen>=r.updated_at)return;
-    const g=(r.guest_code&&S.guests.find(x=>x.code===r.guest_code))||S.guests.find(x=>normPh(x.phone)===r.phone);
+    // a resposta é do convite que a enviou; pelo telefone só respostas antigas, sem código
+    const g=r.guest_code?S.guests.find(x=>x.code===r.guest_code):S.guests.find(x=>normPh(x.phone)===r.phone);
+    if(r.guest_code&&!g){S.rsvpSeen[r.phone]=r.updated_at;return}
     if(g&&g.manualAt&&g.manualAt>=String(r.updated_at)){S.rsvpSeen[r.phone]=r.updated_at;return}
     const data={phone:r.phone,status:r.status,companions:r.companions||[],diet:r.diet||'',notes:r.notes||'',respondedAt:String(r.updated_at).slice(0,10)};
     if(g&&(g.companions||[]).join('|')!==data.companions.join('|'))data.compDiets=[];
@@ -1753,7 +1755,7 @@ document.addEventListener('click',e=>{
    case 'attend-pdf':downloadAttendance();break;
    case 'inv-sent':{const g=byId(S.guests,id);if(g){g.invite=Object.assign({},g.invite,{state:'sent',at:today()});save();closeModal();render();toast('Convite de '+g.name.split(' ')[0]+' marcado como enviado')}break}
    case 'guest-del':{const g=byId(S.guests,id);confirmDialog('Remover convidado','Remover <b>'+esc(g.name)+'</b> da lista? A resposta dessa pessoa também será apagada.','Remover',()=>{S.guests=S.guests.filter(x=>x.id!==id);save();render();toast('Convidado removido')});break}
-   case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],compDiets:[],arrived:'',respondedAt:''});save();render();toast('Resposta cancelada')});break}
+   case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],compDiets:[],arrived:'',respondedAt:'',manualAt:new Date().toISOString()});save();render();toast('Resposta cancelada')});break}
    case 'guest-import':importModal();break;
    case 'imp-run':runImport();break;
    case 'report-pdf':downloadReport();break;
