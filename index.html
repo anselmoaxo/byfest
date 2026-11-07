@@ -685,6 +685,16 @@ function remind(g){
   save();render();toast(opened?'Lembrete aberto no WhatsApp':'Não foi possível abrir o WhatsApp; use "Copiar lembrete"');
 }
 function partyDate(){const p=S.party;if(!p.date)return null;return new Date(p.date+'T'+(p.time||'00:00'))}
+// Resposta já dada por este convidado (vem do banco ao abrir o link, ou da resposta que acabou de enviar).
+function myAnswer(){const pv=invitee&&invitee.prev;return pv&&['yes','no','maybe'].includes(pv.status)?pv:null}
+function answeredCard(){
+  const a=myAnswer();if(!a)return '';const n=(a.companions||[]).length;
+  const msg=a.status==='yes'?'<b>Presença confirmada!</b> 🎉<br><span class="small">'+(n?'Você e mais '+n+' acompanhante'+(n>1?'s':''):'Só você')+'. Até lá!</span>'
+   :a.status==='maybe'?'<b>Você respondeu que ainda não sabe se vai.</b><br><span class="small">Quando decidir, é só atualizar aqui.</span>'
+   :'<b>Você avisou que não vai poder ir.</b><br><span class="small">Obrigada por avisar!</span>';
+  return '<div class="notice '+(a.status==='yes'?'ok':'info')+'" role="status">'+ic(a.status==='yes'?'check':'info')+'<span>'+msg+'</span></div>'+
+   '<button class="btn block" data-act="rsvp-change">'+ic('edit')+'Mudar minha resposta</button>';
+}
 function rsvpClosed(){const p=S.party;if(!p.rsvpOpen)return 'As confirmações estão encerradas.';if(p.rsvpDeadline&&daysUntil(p.rsvpDeadline)<0)return 'O prazo para confirmar presença terminou em '+fmtDate(p.rsvpDeadline)+'.';return ''}
 const PUBLIC_URL='https://myfest.blogdapriscila.com.br/';
 function siteBase(){let b=(S.party.inviteUrl||PUBLIC_URL).split('#')[0].split('?')[0].replace(/\/convite\/.*$/,'/');return b.endsWith('/')?b:b+'/'}
@@ -976,7 +986,7 @@ function viewInvite(){
    '</div></section>'+
    '<div class="cta-bar">'+
      (closed?'<div class="notice info">'+ic('info')+'<span>'+esc(closed)+' Fale com a '+esc(p.name)+' se precisar.</span></div>':
-      '<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
+      answeredCard()||'<a class="btn primary big block" href="#confirmar">'+ic('heart')+'Confirmar presença</a>'+(p.rsvpDeadline?'<p class="small muted" style="text-align:center">Confirme até '+fmtDate(p.rsvpDeadline)+'</p>':''))+
    '</div>'+(p.date?'<div class="actions"><a class="btn" href="'+gcalLink()+'" target="_blank" rel="noopener">'+ic('cal')+'Salvar na agenda</a></div>':'')+
    menuTeaser()+
    '<section class="sect note-card" aria-label="Recado da aniversariante">'+leaf('br')+'<p class="msg">'+esc(welcome)+'</p><p class="from">'+esc(p.name)+'</p></section>'+
@@ -1132,7 +1142,7 @@ function rsvpSubmit(){
     const b=document.querySelector('[data-act=rsvp-submit]');if(b){b.setAttribute('aria-busy','true');b.textContent='Enviando sua resposta…'}
     if(!invitee){rsvp.errors={submit:'Esta é uma prévia do convite. As respostas chegam pelo link pessoal de cada convidado.'};render();return}
     rpc('submit_rsvp_code',{code:invitee.key,name:data.name,phone:normPh(data.phone),status:data.status,companions:data.companions,diet:data.diet,notes:data.notes})
-      .then(()=>{rsvp.step=6;rsvp.errors={};render();window.scrollTo(0,0)})
+      .then(()=>{invitee.prev=Object.assign({},invitee.prev,{status:data.status,companions:data.companions,diet:data.diet,notes:data.notes});rsvp.step=6;rsvp.errors={};render();window.scrollTo(0,0)})
       .catch(e=>{rsvp.errors={submit:RSVP_ERR[e.code]||'Não foi possível enviar agora. Verifique a conexão e tente de novo.'};render()});
     return;
   }
@@ -1730,6 +1740,7 @@ document.addEventListener('click',e=>{
    case 'rsvp-count':{saveCompanionInputs();rsvp.count=Math.max(0,Math.min(rsvp.limit,rsvp.count+Number(el.dataset.d)));render();break}
    case 'rsvp-submit':rsvpSubmit();break;
    case 'rsvp-edit':rsvp.step=1;rsvp.errors={};render();break;
+   case 'rsvp-change':rsvp.step=1;rsvp.errors={};if(location.hash==='#confirmar')render();else location.hash='confirmar';break;
    /* convidados */
    case 'guest-new':guestForm();break;
    case 'guest-edit':guestForm(byId(S.guests,id));break;
