@@ -67,3 +67,10 @@ estão incluídas nesta etapa.
 - Quando um convidado responde pelo link pessoal, `api/rpc.js` grava a resposta e depois manda um POST para `N8N_RSVP_WEBHOOK_URL` com `event: "rsvp"`, a resposta anterior (`previousStatus`), o total de pessoas, o link do convite e os dados do convidado e da festa (`rsvp_event` no banco). Espera no máximo 5 segundos; se o n8n falhar, a resposta já está salva e o convidado não vê erro.
 - No n8n, o fluxo “Festa Priscila 40: aviso de confirmação no WhatsApp” confere o segredo, avisa a Priscila pela Evolution API e, se a resposta for “vai”, pode agradecer o convidado com data, local e link (esse passo começa desligado).
 - O texto do convite usa o apelido de **Festa › Dados da festa › Apelido no convite** (“os 40 anos da Pri”).
+
+## Aviso para os convidados
+
+- Em **Convidados › Avisar convidados** a anfitriã escreve um aviso (já vem com o texto da mudança de horário) e escolhe quem recebe: todos menos quem disse que não vai, só os confirmados ou todos.
+- `{nome}` no texto vira a mesma saudação do convite (casais como “Ana e Pedro”, ou o campo “Como chamar na mensagem”). Opcionalmente o link do convite vai no fim.
+- O painel abre o WhatsApp de um convidado por vez, com a mensagem pronta; nada é enviado sozinho. Quem já teve o aviso aberto fica marcado como “Avisado” (`guest.notice.id` igual a `party.notice.id`); “Começar outro aviso” troca o id e zera as marcas.
+- O horário mostrado no convite continua vindo de Festa › Horário de início.
