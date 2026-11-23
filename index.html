@@ -809,6 +809,62 @@ function inviteModal(g,opened){
    (sent?'<button class="btn primary" data-act="close">Fechar</button>':'<button class="btn primary" data-act="inv-sent" data-id="'+g.id+'">'+ic('check')+'Marcar como enviado</button>'));
 }
 
+/* ---------------- aviso para os convidados (ex.: mudança de horário) ----------------
+   A anfitriã escreve um aviso, e o painel prepara uma mensagem de WhatsApp para cada convidado,
+   uma por vez. Nada é enviado sozinho. Quem já recebeu fica marcado (g.notice.id === aviso atual). */
+const NOTICE_TO={notno:'Todos, menos quem disse que não vai',yes:'Só quem confirmou presença',all:'Todos os convidados'};
+const NOTICE_DEFAULT='Oie, {nome}! Boa tarde!\n\nPassando para avisar que tivemos uma pequena mudança no horário da nossa comemoração.\n\nA festa começará às 14h, então peço que considerem esse novo horário, combinado?\n\nEstou preparando tudo com muito carinho e espero vocês para comemorarmos juntos esse momento especial! 🍒❤';
+function noticeCfg(){
+  let n=S.party.notice;
+  if(!n||typeof n!=='object')n=S.party.notice={text:NOTICE_DEFAULT,to:'notno',link:false,id:'n'+Date.now().toString(36)};
+  if(!NOTICE_TO[n.to])n.to='notno';if(!n.id)n.id='n'+Date.now().toString(36);if(typeof n.text!=='string')n.text=NOTICE_DEFAULT;
+  return n;
+}
+function noticeList(){const n=noticeCfg();return S.guests.filter(g=>g.phone&&!g.demo&&(n.to==='all'||(n.to==='yes'?g.status==='yes':g.status!=='no'))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'))}
+function noticeDone(g){return !!(g.notice&&g.notice.id===noticeCfg().id)}
+// {nome} vira o nome de quem recebe (mesma saudação do convite: casal, "Como chamar"...); sem nome, some junto com a vírgula
+function noticeText(g){
+  const n=noticeCfg(),who=greetName(g);
+  let t=String(n.text||'').trim();
+  t=who?t.replace(/\{nome\}/gi,who):t.replace(/,?[ \t]*\{nome\}/gi,'');
+  if(n.link)t+='\n\nO convite com todos os detalhes continua aqui:\n'+inviteLink(g);
+  return t;
+}
+function noticeSend(g){
+  const opened=openWhatsApp(waShare(noticeText(g),g.phone));
+  if(!opened){copyText(noticeText(g),'Aviso copiado. Cole no WhatsApp de '+g.name.split(' ')[0]);return}
+  g.notice={id:noticeCfg().id,at:new Date().toISOString()};save();noticeModal(true);render();
+}
+function noticeModal(keepScroll){
+  const n=noticeCfg(),p=S.party,list=noticeList(),done=list.filter(noticeDone).length,next=list.find(g=>!noticeDone(g));
+  const sc=keepScroll&&document.querySelector('#modalRoot .modal')?document.querySelector('#modalRoot .modal').scrollTop:0;
+  const sample=list[0]||{name:'Ana e Pedro Souza'};
+  const rows=list.map(g=>{const ok=noticeDone(g);return '<div class="rec"><div style="min-width:0"><div class="t">'+esc(g.name)+'</div><div class="meta"><span class="num">'+esc(fmtPhone(g.phone))+'</span><span>'+G_ST[g.status]+'</span></div></div>'+
+    '<div class="side">'+(ok?'<span class="pill ok">'+ic('check')+'Avisado em '+fmtDate(g.notice.at)+'</span>':'<span class="pill">Ainda não avisado</span>')+'</div>'+
+    '<div class="acts">'+(ok?'<button class="btn sm" data-act="nt-send" data-id="'+g.id+'">'+ic('wa')+'Abrir de novo</button><button class="btn sm" data-act="nt-undo" data-id="'+g.id+'">Desmarcar</button>'
+      :'<button class="btn sm leaf" data-act="nt-send" data-id="'+g.id+'">'+ic('wa')+'Enviar aviso</button><button class="btn sm" data-act="nt-copy" data-id="'+g.id+'">'+ic('copy')+'Copiar</button>')+'</div></div>'}).join('');
+  openModal('Avisar os convidados',
+   '<div class="stack">'+
+   '<div class="notice info">'+ic('clock')+'<span>No convite, a festa '+(p.time?'começa às <b>'+esc(p.time.replace(':','h'))+'</b>'+(p.endTime?' e termina às '+esc(p.endTime.replace(':','h')):''):'está <b>sem horário</b>')+'. Se o horário mudou, troque em <a href="#festa" data-act="close">Festa › Horário de início</a> antes de avisar, para o convite mostrar o novo horário.</span></div>'+
+   '<label class="field"><span>Mensagem do aviso</span><textarea class="input" id="nt-text" rows="9" maxlength="1500">'+esc(n.text)+'</textarea><small>Onde estiver <b>{nome}</b> entra o nome de cada convidado (casais saem como “Ana e Pedro”).</small></label>'+
+   '<label class="switch"><input type="checkbox" id="nt-link" '+(n.link?'checked':'')+'>Colocar o link do convite no fim</label>'+
+   '<label class="field"><span>Quem recebe</span><select class="input" id="nt-to">'+Object.entries(NOTICE_TO).map(([k,v])=>'<option value="'+k+'" '+(n.to===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'+
+   '<details><summary class="small">Ver como fica para '+esc(sample.name.split(' ')[0])+'</summary><textarea class="input" id="nt-prev" rows="9" readonly style="margin-top:8px">'+esc(noticeText(sample))+'</textarea></details>'+
+   '<p><b class="num">'+done+'</b> de <b class="num">'+list.length+'</b> avisados. '+(list.length?'O WhatsApp abre com a mensagem pronta; é só conferir e enviar. Cada convidado fica marcado como avisado ao abrir.':'Ninguém com WhatsApp cadastrado nesse grupo.')+'</p>'+
+   '<div>'+rows+'</div></div>',
+   '<button class="btn" data-act="nt-reset">Começar outro aviso</button>'+
+   (next?'<button class="btn leaf" data-act="nt-send" data-id="'+next.id+'">'+ic('wa')+'Enviar para '+esc(next.name.split(' ')[0])+'</button>':'')+
+   '<button class="btn primary" data-act="close">'+(list.length&&!next?'Pronto, todos avisados':'Fechar')+'</button>');
+  const m=document.querySelector('#modalRoot .modal');if(m&&sc){m.scrollTop=sc}
+}
+function noticeEdit(el){
+  const n=noticeCfg();
+  if(el.id==='nt-text')n.text=el.value;
+  else if(el.id==='nt-link')n.link=el.checked;
+  else if(el.id==='nt-to'){n.to=el.value;save();noticeModal(true);return}
+  const pv=document.getElementById('nt-prev'),first=noticeList()[0]||{name:'Ana e Pedro Souza'};if(pv)pv.value=noticeText(first);
+}
+
 /* ---------------- toast, modal ---------------- */
 let toastT;
 function toast(msg){const r=document.getElementById('toastRoot');r.innerHTML='<div class="toast">'+esc(msg)+'</div>';clearTimeout(toastT);toastT=setTimeout(()=>r.innerHTML='',2800)}
@@ -1254,7 +1310,7 @@ function viewGuests(){
   const tbls=[...new Set(S.guests.map(g=>g.table).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true}));
   const nRemind=S.guests.filter(needsReminder).length;
   const list=S.guests.filter(g=>(!gFilter.status||g.status===gFilter.status)&&(!gFilter.group||g.group===gFilter.group)&&(!gFilter.table||g.table===gFilter.table)&&(!gFilter.remind||needsReminder(g))&&(!q||(g.name+' '+g.phone+' '+(g.companions||[]).join(' ')).toLowerCase().includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
-  return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas'+(invSent?' · '+invSent+' convite'+(invSent>1?'s':'')+' enviado'+(invSent>1?'s':''):'')+'</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
+  return demoNotice()+'<div class="page-head"><div><h2>Convidados</h2><p>'+gs.total+' convites · <b class="num">'+gs.people+'</b> pessoas confirmadas'+(invSent?' · '+invSent+' convite'+(invSent>1?'s':'')+' enviado'+(invSent>1?'s':''):'')+'</p></div><div class="row"><button class="btn primary" data-act="guest-new">'+ic('plus')+'Adicionar</button>'+(REMOTE?'<button class="btn" data-act="refresh">'+ic('back').replace('<svg','<svg style="transform:rotate(90deg)"')+'Atualizar respostas</button>':'')+(S.guests.some(g=>g.phone&&!g.demo)?'<button class="btn leaf" data-act="notice-open">'+ic('wa')+'Avisar convidados</button>':'')+'<button class="btn" data-act="guest-import">'+ic('upload')+'Importar</button><button class="btn" data-act="guest-export">'+ic('download')+'Exportar</button></div></div>'+
    '<div class="kpis"><div class="kpi"><div class="label">Vão</div><div class="v" style="color:var(--ok)">'+gs.yes+'</div></div><div class="kpi"><div class="label">Ainda não sabem</div><div class="v" style="color:var(--warn)">'+gs.maybe+'</div></div><div class="kpi"><div class="label">Não vão</div><div class="v" style="color:var(--bad)">'+gs.no+'</div></div><div class="kpi"><div class="label">Sem resposta</div><div class="v">'+gs.pending+'</div></div></div>'+
    '<div class="panel" style="margin-top:14px"><div class="row"><label class="switch"><input type="checkbox" id="rsvpOpenToggle" data-act="toggle-rsvp" '+(p.rsvpOpen?'checked':'')+'>Confirmações '+(p.rsvpOpen?'abertas':'fechadas')+'</label><span class="spacer"></span><span class="small muted">'+(p.rsvpDeadline?'Prazo: '+fmtDate(p.rsvpDeadline)+(daysUntil(p.rsvpDeadline)<0?' (encerrado)':''):'Sem prazo definido')+' · até '+p.maxCompanions+' acompanhante(s) para novos convidados</span><a class="btn sm" href="#festa">Ajustar</a></div>'+
     (REMOTE?'<div class="row" style="margin-top:10px"><label class="switch"><input type="checkbox" data-act="toggle-legacy" '+(p.legacyLinks!==false?'checked':'')+'>Aceitar links enviados antes do convite com código</label><span class="small muted">Desligue quando todos já tiverem o link novo. Esses links antigos só abrem para quem está na lista.</span></div>':'')+'</div>'+
@@ -1757,6 +1813,11 @@ document.addEventListener('click',e=>{
    case 'guest-del':{const g=byId(S.guests,id);confirmDialog('Remover convidado','Remover <b>'+esc(g.name)+'</b> da lista? A resposta dessa pessoa também será apagada.','Remover',()=>{S.guests=S.guests.filter(x=>x.id!==id);save();render();toast('Convidado removido')});break}
    case 'guest-reset':{const g=byId(S.guests,id);confirmDialog('Cancelar resposta','A resposta de <b>'+esc(g.name)+'</b> volta para “Sem resposta” e os acompanhantes confirmados são apagados.','Cancelar resposta',()=>{Object.assign(g,{status:'pending',companions:[],compDiets:[],arrived:'',respondedAt:'',manualAt:new Date().toISOString()});save();render();toast('Resposta cancelada')});break}
    case 'guest-import':importModal();break;
+   case 'notice-open':noticeModal();break;
+   case 'nt-send':{const g=byId(S.guests,id);if(g)noticeSend(g);break}
+   case 'nt-copy':{const g=byId(S.guests,id);if(g)copyText(noticeText(g),'Aviso copiado');break}
+   case 'nt-undo':{const g=byId(S.guests,id);if(g){delete g.notice;save();noticeModal(true);render()}break}
+   case 'nt-reset':confirmDialog('Começar outro aviso','As marcas de “avisado” do aviso atual saem, para você enviar um aviso novo para todos. O texto continua aqui para você editar.','Começar outro aviso',()=>{const n=noticeCfg();n.id='n'+Date.now().toString(36);save();render();noticeModal()});break;
    case 'imp-run':runImport();break;
    case 'report-pdf':downloadReport();break;
    case 'report-clear':rFilter.q='';rFilter.group='';repMsg=null;render();break;
@@ -1803,6 +1864,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const el=e.target;
+  if(el.id==='nt-text'||el.id==='nt-link'||el.id==='nt-to'){noticeEdit(el);if(el.id!=='nt-to')save();return}
   if(el.id==='photo-input'){const files=Array.from(el.files||[]);if(files.length>10){toast('Selecione até 10 fotos por envio.');el.value='';return}if(files.some(f=>!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>10*1024*1024)){toast('Use fotos JPEG, PNG ou WebP com até 10 MB cada.');el.value='';return}photoFiles.forEach(x=>URL.revokeObjectURL(x.url));photoFiles=files.map(file=>({file,url:URL.createObjectURL(file)}));photoPreview();return}
   if(el.dataset.act==='album-setting'){photoCall({action:'settings',publishImmediately:el.checked}).then(()=>toast(el.checked?'Novas fotos serão exibidas imediatamente':'Novas fotos aguardarão sua aprovação')).catch(()=>{el.checked=!el.checked;toast('Não foi possível salvar essa opção.')});return}
   if(el.dataset.act==='toggle-legacy'){S.party.legacyLinks=el.checked;save();render();toast(el.checked?'Links antigos aceitos':'Só os links novos abrem o convite');return}
@@ -1815,6 +1877,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('input',e=>{
   const el=e.target;
+  if(el.id==='nt-text'){noticeEdit(el);return}
   if(el.dataset.filter&&el.type==='search'){applyFilter(el,true)}
   if(el.hasAttribute('data-calc'))updSaldo();
 });
